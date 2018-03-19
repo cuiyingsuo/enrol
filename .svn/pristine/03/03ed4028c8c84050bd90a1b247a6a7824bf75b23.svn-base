@@ -1,0 +1,17 @@
+package com.cz.enrol.dao.user;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.User;
+
+/**
+ * 
+ * EnrolUserMapper数据库操作接口类
+ * 
+ **/
+
+public interface UserMapper extends BaseDao<User>{
+
+
+
+
+}

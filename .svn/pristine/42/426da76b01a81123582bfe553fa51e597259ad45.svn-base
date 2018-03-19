@@ -1,0 +1,59 @@
+package com.cz.enrol.service;
+
+
+import com.cz.enrol.dao.marketing.EnrolMarketingClassMapper;
+import com.cz.enrol.entity.EnrolMarketingClass;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+/**
+ * 营销策略与班次关系表 服务类
+ **/
+@Transactional
+@Service
+public class EnrolMarketingClassService {
+
+    //统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    private SqlSessionTemplate session;
+
+    //当前业务数据操作接口dao
+    private EnrolMarketingClassMapper dao;
+
+    private EnrolMarketingClassMapper getDao() {
+        if (dao == null)
+            dao = session.getMapper(EnrolMarketingClassMapper.class);
+        return dao;
+    }
+
+    public EnrolMarketingClass selectByPrimaryKey(Long id) {
+        return getDao().selectByPrimaryKey(id);
+    }
+
+    public int deleteByPrimaryKey(Long id) {
+        return getDao().deleteByPrimaryKey(id);
+    }
+
+    public int insert(EnrolMarketingClass record) {
+        return getDao().insert(record);
+    }
+
+    public int insertSelective(EnrolMarketingClass record) {
+        return getDao().insertSelective(record);
+    }
+
+    public int updateByPrimaryKeySelective(EnrolMarketingClass record) {
+        return getDao().updateByPrimaryKeySelective(record);
+    }
+
+    public int updateByPrimaryKey(EnrolMarketingClass record) {
+        return getDao().updateByPrimaryKey(record);
+    }
+
+}

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.order.OrderFlowMapper">
+
+    <!--实体映射-->
+    <resultMap id="EnrolOrderFlowResultMapResultMap" type="com.itcast.enrol.common.entity.OrderFlow">
+        <!--关键字Id;-->
+        <id property="payId" column="关键字Id;"/>
+        <!--合单ID-->
+        <result property="margeOrderNo" column="marge_order_no"/>
+        <!--订单Id-->
+        <result property="orderNo" column="order_no"/>
+        <!--支付类型-->
+        <result property="paymentType" column="payment_type"/>
+        <!--支付的金额(分)-->
+        <result property="amount" column="amount"/>
+        <!--支付用户；对应enrol_student表关键字Id;-->
+        <result property="payUserId" column="pay_user_id"/>
+        <!--支付描述；-->
+        <result property="payDescription" column="pay_description"/>
+        <!--交易的流水号；-->
+        <result property="flowId" column="flow_id"/>
+        <!--支付状态，0:失败、1:成功；-->
+        <result property="status" column="status"/>
+        <!---->
+        <result property="payChannelId" column="pay_channel_id"/>
+        <!---->
+        <result property="payChannelName" column="pay_channel_name"/>
+        <!--记录时间；-->
+        <result property="createDatetime" column="create_datetime"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	marge_order_no,	order_no,	payment_type,	amount,	pay_user_id,	pay_description,	flow_id,	status,	pay_channel_id,	pay_channel_name,	create_datetime
+	</sql>
+
+    <!--支付流水查询-->
+    <select id="queryFlowToPage" parameterType="com.itcast.enrol.management.vo.PayFlowQueryEx" resultType="java.util.LinkedHashMap">
+        SELECT
+        eof.flow_id as payNo,
+        eof.`status` ,
+        eof.amount,
+        eof.pay_channel_name as payChannelName,
+        eof.create_datetime as createTime,
+        concat(
+        ec. NAME,
+        '(',
+        ec.start_date,
+        ec.teach_mode_name,
+        ')'
+        ) AS orderContent,
+        eom.merge_order_no as orderNo,
+        eom.order_price orderPrice,
+        eom.pay_type payType,
+        eom.student_name as studentName,
+        eom.student_mobile as studentMobile,
+        eom.is_free as isFree,
+        eom.other_expense as otherExpense,
+        eom.other_expense_remark as otherExpenseRemark
+        FROM
+        enrol_order_flow eof,
+        enrol_order_main eom,
+        enrol_class ec
+        WHERE
+        eof.marge_order_no = eom.merge_order_no and eom.class_id=ec.id
+
+        AND eom.is_aft=#{isAft}
+
+        <if test="subjectId!=null and subjectId!=''">
+            AND eom.subject_id=#{subjectId}
+        </if>
+
+        <if test="classTypeCode!=null and classTypeCode!=''">
+            AND ec.class_type_code=#{classTypeCode}
+        </if>
+
+        <if test="teachTypeCode!=null and teachTypeCode!=''">
+            AND ec.teach_mode_code=#{teachTypeCode}
+        </if>
+
+        <if test="campusId!=null and campusId!=''">
+            AND eom.campus_id=#{campusId}
+        </if>
+
+        <if test="classId!=null and classId!=''">
+            AND eom.class_id=#{classId}
+        </if>
+
+        <if test="payType!=null and payType!=''">
+            AND eom.pay_type=#{payType}
+        </if>
+
+        <if test="marketId!=null and marketId!=''">
+            AND eom.marketing_id=#{marketId}
+        </if>
+
+        <if test="payStatus!=null and payStatus!=''">
+            AND eof.status=#{payStatus}
+        </if>
+
+        <if test="likeName!=null and likeName!=''">
+            AND (eom.merge_order_no like CONCAT(CONCAT('%', #{likeName}), '%') or eom.student_mobile=#{likeName} or
+            eom.merge_order_no=#{likeName} or eof.flow_id=#{likeName})
+        </if>
+
+        <if test="startDate!=null and startDate!=''">
+            AND eof.create_datetime <![CDATA[ >= ]]> #{startDate}
+        </if>
+
+        <if test="endDate!=null and endDate!=''">
+            AND eof.create_datetime <![CDATA[ <= ]]> #{endDate}
+        </if>
+        ORDER BY eof.create_datetime DESC
+    </select>
+
+
+</mapper>

@@ -1,0 +1,16 @@
+package com.cz.enrol.dao.order;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.OrderFlow;
+
+/**
+ * 
+ * EnrolOrderFlowMapper数据库操作接口类
+ * 
+ **/
+
+public interface OrderFlowMapper extends BaseDao<OrderFlow>{
+
+
+
+}

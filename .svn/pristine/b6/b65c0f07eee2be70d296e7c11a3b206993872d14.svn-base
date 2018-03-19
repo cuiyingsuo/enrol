@@ -1,0 +1,50 @@
+package com.cz.enrol.dao.banner;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolBanner;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+/**
+ * EnrolBannerMapper数据库操作接口类
+ **/
+
+public interface EnrolBannerMapper extends BaseDao<EnrolBanner> {
+
+    /**
+     * 查询（根据主键ID查询）
+     **/
+    EnrolBanner selectByPrimaryKey(@Param("id") Long id);
+
+    /**
+     * 删除（根据主键ID删除）
+     **/
+    int deleteByPrimaryKey(@Param("id") Long id);
+
+    /**
+     * 添加
+     **/
+    int insert(EnrolBanner record);
+
+    /**
+     * 添加 （匹配有值的字段）
+     **/
+    int insertSelective(EnrolBanner record);
+
+    /**
+     * 修改 （匹配有值的字段）
+     **/
+    int updateByPrimaryKeySelective(EnrolBanner record);
+
+    /**
+     * 修改（根据主键ID修改）
+     **/
+    int updateByPrimaryKey(EnrolBanner record);
+
+    /**
+     * 获取列表
+     */
+    List<EnrolBanner> queryBannerList();
+}

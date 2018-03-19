@@ -1,0 +1,16 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.permission.RolePermissionMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 角色与资源关系表 服务类
+ **/
+@Service
+public class RolePermissionService {
+
+	@Autowired
+	private RolePermissionMapper rolePermissionDao;
+
+}

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.student.ClassStudentMapper">
+
+    <!--待入学学生查询-->
+    <select id="queryBeStartSchoolStus" parameterType="com.cz.enrol.vo.StudentQueryEx"
+            resultType="com.cz.enrol.entity.Student">
+        SELECT
+        es.id,
+        es.contacts,
+        es.is_actived AS isActived,
+        es.`name`,
+        es.mobile,
+        es.`status`,
+        es.is_academy AS isAcademy
+        FROM
+        enrol_student es,
+        enrol_class_student ecs,
+        enrol_class ec
+        where ecs.student_id=es.id and ecs.class_id=ec.id
+        AND ec.is_del=0
+        AND ecs.`status`=2
+
+        <if test="campusId!=null">
+            AND ec.campus_id =#{campusId}
+        </if>
+
+        <if test="subjectId!=null">
+            AND ec.subject_id =#{subjectId}
+        </if>
+
+        <if test="classId!=null">
+            AND ec.id =#{classId}
+        </if>
+
+        <if test="classTypeCode!=null">
+            AND ec.class_type_code=#{classTypeCode}
+        </if>
+
+        <if test="teachModeCode!=null">
+            AND ec.teach_mode_code=#{teachModeCode}
+        </if>
+
+        <if test="status!=null">
+            AND ecs.`status`=#{status}
+        </if>
+
+        <if test="likeStr!=null">
+            AND (es.`name`  like CONCAT(CONCAT('%', #{likeStr}), '%') or
+            es.id=#{likeStr} or
+            es.mobile=#{likeStr})
+        </if>
+
+    </select>
+
+
+</mapper>

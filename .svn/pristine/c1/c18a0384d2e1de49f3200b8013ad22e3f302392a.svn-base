@@ -1,0 +1,58 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.order.OrderSubMapper;
+import com.cz.enrol.entity.OrderSub;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+/**
+ * 订单信息表（子表）； 服务类
+ **/
+@Transactional
+@Service
+public class OrderSubService {
+
+    //统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    private SqlSessionTemplate session;
+
+    //当前业务数据操作接口dao
+    private OrderSubMapper dao;
+
+    private OrderSubMapper getDao() {
+        if (dao == null)
+            dao = session.getMapper(OrderSubMapper.class);
+        return dao;
+    }
+
+    public OrderSub selectByPrimaryKey(Long id) {
+        return getDao().selectByPrimaryKey(id);
+    }
+
+    public int deleteByPrimaryKey(Long id) {
+        return getDao().deleteByPrimaryKey(id);
+    }
+
+    public int insert(OrderSub record) {
+        return getDao().insert(record);
+    }
+
+    public int insertSelective(OrderSub record) {
+        return getDao().insertSelective(record);
+    }
+
+    public int updateByPrimaryKeySelective(OrderSub record) {
+        return getDao().updateByPrimaryKeySelective(record);
+    }
+
+    public int updateByPrimaryKey(OrderSub record) {
+        return getDao().updateByPrimaryKey(record);
+    }
+
+}

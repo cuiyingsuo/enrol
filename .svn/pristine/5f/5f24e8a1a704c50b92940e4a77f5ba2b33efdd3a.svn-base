@@ -1,0 +1,379 @@
+package com.cz.enrol.entity;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Table(name = "enrol_marketing")
+public class Marketing {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @Column(name = "duration_type_code")
+    private String durationTypeCode;
+
+    @Column(name = "start_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date startTime;
+
+    @Column(name = "end_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date endTime;
+
+    @Column(name = "reduction_price")
+    private Long reductionPrice;
+
+    @Column(name = "subject_id")
+    private Integer subjectId;
+
+    @Column(name = "class_type_code")
+    private String classTypeCode;
+
+    @Column(name = "class_type_name")
+    private String classTypeName;
+
+    @Column(name = "duration_type_name")
+    private String durationTypeName;
+
+    @Column(name = "teach_model_code")
+    private String teachModelCode;
+
+    @Column(name = "teach_model_name")
+    private String teachModelName;
+
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    private String creator;
+
+    @Column(name = "creator_id")
+    private Long creatorId;
+
+    private String editor;
+
+    @Column(name = "editor_id")
+    private Long editorId;
+
+    /**
+     * 0:停用 1：启用
+     */
+    private Integer status;
+
+    /**
+     * 0:未删除 1：已删除
+     */
+    @Column(name = "is_del")
+    private Integer isDel;
+
+    @Column(name = "create_time")
+    private Date createTime;
+
+    @Column(name = "edit_time")
+    private Date editTime;
+
+    /**
+     * @return id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return duration_type_code
+     */
+    public String getDurationTypeCode() {
+        return durationTypeCode;
+    }
+
+    /**
+     * @param durationTypeCode
+     */
+    public void setDurationTypeCode(String durationTypeCode) {
+        this.durationTypeCode = durationTypeCode;
+    }
+
+    /**
+     * @return start_time
+     */
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * @param startTime
+     */
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    /**
+     * @return end_time
+     */
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    /**
+     * @param endTime
+     */
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    /**
+     * @return reduction_price
+     */
+    public Long getReductionPrice() {
+        return reductionPrice;
+    }
+
+    /**
+     * @param reductionPrice
+     */
+    public void setReductionPrice(Long reductionPrice) {
+        this.reductionPrice = reductionPrice;
+    }
+
+    /**
+     * @return subject_id
+     */
+    public Integer getSubjectId() {
+        return subjectId;
+    }
+
+    /**
+     * @param subjectId
+     */
+    public void setSubjectId(Integer subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    /**
+     * @return class_type_code
+     */
+    public String getClassTypeCode() {
+        return classTypeCode;
+    }
+
+    /**
+     * @param classTypeCode
+     */
+    public void setClassTypeCode(String classTypeCode) {
+        this.classTypeCode = classTypeCode;
+    }
+
+    /**
+     * @return class_type_name
+     */
+    public String getClassTypeName() {
+        return classTypeName;
+    }
+
+    /**
+     * @param classTypeName
+     */
+    public void setClassTypeName(String classTypeName) {
+        this.classTypeName = classTypeName;
+    }
+
+    /**
+     * @return duration_type_name
+     */
+    public String getDurationTypeName() {
+        return durationTypeName;
+    }
+
+    /**
+     * @param durationTypeName
+     */
+    public void setDurationTypeName(String durationTypeName) {
+        this.durationTypeName = durationTypeName;
+    }
+
+    /**
+     * @return teach_model_code
+     */
+    public String getTeachModelCode() {
+        return teachModelCode;
+    }
+
+    /**
+     * @param teachModelCode
+     */
+    public void setTeachModelCode(String teachModelCode) {
+        this.teachModelCode = teachModelCode;
+    }
+
+    /**
+     * @return teach_model_name
+     */
+    public String getTeachModelName() {
+        return teachModelName;
+    }
+
+    /**
+     * @param teachModelName
+     */
+    public void setTeachModelName(String teachModelName) {
+        this.teachModelName = teachModelName;
+    }
+
+    /**
+     * @return campus_id
+     */
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    /**
+     * @param campusId
+     */
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    /**
+     * @return creator
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * @param creator
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * @return creator_id
+     */
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    /**
+     * @param creatorId
+     */
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    /**
+     * @return editor
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * @param editor
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * @return editor_id
+     */
+    public Long getEditorId() {
+        return editorId;
+    }
+
+    /**
+     * @param editorId
+     */
+    public void setEditorId(Long editorId) {
+        this.editorId = editorId;
+    }
+
+    /**
+     * 获取0:停用 1：启用
+     *
+     * @return status - 0:停用 1：启用
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置0:停用 1：启用
+     *
+     * @param status 0:停用 1：启用
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
+     * 获取0:未删除 1：已删除
+     *
+     * @return is_del - 0:未删除 1：已删除
+     */
+    public Integer getIsDel() {
+        return isDel;
+    }
+
+    /**
+     * 设置0:未删除 1：已删除
+     *
+     * @param isDel 0:未删除 1：已删除
+     */
+    public void setIsDel(Integer isDel) {
+        this.isDel = isDel;
+    }
+
+    /**
+     * @return create_time
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * @param createTime
+     */
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * @return edit_time
+     */
+    public Date getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * @param editTime
+     */
+    public void setEditTime(Date editTime) {
+        this.editTime = editTime;
+    }
+}

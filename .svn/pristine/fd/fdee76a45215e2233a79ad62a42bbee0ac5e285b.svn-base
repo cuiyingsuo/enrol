@@ -1,0 +1,785 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_order_main")
+public class OrderMain {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 合单号；
+     */
+    @Column(name = "merge_order_no")
+    private String mergeOrderNo;
+
+    /**
+     * 订单金额
+     */
+    @Column(name = "order_price")
+    private Integer orderPrice;
+
+    /**
+     * 学员Id，对应enrol_student表的关键字Id
+     */
+    @Column(name = "student_id")
+    private Long studentId;
+
+    /**
+     * 学员名称
+     */
+    @Column(name = "student_name")
+    private String studentName;
+
+    /**
+     * 学员手机号
+     */
+    @Column(name = "student_mobile")
+    private String studentMobile;
+
+    /**
+     * 学科Id，对应enrol_subject表关键字Id;
+     */
+    @Column(name = "subject_id")
+    private Long subjectId;
+
+    /**
+     * 学科名字
+     */
+    @Column(name = "subject_name")
+    private String subjectName;
+
+    /**
+     * 校区Id,对应表enrol_campus关键字；
+     */
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    /**
+     * 分校名称
+     */
+    @Column(name = "campus_name")
+    private String campusName;
+
+    /**
+     * 商品Id，对应enrol_goods表主键；
+     */
+    @Column(name = "goods_id")
+    private Long goodsId;
+
+    /**
+     * 商品名称
+     */
+    @Column(name = "goods_name")
+    private String goodsName;
+
+    /**
+     * 班级id，对应表enrol_class关键字Id；
+     */
+    @Column(name = "class_id")
+    private Long classId;
+
+    /**
+     * 班级名称
+     */
+    @Column(name = "class_name")
+    private String className;
+
+    /**
+     * 支付类型，0、
+     * 全款支付，1、分次支付，2、
+     * 全额贷款
+     */
+    @Column(name = "pay_type")
+    private Integer payType;
+
+    /**
+     * 营销策略Id，对应表enrol_marketing关键字；
+     */
+    @Column(name = "marketing_id")
+    private Long marketingId;
+
+    /**
+     * 营销策略名称
+     */
+    @Column(name = "marketing_name")
+    private String marketingName;
+
+    /**
+     * 支付渠道名称,如通联，百度；
+     */
+    @Column(name = "pay_channel_name")
+    private String payChannelName;
+
+    /**
+     * 优惠金额
+     */
+    @Column(name = "pref_amount")
+    private Integer prefAmount;
+
+    @Column(name = "cost_price")
+    private Integer costPrice;
+
+    @Column(name = "is_cancel")
+    private Integer isCancel;
+
+    public Integer getIsCancel() {
+        return isCancel;
+    }
+
+    public void setIsCancel(Integer isCancel) {
+        this.isCancel = isCancel;
+    }
+
+    /**
+     * 已支付
+     */
+    private Integer paid;
+
+    /**
+     * 支付时间
+     */
+    @Column(name = "pay_time")
+    private Long payTime;
+
+    /**
+     * 订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功)
+     */
+    private Integer status;
+
+    /**
+     * 是否开具电子收据（0：否，1：是）
+     */
+    @Column(name = "elec_receipt")
+    private Integer elecReceipt;
+
+    /**
+     * 收据地址
+     */
+    @Column(name = "receipt_url")
+    private String receiptUrl;
+
+    /**
+     * 收据号
+     */
+    @Column(name = "receipt_no")
+    private String receiptNo;
+
+    /**
+     * 创建者
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    /**
+     * 贷款额度
+     */
+    @Column(name = "loan_money")
+    private Integer loanMoney;
+
+    /**
+     * 退费费用
+     */
+    @Column(name = "return_money")
+    private Integer returnMoney;
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取合单号；
+     *
+     * @return merge_order_no - 合单号；
+     */
+    public String getMergeOrderNo() {
+        return mergeOrderNo;
+    }
+
+    /**
+     * 设置合单号；
+     *
+     * @param mergeOrderNo 合单号；
+     */
+    public void setMergeOrderNo(String mergeOrderNo) {
+        this.mergeOrderNo = mergeOrderNo;
+    }
+
+    /**
+     * 获取订单金额
+     *
+     * @return order_price - 订单金额
+     */
+    public Integer getOrderPrice() {
+        return orderPrice;
+    }
+
+    /**
+     * 设置订单金额
+     *
+     * @param orderPrice 订单金额
+     */
+    public void setOrderPrice(Integer orderPrice) {
+        this.orderPrice = orderPrice;
+    }
+
+    /**
+     * 获取学员Id，对应enrol_student表的关键字Id
+     *
+     * @return student_id - 学员Id，对应enrol_student表的关键字Id
+     */
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    /**
+     * 设置学员Id，对应enrol_student表的关键字Id
+     *
+     * @param studentId 学员Id，对应enrol_student表的关键字Id
+     */
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
+    /**
+     * 获取学员名称
+     *
+     * @return student_name - 学员名称
+     */
+    public String getStudentName() {
+        return studentName;
+    }
+
+    /**
+     * 设置学员名称
+     *
+     * @param studentName 学员名称
+     */
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    /**
+     * 获取学员手机号
+     *
+     * @return student_mobile - 学员手机号
+     */
+    public String getStudentMobile() {
+        return studentMobile;
+    }
+
+    /**
+     * 设置学员手机号
+     *
+     * @param studentMobile 学员手机号
+     */
+    public void setStudentMobile(String studentMobile) {
+        this.studentMobile = studentMobile;
+    }
+
+    /**
+     * 获取学科Id，对应enrol_subject表关键字Id;
+     *
+     * @return subject_id - 学科Id，对应enrol_subject表关键字Id;
+     */
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    /**
+     * 设置学科Id，对应enrol_subject表关键字Id;
+     *
+     * @param subjectId 学科Id，对应enrol_subject表关键字Id;
+     */
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    /**
+     * 获取学科名字
+     *
+     * @return subject_name - 学科名字
+     */
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    /**
+     * 设置学科名字
+     *
+     * @param subjectName 学科名字
+     */
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    /**
+     * 获取校区Id,对应表enrol_campus关键字；
+     *
+     * @return campus_id - 校区Id,对应表enrol_campus关键字；
+     */
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    /**
+     * 设置校区Id,对应表enrol_campus关键字；
+     *
+     * @param campusId 校区Id,对应表enrol_campus关键字；
+     */
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    /**
+     * 获取分校名称
+     *
+     * @return campus_name - 分校名称
+     */
+    public String getCampusName() {
+        return campusName;
+    }
+
+    /**
+     * 设置分校名称
+     *
+     * @param campusName 分校名称
+     */
+    public void setCampusName(String campusName) {
+        this.campusName = campusName;
+    }
+
+    /**
+     * 获取商品Id，对应enrol_goods表主键；
+     *
+     * @return goods_id - 商品Id，对应enrol_goods表主键；
+     */
+    public Long getGoodsId() {
+        return goodsId;
+    }
+
+    /**
+     * 设置商品Id，对应enrol_goods表主键；
+     *
+     * @param goodsId 商品Id，对应enrol_goods表主键；
+     */
+    public void setGoodsId(Long goodsId) {
+        this.goodsId = goodsId;
+    }
+
+    /**
+     * 获取商品名称
+     *
+     * @return goods_name - 商品名称
+     */
+    public String getGoodsName() {
+        return goodsName;
+    }
+
+    /**
+     * 设置商品名称
+     *
+     * @param goodsName 商品名称
+     */
+    public void setGoodsName(String goodsName) {
+        this.goodsName = goodsName;
+    }
+
+    /**
+     * 获取班级id，对应表enrol_class关键字Id；
+     *
+     * @return class_id - 班级id，对应表enrol_class关键字Id；
+     */
+    public Long getClassId() {
+        return classId;
+    }
+
+    /**
+     * 设置班级id，对应表enrol_class关键字Id；
+     *
+     * @param classId 班级id，对应表enrol_class关键字Id；
+     */
+    public void setClassId(Long classId) {
+        this.classId = classId;
+    }
+
+    /**
+     * 获取班级名称
+     *
+     * @return class_name - 班级名称
+     */
+    public String getClassName() {
+        return className;
+    }
+
+    /**
+     * 设置班级名称
+     *
+     * @param className 班级名称
+     */
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    /**
+     * 获取支付类型，0、
+     * 全款支付，1、分次支付，2、
+     * 全额贷款
+     *
+     * @return pay_type - 支付类型，0、
+     * 全款支付，1、分次支付，2、
+     * 全额贷款
+     */
+    public Integer getPayType() {
+        return payType;
+    }
+
+    /**
+     * 设置支付类型，0、
+     * 全款支付，1、分次支付，2、
+     * 全额贷款
+     *
+     * @param payType 支付类型，0、
+     *                全款支付，1、分次支付，2、
+     *                全额贷款
+     */
+    public void setPayType(Integer payType) {
+        this.payType = payType;
+    }
+
+    /**
+     * 获取营销策略Id，对应表enrol_marketing关键字；
+     *
+     * @return marketing_id - 营销策略Id，对应表enrol_marketing关键字；
+     */
+    public Long getMarketingId() {
+        return marketingId;
+    }
+
+    /**
+     * 设置营销策略Id，对应表enrol_marketing关键字；
+     *
+     * @param marketingId 营销策略Id，对应表enrol_marketing关键字；
+     */
+    public void setMarketingId(Long marketingId) {
+        this.marketingId = marketingId;
+    }
+
+    /**
+     * 获取营销策略名称
+     *
+     * @return marketing_name - 营销策略名称
+     */
+    public String getMarketingName() {
+        return marketingName;
+    }
+
+    /**
+     * 设置营销策略名称
+     *
+     * @param marketingName 营销策略名称
+     */
+    public void setMarketingName(String marketingName) {
+        this.marketingName = marketingName;
+    }
+
+    /**
+     * 获取支付渠道名称,如通联，百度；
+     *
+     * @return pay_channel_name - 支付渠道名称,如通联，百度；
+     */
+    public String getPayChannelName() {
+        return payChannelName;
+    }
+
+    /**
+     * 设置支付渠道名称,如通联，百度；
+     *
+     * @param payChannelName 支付渠道名称,如通联，百度；
+     */
+    public void setPayChannelName(String payChannelName) {
+        this.payChannelName = payChannelName;
+    }
+
+    /**
+     * 获取优惠金额
+     *
+     * @return pref_amount - 优惠金额
+     */
+    public Integer getPrefAmount() {
+        return prefAmount;
+    }
+
+    /**
+     * 设置优惠金额
+     *
+     * @param prefAmount 优惠金额
+     */
+    public void setPrefAmount(Integer prefAmount) {
+        this.prefAmount = prefAmount;
+    }
+
+    /**
+     * @return cost_price
+     */
+    public Integer getCostPrice() {
+        return costPrice;
+    }
+
+    /**
+     * @param costPrice
+     */
+    public void setCostPrice(Integer costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    /**
+     * 获取已支付
+     *
+     * @return paid - 已支付
+     */
+    public Integer getPaid() {
+        return paid;
+    }
+
+    /**
+     * 设置已支付
+     *
+     * @param paid 已支付
+     */
+    public void setPaid(Integer paid) {
+        this.paid = paid;
+    }
+
+    /**
+     * 获取支付时间
+     *
+     * @return pay_time - 支付时间
+     */
+    public Long getPayTime() {
+        return payTime;
+    }
+
+    /**
+     * 设置支付时间
+     *
+     * @param payTime 支付时间
+     */
+    public void setPayTime(Long payTime) {
+        this.payTime = payTime;
+    }
+
+    /**
+     * 获取订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功)
+     *
+     * @return status - 订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功)
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功)
+     *
+     * @param status 订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功)
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
+     * 获取是否开具电子收据（0：否，1：是）
+     *
+     * @return elec_receipt - 是否开具电子收据（0：否，1：是）
+     */
+    public Integer getElecReceipt() {
+        return elecReceipt;
+    }
+
+    /**
+     * 设置是否开具电子收据（0：否，1：是）
+     *
+     * @param elecReceipt 是否开具电子收据（0：否，1：是）
+     */
+    public void setElecReceipt(Integer elecReceipt) {
+        this.elecReceipt = elecReceipt;
+    }
+
+    /**
+     * 获取收据地址
+     *
+     * @return receipt_url - 收据地址
+     */
+    public String getReceiptUrl() {
+        return receiptUrl;
+    }
+
+    /**
+     * 设置收据地址
+     *
+     * @param receiptUrl 收据地址
+     */
+    public void setReceiptUrl(String receiptUrl) {
+        this.receiptUrl = receiptUrl;
+    }
+
+    /**
+     * 获取收据号
+     *
+     * @return receipt_no - 收据号
+     */
+    public String getReceiptNo() {
+        return receiptNo;
+    }
+
+    /**
+     * 设置收据号
+     *
+     * @param receiptNo 收据号
+     */
+    public void setReceiptNo(String receiptNo) {
+        this.receiptNo = receiptNo;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * 获取贷款额度
+     *
+     * @return loan_money - 贷款额度
+     */
+    public Integer getLoanMoney() {
+        return loanMoney;
+    }
+
+    /**
+     * 设置贷款额度
+     *
+     * @param loanMoney 贷款额度
+     */
+    public void setLoanMoney(Integer loanMoney) {
+        this.loanMoney = loanMoney;
+    }
+
+    /**
+     * 获取退费费用
+     *
+     * @return return_money - 退费费用
+     */
+    public Integer getReturnMoney() {
+        return returnMoney;
+    }
+
+    /**
+     * 设置退费费用
+     *
+     * @param returnMoney 退费费用
+     */
+    public void setReturnMoney(Integer returnMoney) {
+        this.returnMoney = returnMoney;
+    }
+}

@@ -1,0 +1,147 @@
+package com.cz.enrol.service.plugIns;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import org.springframework.stereotype.Service;
+
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
+import com.timevale.esign.sdk.esignpro.bean.HttpConnectConfig;
+import com.timevale.esign.sdk.esignpro.bean.PositionBean;
+import com.timevale.esign.sdk.esignpro.bean.ProjectConfig;
+import com.timevale.esign.sdk.esignpro.bean.SignPDFFileBean;
+import com.timevale.esign.sdk.esignpro.bean.SignerAutoBean;
+import com.timevale.esign.sdk.esignpro.bean.result.AccountResult;
+import com.timevale.esign.sdk.esignpro.bean.result.CertResult;
+import com.timevale.esign.sdk.esignpro.bean.result.FileDigestSignResult;
+import com.timevale.esign.sdk.esignpro.bean.result.Result;
+import com.timevale.esign.sdk.esignpro.bean.result.SealResult;
+import com.timevale.esign.sdk.esignpro.constants.AccountType;
+import com.timevale.esign.sdk.esignpro.constants.HttpType;
+import com.timevale.esign.sdk.esignpro.constants.PosType;
+import com.timevale.esign.sdk.esignpro.constants.SealColorType;
+import com.timevale.esign.sdk.esignpro.constants.SealType;
+import com.timevale.esign.sdk.esignpro.outer.bean.PersonalOuterBean;
+import com.timevale.esign.sdk.esignpro.outer.bean.TemplateSealOuterBean;
+import com.timevale.esign.sdk.esignpro.outer.service.AccountService;
+import com.timevale.esign.sdk.esignpro.outer.service.BackSignService;
+import com.timevale.esign.sdk.esignpro.outer.service.CertService;
+import com.timevale.esign.sdk.esignpro.outer.service.SealService;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.AccountServiceFactory;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.BackSignServiceFactory;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.CertServiceFactory;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.SealServiceFactory;
+import com.timevale.esign.sdk.esignpro.service.SDKService;
+import com.timevale.esign.sdk.esignpro.service.factory.SDKServiceFactory;
+
+/**
+ * 合同
+ * 
+ * @author My
+ *
+ */
+@Service
+public class AgreementService {
+
+	public int signAgreement(String name, String carNo, String fileUrl) {
+		// 初始化项目
+		SDKService sdkService = SDKServiceFactory.instance();
+		ProjectConfig projectConfig = new ProjectConfig();
+		projectConfig.setProjectId("1000005");// 项目projectid
+		projectConfig.setProjectSecret("86edd6e7a95b7d1035c2f02b39599e1d"); // 项目projectsecret
+
+		HttpConnectConfig httpConnectConfig = new HttpConnectConfig();
+		httpConnectConfig.setServerIp("116.62.194.137");// 天印签章服务IP地址
+		httpConnectConfig.setServerPort(8080);// 天印签章服务端口
+		httpConnectConfig.setHttpType(HttpType.HTTP);
+		Result result = sdkService.init(projectConfig, httpConnectConfig);
+		System.out.println(result.getMsg());
+
+		// 创建个人账户
+		AccountService accountService = AccountServiceFactory.instance();
+		PersonalOuterBean personalOuterBean = new PersonalOuterBean();
+		personalOuterBean.setName(name);
+		personalOuterBean.setLicenseNumber(carNo);
+		// personalOuterBean.setLicenseType(LicenseType.IDCard);
+		AccountResult accountResult = accountService
+				.createAccount(personalOuterBean);// 创建个人证书
+		// accountService.createAccount(organizeOuterBean)；//创建企业证书
+		String accountId = accountResult.getAccountId();
+		if (accountId == null)
+			accountId = "83366d11-f8c7-4260-8668-67bdaf63944e";
+
+		// 创建证书并做关联
+		CertService certService = CertServiceFactory.instance();
+		CertResult certResult = certService.createCert(accountId, Boolean.TRUE);
+		String certId = certResult.getCertId();// 证书id
+		if (certId == null)
+			certId = "669145f3-ce75-4cf1-a8f4-a7b1bdbcaeab";
+
+		// 创建印章
+		SealService sealService = SealServiceFactory.instance();
+		TemplateSealOuterBean templateSealOuterBean = new TemplateSealOuterBean();
+		templateSealOuterBean.setSealName(name);
+		templateSealOuterBean.setType(SealType.SEAL_PERSON);
+		// templateSealOuterBean.setTemplateType(TemplateType.SQUARE);
+		// templateSealOuterBean.setCentral(TemplateCentralType.STAR);
+		// templateSealOuterBean.setTemplateOfficialType(TemplateOfficialType.TEMPLATE_ROUND);
+		// templateSealOuterBean.gethText();
+		// templateSealOuterBean.setqText();
+		templateSealOuterBean.setColor(SealColorType.RED);
+		templateSealOuterBean.setType(SealType.SEAL_PERSON);
+		SealResult sealResult = sealService.createSeal(accountId,
+				templateSealOuterBean, Boolean.TRUE);
+
+		// 盖章操作
+		BackSignService backSignService = BackSignServiceFactory.instance();
+		SignerAutoBean signerAutoBean = new SignerAutoBean();
+		signerAutoBean.setAccountId(accountId);
+		signerAutoBean.setAccountType(AccountType.Person);
+		signerAutoBean.setCertId("0");
+		signerAutoBean.setSealId("0");
+		SignPDFFileBean signPDFFileBean = new SignPDFFileBean();
+		signPDFFileBean.setSrcPdfFile(fileUrl);
+		signPDFFileBean.setDstPdfFile(fileUrl);
+		PositionBean positionBean = new PositionBean();
+		positionBean.setPosType(PosType.Multi);
+		positionBean.setPosPage("1");
+		positionBean.setPosX(200);
+		positionBean.setPosY(200);
+		// positionBean.setKey("");
+		FileDigestSignResult fileDigestSignResult = backSignService.pdfSign(
+				signerAutoBean, signPDFFileBean, positionBean);
+		System.out.printf(fileDigestSignResult.getSignServiceId());
+		return 0;
+	}
+
+	public static void createAgreement(String templateFile, String outFile) throws IOException, DocumentException {
+		PdfReader reader = new PdfReader(templateFile); // 模版文件目录
+		PdfStamper ps = new PdfStamper(reader, new FileOutputStream(outFile)); // 生成的输出流
+		BaseFont bf = BaseFont.createFont("C:/WINDOWS/Fonts/SIMSUN.TTC,1",BaseFont.IDENTITY_H,BaseFont.NOT_EMBEDDED);
+		AcroFields s = ps.getAcroFields();
+		// 设置文本域表单的字体
+		// 对于模板要显中文的，在此处设置字体比在pdf模板中设置表单字体的好处：
+		// 1.模板文件的大小不变；2.字体格式满足中文要求
+		s.setFieldProperty("test", "textfont", bf, null);
+		s.setFieldProperty("@studentName", "textfont", bf, null);
+		s.setFieldProperty("@goodsNam", "textfont", bf, null);
+		s.setFieldProperty("@sYear", "textfont", bf, null);
+		s.setFieldProperty("@goodsPrice", "textfont", bf, null);
+		// 编辑文本域表单的内容
+		s.setField("test", "北京");
+		s.setField("@studentName", "崔英锁");
+		s.setField("@goodsNam", "黑马程序员");
+		s.setField("@sYear", "2017");
+		s.setField("@goodsPrice", "10000");
+		ps.setFormFlattening(true); // 这句不能少
+		ps.close();
+		reader.close();
+	}
+	public static void main(String[] args) throws IOException, DocumentException{
+		createAgreement("D:/tmp/15210173019.pdf", "D:/tmp/15801514010.pdf");
+	}
+}

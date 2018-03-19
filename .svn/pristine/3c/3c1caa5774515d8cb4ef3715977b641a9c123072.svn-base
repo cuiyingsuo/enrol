@@ -1,0 +1,213 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.Goods;
+import com.cz.enrol.service.CampusService;
+import com.cz.enrol.service.DictService;
+import com.cz.enrol.service.GoodsService;
+import com.cz.enrol.service.SubjectService;
+import com.cz.enrol.utils.TokenUtil;
+import com.cz.enrol.vo.GoodsEx;
+import com.cz.enrol.vo.UserEx;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Created by liuzhongshuai on 2017/10/23.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerGoodsController {
+
+
+    @Autowired
+    private GoodsService managerGoodsService;
+
+    @Autowired
+    private DictService dictService;
+
+    @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
+    private CampusService campusService;
+
+    @Value("${server.token-key}")
+    private String loginToken;
+
+
+    /**
+     * 新增商品
+     *
+     * @param goodsEx
+     * @return
+     */
+    @PostMapping("/goods/addGoods")
+    public BaseBody<Goods> addGoods(HttpServletRequest request, @Valid GoodsEx goodsEx, BindingResult bindingResult, @RequestParam("coverImg") MultipartFile coverImg, @RequestParam("detailImg") MultipartFile detailImg) throws IOException {
+
+        BaseBody<Goods> baseBody = new BaseBody<Goods>();
+        if (bindingResult.hasErrors()) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage(bindingResult.getAllErrors().get(0).getDefaultMessage());
+            return baseBody;
+        }
+
+        //图片转base64
+        String coverImgName = coverImg.getOriginalFilename();
+        String coverImguffix = coverImgName.substring(coverImgName.lastIndexOf(".") + 1);
+        String img64Str = new String(Base64.encodeBase64(coverImg.getBytes()));
+        goodsEx.setCoverImgTmp("data:image/" + coverImguffix + ";base64," + img64Str);
+
+        String detailImgName = detailImg.getOriginalFilename();
+        String detailImgSuffix = coverImgName.substring(detailImgName.lastIndexOf(".") + 1);
+        String img64Strd = new String(Base64.encodeBase64(coverImg.getBytes()));
+        goodsEx.setDetailImgTmp("data:image/" + detailImgSuffix + ";base64," + img64Strd);
+
+        String userToken = request.getHeader(loginToken);
+        UserEx userEx = TokenUtil.getUserEx(userToken);
+        goodsEx.setCreator(userEx.getName());
+
+        managerGoodsService.batchAddGoodsClass(goodsEx);
+        baseBody.setMessage("保存成功!");
+        return baseBody;
+    }
+
+
+    /**
+     * 商品管理，查询商品列表 分页
+     *
+     * @param conditions
+     * @return
+     */
+    @GetMapping("/goods/queryGoodsList")
+    public BaseBody<BasePage<Map<String, Object>>> queryGoodsList(@RequestParam Map<String, String> conditions) {
+
+        BaseBody<BasePage<Map<String, Object>>> basePageBaseBody = new BaseBody<BasePage<Map<String, Object>>>();
+
+        if (null == conditions || conditions.size() == 0) {
+            conditions = new HashMap<String, String>(16);
+            conditions.put("startPage", "1");
+            conditions.put("pageSize", "0");
+        }
+
+        BasePage<Map<String, Object>> basePage = managerGoodsService.queryByConditions(Integer.parseInt(conditions.get("startPage")), Integer.parseInt(conditions.get("pageSize")), conditions);
+
+        basePageBaseBody.setContent(basePage);
+        basePageBaseBody.setMessage("查询成功!");
+        return basePageBaseBody;
+    }
+
+    /**
+     * 商品上下架
+     *
+     * @param goodsId
+     * @return
+     */
+    @DeleteMapping("/goods/upOrDownGoods")
+    public BaseBody upOrDownGoods(@RequestParam(defaultValue = "0") String goodsId, @RequestParam(defaultValue = "0") String status) {
+        BaseBody baseBody = new BaseBody();
+        if ("0".equals(goodsId)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("商品编号不正确!");
+            return baseBody;
+        }
+        //验证参数值范围
+        if ((!"0".equals(status) || "1".equals(status))) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("参数值不正确!");
+            return baseBody;
+        }
+        //查询商品是否存在
+        Goods goodsTmp = managerGoodsService.selectByPrimaryKey(Integer.valueOf(goodsId));
+        if (null == goodsTmp) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("未能查询到该商品!");
+            return baseBody;
+        }
+        if (goodsTmp.getIsDel() == 1) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("改商品已经被删除!");
+            return baseBody;
+        }
+        if (goodsTmp.getStatus() == Byte.valueOf(status).byteValue()) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("已经是目标状态!");
+            return baseBody;
+        }
+        Goods goods = new Goods();
+        goods.setId(Long.parseLong(goodsId));
+        goods.setStatus(Byte.valueOf(status).byteValue());
+        goods.setEditTime(System.currentTimeMillis());
+        managerGoodsService.updateByPk(goods);
+
+        baseBody.setMessage("操作成功!");
+        return baseBody;
+
+    }
+
+    /**
+     * 通过商品编号删除 商品
+     *
+     * @param goodsNo
+     * @return
+     */
+    @DeleteMapping("/goods/delGoods")
+    public BaseBody delGoods(@RequestParam(defaultValue = "0") String goodsId) {
+        BaseBody baseBody = new BaseBody();
+        if ("0".equals(goodsId)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("商品编号不正确!");
+            return baseBody;
+        }
+        //查询商品是否存在
+        Goods goodsTmp = managerGoodsService.selectByPrimaryKey(Integer.valueOf(goodsId));
+        if (null == goodsTmp) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("未能查询到该商品!");
+            return baseBody;
+        }
+        if (goodsTmp.getStatus() == 1) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("只能删除已下架的商品!");
+            return baseBody;
+        }
+        if (goodsTmp.getIsDel() == 1) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage("改商品已经被删除!");
+            return baseBody;
+        }
+        Goods goods = new Goods();
+        goods.setId(Long.parseLong(goodsId));
+        goods.setIsDel((byte) 1);
+        managerGoodsService.updateByPk(goods);
+
+        baseBody.setMessage("删除成功!");
+        return baseBody;
+    }
+
+
+}

@@ -1,0 +1,95 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ManageBaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.Student;
+import com.cz.enrol.service.StudentService;
+import com.cz.enrol.utils.MD5Util;
+import com.cz.enrol.vo.StudentQueryEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+/**
+ * Created by liuzhongshuai on 2017/11/6.
+ */
+@RestController
+@RequestMapping("/managenment/beschool")
+public class ManagerBeStartSchoolController {
+
+
+    @Autowired
+    private StudentService studentService;
+    @Value("{enrol.user.login.key}")
+    private String key;
+
+    /**
+     * 待入学管理：查询
+     *
+     * @param studentQueryEx
+     * @return
+     */
+    @GetMapping("/queryBeSchoolStus")
+    public ManageBaseBody<Student> queryBeSchoolStus(@Valid StudentQueryEx studentQueryEx, BindingResult bindingResult) {
+
+        ManageBaseBody<Student> baseBody = new ManageBaseBody<>();
+        if (bindingResult.hasErrors()) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMsg(bindingResult.getFieldError().getDefaultMessage());
+            return baseBody;
+        }
+        BasePage<Student> basePage = studentService.queryBeStartSchoolStus(studentQueryEx);
+
+        baseBody.setCode(0);
+        baseBody.setCount(basePage.getCount());
+        baseBody.setData(basePage.getPageData());
+        return baseBody;
+    }
+
+
+    /**
+     * 重置学生密码
+     *
+     * @param id
+     * @return
+     */
+    @PutMapping("/resetPass")
+    public BaseBody resetPass(Long id) {
+
+        BaseBody baseBody = new BaseBody();
+        if (null == id) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("参数不能为null");
+            return baseBody;
+        }
+        //查询学生
+        Student student = studentService.selectByPrimaryKey(id);
+        if (null == student) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("查询不到该学员信息!");
+            return baseBody;
+        }
+        //重置密码
+        String initPass = "123456";
+        String md5Str = MD5Util.encryption(student.getMobile() + initPass + key).trim();
+
+        student.setPassword(md5Str);
+
+        studentService.updateByPk(student);
+
+        baseBody.setMessage("重置密码成功!");
+        return baseBody;
+
+    }
+
+
+}

@@ -1,0 +1,17 @@
+package com.cz.enrol.common;
+
+/**
+ * @Author liuzhongshuai
+ * Created by liuzhongshuai on 2017/10/20.
+ */
+public class ReturnStatus {
+    /**
+     * 请求成功
+     */
+    public static boolean SUCCESS=true;
+
+    /**
+     * 请求失败
+     */
+    public static boolean FAILD=false;
+}

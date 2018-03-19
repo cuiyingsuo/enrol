@@ -1,0 +1,26 @@
+package com.cz.enrol.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.order.OrderSubMapper;
+import com.cz.enrol.entity.OrderSub;
+
+/**
+ * 订单信息表（子表）； 服务类
+ **/
+@Service
+public class OrderSubService {
+
+	@Autowired
+	private OrderSubMapper orderSubDao;
+
+	public OrderSub queryByPrimaryKey(Long id) {
+		return orderSubDao.selectByPrimaryKey(id);
+	}
+
+	public int insertSelective(OrderSub record) {
+		return orderSubDao.insertSelective(record);
+	}
+
+}

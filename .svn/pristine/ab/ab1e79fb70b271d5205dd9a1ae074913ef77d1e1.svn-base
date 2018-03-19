@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.goods.GoodsClassMapper">
+
+    <!--实体映射-->
+    <resultMap id="EnrolGoodsClassResultMapResultMap" type="com.cz.enrol.entity.GoodsClass">
+        <!--主键Id-->
+        <id property="id" column="主键Id"/>
+        <!--商品Id-->
+        <result property="goodsId" column="goods_id"/>
+        <!--班级Id-->
+        <result property="classId" column="class_id"/>
+        <!--创建者-->
+        <result property="creator" column="creator"/>
+        <!--创建时间-->
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	goods_id,	class_id,	creator,	create_time
+	</sql>
+
+    <!-- 根据商品id查询 -->
+    <select id="selectByGoodsId" parameterType="java.lang.Long" resultMap="EnrolGoodsClassResultMapResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM enrol_goods_class WHERE goods_id=1
+    </select>
+
+    <!--商品管理 查询列表-->
+    <select id="queryGoodsForClass" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        ec.id as classId,
+        eg.id as goodsId,
+        eg.goods_no as goodsNo,
+        eg.`name`,
+        es.`name` as subjectName,
+        es.id as subjectId,
+        ec.class_type_name as classType,
+        ec.class_type_code as classTypeCode,
+        ec.teach_mode_name as teachMode,
+        ec.teach_mode_code as teachModeCode,
+        ecampus.`name` as campusName,
+        ecampus.id as campusId,
+        ec.periods,
+        ec.start_date as startDate,
+        eg.price,
+        eg.price as lastPrice,
+        '' as marketName,
+        ec.plan,
+        ec.current,
+        eg.`status`,
+        egc.create_time as createTime,
+        egc.creator,
+        eg.is_full as isFull,
+        eg.is_batch as isBatch,
+        eg.is_free as isFree,
+        eg.other_expense as otherExpense,
+        eg.other_expense_remark as otherExpenseRemark
+        FROM
+        enrol_goods_class egc,
+        enrol_goods eg,
+        enrol_class ec,
+        enrol_subject es,
+        enrol_campus ecampus
+        WHERE
+        egc.class_id = ec.id
+        AND egc.goods_id = eg.id
+        AND es.id=ec.subject_id
+        AND ecampus.id=ec.campus_id
+        AND eg.is_del=0
+        AND eg.is_del=0
+        <if test="_parameter.containsKey('subjectId') and _parameter.get('subjectId')!=''">
+            AND es.id = #{subjectId}
+        </if>
+
+        <if test="_parameter.containsKey('classType') and _parameter.get('classType')!=''">
+            AND ec.class_type_code = #{classType}
+        </if>
+
+        <if test="_parameter.containsKey('teachModeCode') and _parameter.get('teachModeCode')!='' ">
+            AND ec.teach_mode_code = #{teachModeCode}
+        </if>
+
+        <if test="_parameter.containsKey('campusId') and _parameter.get('campusId')!='' ">
+            AND ec.campus_id = #{campusId}
+        </if>
+
+        <if test="_parameter.containsKey('name') and _parameter.get('name')!='' ">
+            AND eg.name like CONCAT('%', #{name}, '%')
+        </if>
+        ORDER BY egc.create_time desc
+    </select>
+
+    <!--商品详情-->
+    <select id="getGoodsDetail" parameterType="java.lang.Long" resultType="java.util.Map">
+      SELECT
+        group_concat(distinct ec.`name`) as className,
+        group_concat(distinct ec.id) as classIds,
+        eg.goods_no as goodsNo,
+        eg.`name` as goodsName,
+		eg.detail_img_url as detailImg,
+		eg.cover_img_url as coverImg,
+		eg.is_full as isFull,
+		eg.is_batch as isBatch,
+		eg.synopsis,
+		eg.detail,
+		es.`name` as subjectName,
+		group_concat(distinct ecampus.`name`) as campusName,
+		group_concat(distinct ecampus.id) as campusIds,
+        ec.class_type_name as classType,
+        ec.class_type_code as classTypeCode,
+        ec.teach_mode_name as teachMode,
+        ec.teach_mode_code as teachModeCode,
+        ec.subject_id as subjectId,
+        ec.periods,
+        eg.price,
+        ec.plan,
+        ec.current,
+        eg.`status`,
+        egc.create_time as createTime,
+        egc.creator
+        FROM
+        enrol_goods_class egc,
+        enrol_goods eg,
+        enrol_class ec,
+        enrol_subject es,
+        enrol_campus ecampus
+        WHERE
+        egc.class_id = ec.id
+        AND egc.goods_id = eg.id
+        AND es.id=ec.subject_id
+        AND ecampus.id=ec.campus_id
+        AND eg.is_del=0
+        AND eg.is_del=0
+		AND eg.id=#{goodsId}
+		group by eg.id
+    </select>
+</mapper>

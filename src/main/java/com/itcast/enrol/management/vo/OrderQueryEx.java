@@ -1,0 +1,197 @@
+package com.itcast.enrol.management.vo;
+
+import org.hibernate.validator.constraints.Range;
+
+import javax.validation.constraints.Min;
+
+/**
+ * Created by liuzhongshuai on 2017/10/27.
+ */
+public class OrderQueryEx {
+
+    /**
+     * 学科Id
+     */
+    private Long subjectId;
+
+
+    /**
+     * 是否补录订单
+     */
+    private Integer isAft;
+
+    /**
+     * 班级类型
+     */
+    private String classTypeCode;
+
+    /**
+     * 授课类型
+     */
+    private String teachTypeCode;
+
+    /**
+     * 区域
+     */
+    private Long campusId;
+
+    /**
+     * 班级
+     */
+    private Long classId;
+
+    /**
+     * 支付方式
+     */
+    private Long payType;
+
+    /**
+     * 优惠策略
+     */
+    private Long marketId;
+
+
+    /**
+     * 订单状态
+     */
+    private Integer orderStatus;
+
+    /**
+     * 模糊匹配多条件
+     */
+    private String likeName;
+
+    /**
+     * 开始时间
+     */
+    private String startDate;
+
+    /**
+     * 结束时间
+     */
+    private String endDate;
+
+    /**
+     * 开始页、
+     */
+    @Min(value = 1, message = "开始页最小为 1 !")
+    private Integer page;
+
+    /**
+     * 每页大小
+     */
+    @Range(min = 1, max = 50, message = "分页数据过大(每页最大为50条数据!)")
+    private Integer limit;
+
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public String getClassTypeCode() {
+        return classTypeCode;
+    }
+
+    public void setClassTypeCode(String classTypeCode) {
+        this.classTypeCode = classTypeCode;
+    }
+
+    public String getTeachTypeCode() {
+        return teachTypeCode;
+    }
+
+    public void setTeachTypeCode(String teachTypeCode) {
+        this.teachTypeCode = teachTypeCode;
+    }
+
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    public Long getClassId() {
+        return classId;
+    }
+
+    public void setClassId(Long classId) {
+        this.classId = classId;
+    }
+
+    public Long getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Long payType) {
+        this.payType = payType;
+    }
+
+    public Long getMarketId() {
+        return marketId;
+    }
+
+    public void setMarketId(Long marketId) {
+        this.marketId = marketId;
+    }
+
+    public Integer getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(Integer orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+
+    public String getLikeName() {
+        return likeName;
+    }
+
+    public void setLikeName(String likeName) {
+        this.likeName = likeName;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
+    }
+
+    public Integer getIsAft() {
+        return isAft;
+    }
+
+    public void setIsAft(Integer isAft) {
+        this.isAft = isAft;
+    }
+}

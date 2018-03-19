@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.student.ClassStudentMapper">
+
+    <!--待入学学生查询-->
+    <select id="queryBeStartSchoolStus" parameterType="com.cz.enrol.vo.StudentQueryEx"
+            resultType="com.cz.enrol.entity.Student">
+        SELECT
+        es.id,
+        es.creator,
+        es.is_actived AS isActived,
+        es.`name`,
+        es.mobile,
+        ecs.`status`,
+        es.is_academy AS isAcademy
+        FROM
+        enrol_student es,
+        enrol_class_student ecs,
+        enrol_class ec
+        where ecs.student_id=es.id and ecs.class_id=ec.id
+        AND ec.is_del=0 AND ecs.data_status=1
+
+        <if test="campusId!=null and campusId!=''">
+            AND ec.campus_id =#{campusId}
+        </if>
+
+        <if test="subjectId!=null and subjectId!=''">
+            AND ec.subject_id =#{subjectId}
+        </if>
+
+        <if test="classId!=null and classId!=''">
+            AND ec.id =#{classId}
+        </if>
+
+        <if test="classTypeCode!=null and classTypeCode!=''">
+            AND ec.class_type_code=#{classTypeCode}
+        </if>
+
+        <if test="teachModeCode!=null and teachModeCode!=''">
+            AND ec.teach_mode_code=#{teachModeCode}
+        </if>
+
+        <if test="status!=null and status!=''">
+            AND ecs.`status` IN (${status})
+        </if>
+
+        <if test="likeStr!=null and likeStr!=''">
+            AND (es.`name` like CONCAT(CONCAT('%', #{likeStr}), '%') or
+            es.id=#{likeStr} or
+            es.mobile=#{likeStr})
+        </if>
+
+    </select>
+
+    <!--查询待入学学生对应的班级信息-->
+    <select id="getBeSchoolForClass" parameterType="java.lang.Long" resultType="java.util.Map">
+        SELECT
+        ec.id as classId,
+        ec.`name`,
+        ec.subject_id as subjectId,
+        ec.class_type_code as classTypeCode,
+        ecs.status,
+        ec.start_date as startDate
+        FROM
+        enrol_class_student ecs,
+        enrol_class ec
+        where ecs.class_id=ec.id
+        AND ec.is_del=0 AND esc.data_status=1
+        <!--AND ecs.`status`=2-->
+        AND ecs.student_id=#{studentId} order BY ec.start_date desc
+    </select>
+
+    <select id="stuClassDetail" parameterType="java.util.Map" resultType="com.cz.enrol.vo.StuClassDetailVo">
+            SELECT
+        es.`name` AS subjectName,
+        ec.teach_mode_name AS teachMOdeName,
+        ec.class_type_name AS classTypeName,
+        ecs.`name` AS campusName,
+        ec.`name` AS className,
+        eom.pay_type as payType,
+        eom.cost_price as costPrice,
+        eom.marketing_name as marketingName,
+        eom.pref_amount as prefAmount,
+        eom.order_price as orderPrice,
+        eom.paid,
+        (eom.order_price-eom.paid) as arrearage,
+        eom.return_money as returnMoney
+        FROM
+        enrol_class ec,
+        enrol_order_main eom,
+        enrol_subject es,
+        enrol_campus ecs
+        WHERE
+        ec.id = eom.class_id
+        AND ec.subject_id = es.id
+        AND ec.campus_id=ecs.id
+        AND ec.id=#{classId} AND eom.class_id=#{classId} AND eom.student_id=#{studentId}
+    </select>
+
+    <!--通过班级获取学生-->
+    <select id="showStuByClass" parameterType="java.lang.Long" resultType="java.util.LinkedHashMap">
+                SELECT
+            es.id,
+            es.`name`,
+            ecs.`status`
+        FROM
+            enrol_class_student ecs,
+            enrol_student es
+        WHERE
+            ecs.student_id = es.id
+        AND
+            ecs.class_id =#{classId}
+    </select>
+
+    <!--通过状态查询合同-->
+    <select id="queryContractByStatus" parameterType="com.cz.enrol.vo.StudentQueryEx"
+            resultType="java.util.LinkedHashMap">
+        SELECT
+        ect.contract_code AS contractPdfName,
+        eom.subject_name AS subjectName,
+        ec.class_type_name AS classTypeName,
+        es.`name` AS stuName,
+        es.card_no AS cardNo,
+        eom.class_name AS className,
+        eom.order_price AS orderPrice,
+        ec.teach_mode_name as teachModeName,
+        ec.start_date as startDate,
+        ec.end_date as endDate,
+        ect.contract_sign_time AS contractSignTime
+        FROM
+        enrol_contract ect,
+        enrol_class_student ecs,
+        enrol_student es,
+        enrol_order_main eom,
+        enrol_class ec
+        WHERE
+        ect.contract_status =#{status} AND
+        ect.merge_order_no=eom.merge_order_no
+        AND ecs.student_id = es.id
+        AND eom.student_id = ecs.student_id
+        AND eom.class_id = ecs.class_id
+        AND ecs.class_id=ec.id
+
+        <if test="campusId!=null and campusId!=''">
+            AND eom.campus_id =#{campusId}
+        </if>
+
+        <if test="subjectId!=null and subjectId!=''">
+            AND eom.subject_id =#{subjectId}
+        </if>
+
+        <if test="classId!=null and classId!=''">
+            AND eom.id =#{classId}
+        </if>
+
+        <if test="classTypeCode!=null and classTypeCode!=''">
+            AND ec.class_type_code=#{classTypeCode}
+        </if>
+
+        <if test="teachModeCode!=null and teachModeCode!=''">
+            AND ec.teach_mode_code=#{teachModeCode}
+        </if>
+
+        <if test="likeStr!=null and likeStr!=''">
+            AND (es.`name` like CONCAT(CONCAT('%', #{likeStr}), '%') or
+            es.id=#{likeStr} or
+            es.mobile=#{likeStr})
+        </if>
+
+    </select>
+
+
+</mapper>

@@ -1,0 +1,115 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.Campus;
+import com.cz.enrol.entity.Goods;
+import com.cz.enrol.entity.Subject;
+import com.cz.enrol.service.CampusService;
+import com.cz.enrol.service.DictService;
+import com.cz.enrol.service.GoodsService;
+import com.cz.enrol.service.SubjectService;
+import com.cz.enrol.vo.GoodsEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author Created by liuzhongshuai on 2017/10/23.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerGoodsController {
+
+
+    @Autowired
+    private GoodsService managerGoodsService;
+
+    @Autowired
+    private DictService dictService;
+
+    @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
+    private CampusService campusService;
+
+
+    /**
+     * 新增商品
+     *
+     * @param goodsEx
+     * @return
+     */
+    @PostMapping("/goods/addGoods")
+    public BaseBody<Goods> addGoods(@Valid GoodsEx goodsEx, BindingResult bindingResult) {
+
+        BaseBody<Goods> baseBody = new BaseBody<Goods>();
+        if (bindingResult.hasErrors()) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            baseBody.setMessage(bindingResult.getAllErrors().get(0).getDefaultMessage());
+            return baseBody;
+        }
+        managerGoodsService.batchAddGoodsClass(goodsEx);
+        baseBody.setMessage("保存成功!");
+        return baseBody;
+    }
+
+
+    @GetMapping("/goods/queryGoodsList")
+    public BaseBody<BasePage<Map<String, Object>>> queryGoodsList(@RequestParam Map<String, String> conditions) {
+
+        BaseBody<BasePage<Map<String, Object>>> basePageBaseBody = new BaseBody<BasePage<Map<String, Object>>>();
+
+        if (null == conditions || conditions.size() == 0) {
+            conditions = new HashMap<String, String>(16);
+            conditions.put("startPage", "1");
+            conditions.put("pageSize", "0");
+        }
+
+        BasePage<Map<String, Object>> basePage = managerGoodsService.queryByConditions(Integer.parseInt(conditions.get("startPage")), Integer.parseInt(conditions.get("pageSize")), conditions);
+
+        basePageBaseBody.setContent(basePage);
+        basePageBaseBody.setMessage("查询成功!");
+        return basePageBaseBody;
+    }
+
+
+    /**
+     * 增加商品 时候  对于选择班级的 前置条件的初始化
+     *
+     * @return
+     */
+    @GetMapping("/goods/initrerequisiteInfo")
+    public BaseBody<Map> initrerequisiteInfo() {
+        BaseBody<Map> baseBody = new BaseBody<Map>();
+        //查询学科
+        byte subStatus = 1;
+        List subjectList = subjectService.querySubjectListByStatus(subStatus);
+        //查询校区
+        Byte camputStatus = 1;
+        List<Map<String, Object>> camputList = campusService.queryCampusListByStatus(camputStatus);
+        //班级类型
+        Map classTypes = dictService.getDetailType("class_type");
+        //授课模式
+        Map teachTypes = dictService.getDetailType("teach_type");
+
+        Map stringListMap = new HashMap<String, List<Map<String, Object>>>(16);
+
+        stringListMap.put("subjectList", subjectList);
+        stringListMap.put("camputList", camputList);
+        stringListMap.put("classType", classTypes.get("class_type"));
+        stringListMap.put("teachType", teachTypes.get("teach_type"));
+
+        baseBody.setContent(stringListMap);
+
+        return baseBody;
+    }
+}

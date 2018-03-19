@@ -1,0 +1,14 @@
+package com.cz.enrol.service.enrol;
+
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.entity.enrol.Org;
+
+/**
+ * enrol库，enrol_org表，机构服务类
+ **/
+@Service
+public class OrgService extends BaseService<Org> {
+	
+}

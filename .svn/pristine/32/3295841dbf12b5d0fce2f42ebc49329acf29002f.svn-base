@@ -1,0 +1,486 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_goods")
+public class Goods {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 商品编号
+     */
+    @Column(name = "goods_no")
+    private String goodsNo;
+
+    /**
+     * 商品名称
+     */
+    private String name;
+
+    /**
+     * 学科Id
+     */
+    @Column(name = "subject_id")
+    private Long subjectId;
+
+    /**
+     * 价格
+     */
+    private Integer price;
+
+    /**
+     * 状态（0：可用，1：删除）
+     */
+    private Byte status;
+
+    /**
+     * 简介
+     */
+    private String synopsis;
+
+    /**
+     * 创建者
+     */
+    @Column(name = "creator")
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    /**
+     * 是否支持全款支付，0否，1是；默认为1；
+     */
+    @Column(name = "is_full")
+    private Byte isFull;
+
+    /**
+     * 是否支持分批付款，0否，1是；默认为1；
+     */
+    @Column(name = "is_batch")
+    private Byte isBatch;
+
+    /**
+     * 最大分配付款批次数，默认为3次；
+     */
+    @Column(name = "batch_max")
+    private Byte batchMax;
+
+    /**
+     * 是否支持贷款，0否，1是；默认位1；
+     */
+    @Column(name = "is_loan")
+    private Byte isLoan;
+
+
+    @Column(name = "cover_img_url")
+    private String coverImgUrl;
+
+
+    @Column(name = "detail_img_url")
+    private String detailImgUrl;
+
+    /**
+     * 商品详情
+     */
+    private String detail;
+
+
+    /**
+     * 是否被删除
+     * 0:否 1:是
+     */
+    private byte isDel;
+
+
+    /**
+     * 是否免费
+     * 0：否 1：是
+     */
+    @Column(name = "is_free")
+    private int isFree;
+
+
+    /**
+     * 是否有其它费用
+     */
+    @Column(name = "is_other_expense")
+    private int isOtherExpense;
+
+    /**
+     * 其它费用
+     */
+    @Column(name = "other_expense")
+    private int otherExpense;
+
+    /**
+     * 对其他费用的备注
+     */
+    @Column(name = "other_expense_remark")
+    private String otherExpenseRemark;
+
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取商品编号
+     *
+     * @return goods_no - 商品编号
+     */
+    public String getGoodsNo() {
+        return goodsNo;
+    }
+
+    /**
+     * 设置商品编号
+     *
+     * @param goodsNo 商品编号
+     */
+    public void setGoodsNo(String goodsNo) {
+        this.goodsNo = goodsNo;
+    }
+
+    /**
+     * 获取商品名称
+     *
+     * @return name - 商品名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置商品名称
+     *
+     * @param name 商品名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取学科Id
+     *
+     * @return subject_id - 学科Id
+     */
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    /**
+     * 设置学科Id
+     *
+     * @param subjectId 学科Id
+     */
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    /**
+     * 获取价格
+     *
+     * @return price - 价格
+     */
+    public Integer getPrice() {
+        return price;
+    }
+
+    /**
+     * 设置价格
+     *
+     * @param price 价格
+     */
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    /**
+     * 获取状态（0：下架，1：上架）
+     *
+     * @return status - 状态（0：下架，1：上架）
+     */
+    public Byte getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置状态（0：下架，1：上架）
+     *
+     * @param status 状态（0：下架，1：上架）
+     */
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    /**
+     * 获取简介
+     *
+     * @return synopsis - 简介
+     */
+    public String getSynopsis() {
+        return synopsis;
+    }
+
+    /**
+     * 设置简介
+     *
+     * @param synopsis 简介
+     */
+    public void setSynopsis(String synopsis) {
+        this.synopsis = synopsis;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * 获取是否支持全款支付，0否，1是；默认为1；
+     *
+     * @return is_full - 是否支持全款支付，0否，1是；默认为1；
+     */
+    public Byte getIsFull() {
+        return isFull;
+    }
+
+    /**
+     * 设置是否支持全款支付，0否，1是；默认为1；
+     *
+     * @param isFull 是否支持全款支付，0否，1是；默认为1；
+     */
+    public void setIsFull(Byte isFull) {
+        this.isFull = isFull;
+    }
+
+    /**
+     * 获取是否支持分批付款，0否，1是；默认为1；
+     *
+     * @return is_batch - 是否支持分批付款，0否，1是；默认为1；
+     */
+    public Byte getIsBatch() {
+        return isBatch;
+    }
+
+    /**
+     * 设置是否支持分批付款，0否，1是；默认为1；
+     *
+     * @param isBatch 是否支持分批付款，0否，1是；默认为1；
+     */
+    public void setIsBatch(Byte isBatch) {
+        this.isBatch = isBatch;
+    }
+
+    /**
+     * 获取最大分配付款批次数，默认为3次；
+     *
+     * @return batch_max - 最大分配付款批次数，默认为3次；
+     */
+    public Byte getBatchMax() {
+        return batchMax;
+    }
+
+    /**
+     * 设置最大分配付款批次数，默认为3次；
+     *
+     * @param batchMax 最大分配付款批次数，默认为3次；
+     */
+    public void setBatchMax(Byte batchMax) {
+        this.batchMax = batchMax;
+    }
+
+    /**
+     * 获取是否支持贷款，0否，1是；默认位1；
+     *
+     * @return is_loan - 是否支持贷款，0否，1是；默认位1；
+     */
+    public Byte getIsLoan() {
+        return isLoan;
+    }
+
+    /**
+     * 设置是否支持贷款，0否，1是；默认位1；
+     *
+     * @param isLoan 是否支持贷款，0否，1是；默认位1；
+     */
+    public void setIsLoan(Byte isLoan) {
+        this.isLoan = isLoan;
+    }
+
+
+    /**
+     * 获取商品详情
+     *
+     * @return detail - 商品详情
+     */
+    public String getDetail() {
+        return detail;
+    }
+
+    /**
+     * 设置商品详情
+     *
+     * @param detail 商品详情
+     */
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    public byte getIsDel() {
+        return isDel;
+    }
+
+    public void setIsDel(byte isDel) {
+        this.isDel = isDel;
+    }
+
+
+    public String getCoverImgUrl() {
+        return coverImgUrl;
+    }
+
+    public void setCoverImgUrl(String coverImgUrl) {
+        this.coverImgUrl = coverImgUrl;
+    }
+
+    public String getDetailImgUrl() {
+        return detailImgUrl;
+    }
+
+    public void setDetailImgUrl(String detailImgUrl) {
+        this.detailImgUrl = detailImgUrl;
+    }
+
+    public int getIsFree() {
+        return isFree;
+    }
+
+    public void setIsFree(int isFree) {
+        this.isFree = isFree;
+    }
+
+    public int getIsOtherExpense() {
+        return isOtherExpense;
+    }
+
+    public void setIsOtherExpense(int isOtherExpense) {
+        this.isOtherExpense = isOtherExpense;
+    }
+
+    public int getOtherExpense() {
+        return otherExpense;
+    }
+
+    public void setOtherExpense(int otherExpense) {
+        this.otherExpense = otherExpense;
+    }
+
+    public String getOtherExpenseRemark() {
+        return otherExpenseRemark;
+    }
+
+    public void setOtherExpenseRemark(String otherExpenseRemark) {
+        this.otherExpenseRemark = otherExpenseRemark;
+    }
+}

@@ -1,0 +1,96 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.marketing.MarketingMapper;
+import com.cz.enrol.dao.organize.ClassMapper;
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.entity.Marketing;
+import com.cz.enrol.entity.OrderMain;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 营销策略表 服务类
+ **/
+@Service
+public class MarketingService extends BaseService<Marketing> {
+
+
+    @Autowired
+    private MarketingMapper marketingMapper;
+
+    @Autowired
+    private ClassMapper classMapper;
+
+
+    /**
+     * 查询非删除状态的营销数据
+     *
+     * @return
+     */
+    public BasePage queryMarking(Integer startPage, Integer pageSize) {
+
+        PageHelper.startPage(startPage, pageSize);
+
+        List<Map<String, String>> resultList = marketingMapper.queryMarking();
+
+        PageInfo<Map<String, String>> pageInfo = new PageInfo(resultList);
+
+        BasePage basePage = new BasePage();
+        basePage.setPageData(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startPage);
+        basePage.setTotalPage(pageInfo.getPages());
+        basePage.setCount(pageInfo.getTotal());
+        return basePage;
+    }
+
+
+    /**
+     * 订单优惠处理
+     *
+     * @param orderMain
+     * @return
+     */
+    public OrderMain orderMarket(OrderMain orderMain) {
+
+        //订单优惠 减免
+        Marketing marketing = new Marketing();
+        marketing.setIsDel(0);
+        marketing.setStatus(1);
+        marketing.setCampusId(orderMain.getCampusId());
+        marketing.setSubjectId(orderMain.getSubjectId().intValue());
+
+        EnrolClass enrolClass = classMapper.selectByPrimaryKey(orderMain.getClassId());
+        if (null == enrolClass) {
+            throw new RuntimeException("班级信息不存在!");
+        }
+        marketing.setTeachModelCode(enrolClass.getTeachModeCode());
+        marketing.setClassTypeCode(enrolClass.getClassTypeCode());
+
+        marketing = marketingMapper.selectOne(marketing);
+        if (null != marketing) {
+            //判断订单 优惠开始时间是否 包含当前时间
+            Long startTime = marketing.getStartTime().getTime();
+            Long endTime = marketing.getEndTime().getTime();
+            Long currentTime = System.currentTimeMillis();
+
+            if (currentTime > startTime && currentTime < endTime) {
+                //减价
+                orderMain.setOrderPrice(orderMain.getCostPrice().intValue() - marketing.getReductionPrice().intValue());
+                orderMain.setMarketingName(marketing.getName());
+                orderMain.setMarketingId(marketing.getId());
+                orderMain.setPrefAmount(marketing.getReductionPrice().intValue());
+            }
+        }
+        return orderMain;
+    }
+
+}

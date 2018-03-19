@@ -1,0 +1,32 @@
+package com.cz.enrol.dao.subject;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Subject;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 
+ * EnrolSubjectMapper数据库操作接口类
+ * 
+ **/
+
+public interface SubjectMapper extends BaseDao<Subject> {
+
+
+	
+	/**
+	 * 
+	 * 学科列表
+	 */
+	List<Subject> querySubjectList();
+
+	/**
+	 * 学科下拉选查询 返回字段（id，name）
+	 * @param status
+	 * @return
+	 */
+	List<Map<String,Object>> querySubjectListByStatus(Byte status);
+}

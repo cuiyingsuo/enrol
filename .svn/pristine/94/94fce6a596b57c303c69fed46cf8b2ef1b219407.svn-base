@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.user.EnrolUserRoleMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolUserRoleResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolUserRole">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--用户Id-->
+		<result property="userId" column="user_id" />
+		<!--角色Id-->
+		<result property="roleId" column="role_id" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	user_id,	role_id,	creator,	create_time
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolUserRole" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_user_role
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_user_role
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolUserRole">
+		 INSERT INTO enrol_user_role
+ 		(id,user_id,role_id,creator,create_time) 
+		 VALUES 
+ 		(#{id},#{userId},#{roleId},#{creator},#{createTime}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolUserRole">
+		 INSERT INTO enrol_user_role
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="userId != null">
+				 user_id,
+			</if>
+			<if test="roleId != null">
+				 role_id,
+			</if>
+			<if test="creator != null">
+				 creator,
+			</if>
+			<if test="createTime != null">
+				 create_time,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="userId!=null">
+				 #{userId},
+			</if>
+			<if test="roleId!=null">
+				 #{roleId},
+			</if>
+			<if test="creator!=null">
+				 #{creator},
+			</if>
+			<if test="createTime!=null">
+				 #{createTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolUserRole">
+		 UPDATE enrol_user_role
+ 		 <set> 
+			<if test="userId != null">
+				 user_id = #{userId},
+			</if>
+			<if test="roleId != null">
+				 role_id = #{roleId},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolUserRole">
+		 UPDATE enrol_user_role
+		 SET 
+			 user_id = #{userId},
+			 role_id = #{roleId},
+			 creator = #{creator},
+			 create_time = #{createTime}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

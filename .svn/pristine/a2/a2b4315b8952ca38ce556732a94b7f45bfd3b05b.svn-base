@@ -1,0 +1,16 @@
+package com.cz.enrol.dao.invoice;
+
+import java.util.Map;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Invoice;
+
+
+/**
+ * EnrolInvoiceMapper数据库操作接口类
+ **/
+
+public interface InvoiceMapper extends BaseDao<Invoice> {
+	
+	public Map<String,Object> selectOneByOrderMainNo(String orderMainNo);
+}

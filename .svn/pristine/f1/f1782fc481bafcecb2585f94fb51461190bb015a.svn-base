@@ -1,0 +1,63 @@
+package com.cz.enrol.service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cz.enrol.dao.goods.GoodsHotMapper;
+import com.cz.enrol.dao.goods.GoodsMapper;
+import com.cz.enrol.entity.GoodsHot;
+
+/**
+ * 商品班级关系表 服务类
+ **/
+@Service
+public class GoodsHotService {
+	private Logger logger = LoggerFactory.getLogger("enrol");
+	
+	// 热门课程dao
+	@Autowired
+	private GoodsHotMapper goodsHotDao;
+	
+	@Autowired
+	private GoodsMapper goodsDao;
+
+	/**
+	 * 查询全部热门课程
+	 * 
+	 * @return
+	 */
+	public List<GoodsHot> queryAll() {
+		
+		return goodsHotDao.selectGHList();
+	}
+	@Transactional
+	public void updateGoodshot(){
+		List<Map<String,Object>> ghListMap = goodsHotDao.countGoodsHot();
+		
+		List<GoodsHot> ghList = goodsHotDao.selectAll();
+		for(GoodsHot gh:ghList){
+			goodsHotDao.delete(gh);
+		}
+		
+		for(Map<String,Object> ghMap:ghListMap){
+			GoodsHot gh = new GoodsHot();
+			gh.setCoverImg(String.valueOf(ghMap.get("coverImg")));
+			gh.setCurrentNum(Integer.valueOf(String.valueOf(ghMap.get("currentNum"))));
+			gh.setDetail(String.valueOf(ghMap.get("detail")));
+			gh.setGoodsId(Long.valueOf(String.valueOf(ghMap.get("goodsId"))));
+			gh.setGoodsNo(String.valueOf(ghMap.get("goodsNo")));
+			gh.setName(String.valueOf(ghMap.get("name")));
+			gh.setPrice(Integer.valueOf(String.valueOf(ghMap.get("price"))));
+			gh.setSynopsis(String.valueOf(ghMap.get("synopsis")));
+			goodsHotDao.insertSelective(gh);
+		}
+		logger.info("热门课程已更新.");
+	}
+}

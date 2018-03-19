@@ -1,0 +1,12 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.entity.BankAccount;
+import org.springframework.stereotype.Service;
+
+/**
+ * Created by liuzhongshuai on 2018/1/19.
+ */
+@Service
+public class BankAccountService extends BaseService<BankAccount> {
+}

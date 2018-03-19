@@ -1,0 +1,71 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_post")
+public class EnrolPost {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 岗位名称
+     */
+    private String name;
+
+    /**
+     * 部门Id
+     */
+    @Column(name = "department_id")
+    private Long departmentId;
+
+    /**
+     * @return id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取岗位名称
+     *
+     * @return name - 岗位名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置岗位名称
+     *
+     * @param name 岗位名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取部门Id
+     *
+     * @return department_id - 部门Id
+     */
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    /**
+     * 设置部门Id
+     *
+     * @param departmentId 部门Id
+     */
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+}

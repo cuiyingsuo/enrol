@@ -1,0 +1,17 @@
+package com.cz.enrol.dao.organize;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolCampus;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * 
+ * EnrolCampusMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolCampusMapper extends BaseDao<EnrolCampus>{
+
+
+
+}

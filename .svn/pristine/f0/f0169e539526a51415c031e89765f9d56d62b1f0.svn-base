@@ -1,0 +1,27 @@
+package com.cz.enrol.dao.order;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.OrderMain;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * EnrolOrderMainMapper数据库操作接口类
+ * 
+ **/
+
+public interface OrderMainMapper extends BaseDao<OrderMain>{
+
+
+	
+	Map<String,Object> selectOrderMainByNo(String orderMainNo);
+	/**
+	 * 
+	 * 根据学员id查询订单
+	 * 
+	 */
+	List<Map<String,Object>> queryOrderByMobile(String mobile);
+
+}

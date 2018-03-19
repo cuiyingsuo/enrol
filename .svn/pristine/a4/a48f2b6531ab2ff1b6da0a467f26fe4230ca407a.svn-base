@@ -1,0 +1,37 @@
+package com.cz.enrol.common;
+
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSONObject;
+import com.cz.enrol.utils.RedisUtil;
+
+public class BaseController {
+	/**
+	 * 用token在redis查用户信息
+	 * 
+	 * @param token
+	 * @return
+	 */
+	protected Map<String, Object> getUserInfoByRedis(String token) {
+		Map<String, Object> userInfo = new HashMap<String, Object>();
+		if (null == token || "".equals(token)) {
+			return null;
+		}
+
+		if (RedisUtil.hasKey(token)) {
+			JSONObject jsonObj = JSONObject.parseObject(RedisUtil.get(token)
+					.toString());
+			if (null != jsonObj && !jsonObj.isEmpty()) {
+				userInfo.put("mobile", jsonObj.get("mobile").toString());
+				userInfo.put("name", jsonObj.get("name").toString());
+				userInfo.put("id", jsonObj.get("id").toString());
+			}
+
+		} else {
+			return null;
+		}
+		return userInfo;
+	}
+}

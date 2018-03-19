@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.marketing.MarketingMapper">
+
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	strategy,	condition,	reduction_money,	reduction_term,	is_enable,	is_delete,	is_publish,	memo
+	</sql>
+
+    <!--营销政策下拉选-->
+    <select id="marketingDownSelect" resultType="java.util.Map">
+        select em.id ,em.`name` from enrol_marketing em where em.status=1 and em.is_del=0
+    </select>
+
+    <!--查询营销政策 -->
+    <select id="queryMarking" parameterType="com.cz.enrol.entity.Marketing" resultType="java.util.Map">
+          SELECT
+        em.id,
+        em.`name`,
+        em.duration_type_name as durationTypeName,
+        em.start_time as startTime,
+        em.end_time as endTime,
+        em.reduction_price as reductionPrice,
+        es.`name` as subjectName,
+        em.class_type_name as classTypeName,
+        em.teach_model_name as teachModelName,
+        ec.`name` as campusName,
+        em.create_time as createTime,
+        em.`status`
+    FROM
+        enrol_marketing em,
+        enrol_campus ec,
+        enrol_subject es
+    where em.campus_id=ec.id
+    AND em.subject_id=es.id
+    AND em.is_del=0
+    </select>
+</mapper>

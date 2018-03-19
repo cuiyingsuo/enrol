@@ -1,0 +1,49 @@
+package com.cz.enrol.dao.organize;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolPost;
+import org.apache.ibatis.annotations.Param;
+
+public interface EnrolPostMapper extends BaseDao<EnrolPost> {
+	/**
+	 * 
+	 * 查询（根据主键ID查询）
+	 * 
+	 **/
+	EnrolPost selectByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 * 
+	 * 删除（根据主键ID删除）
+	 * 
+	 **/
+	int deleteByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 * 
+	 * 添加
+	 * 
+	 **/
+	int insert(EnrolPostMapper record);
+
+	/**
+	 * 
+	 * 添加 （匹配有值的字段）
+	 * 
+	 **/
+	int insertSelective(EnrolPostMapper record);
+
+	/**
+	 * 
+	 * 修改 （匹配有值的字段）
+	 * 
+	 **/
+	int updateByPrimaryKeySelective(EnrolPostMapper record);
+
+	/**
+	 * 
+	 * 修改（根据主键ID修改）
+	 * 
+	 **/
+	int updateByPrimaryKey(EnrolPostMapper record);
+}

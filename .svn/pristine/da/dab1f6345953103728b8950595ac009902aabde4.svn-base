@@ -1,0 +1,58 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.user.UserRoleMapper;
+import com.cz.enrol.entity.UserRole;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+/**
+ * 用户角色表 服务类
+ **/
+@Transactional
+@Service
+public class UserRoleService {
+
+    //统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    private SqlSessionTemplate session;
+
+    //当前业务数据操作接口dao
+    private UserRoleMapper dao;
+
+    private UserRoleMapper getDao() {
+        if (dao == null)
+            dao = session.getMapper(UserRoleMapper.class);
+        return dao;
+    }
+
+    public UserRole selectByPrimaryKey(Long id) {
+        return getDao().selectByPrimaryKey(id);
+    }
+
+    public int deleteByPrimaryKey(Long id) {
+        return getDao().deleteByPrimaryKey(id);
+    }
+
+    public int insert(UserRole record) {
+        return getDao().insert(record);
+    }
+
+    public int insertSelective(UserRole record) {
+        return getDao().insertSelective(record);
+    }
+
+    public int updateByPrimaryKeySelective(UserRole record) {
+        return getDao().updateByPrimaryKeySelective(record);
+    }
+
+    public int updateByPrimaryKey(UserRole record) {
+        return getDao().updateByPrimaryKey(record);
+    }
+
+}

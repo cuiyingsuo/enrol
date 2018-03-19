@@ -1,0 +1,15 @@
+package com.cz.enrol.dao.marketing;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.MarketingClass;
+
+/**
+ * 
+ * EnrolMarketingClassMapper数据库操作接口类
+ * 
+ **/
+
+public interface MarketingClassMapper extends BaseDao<MarketingClass>{
+
+
+}

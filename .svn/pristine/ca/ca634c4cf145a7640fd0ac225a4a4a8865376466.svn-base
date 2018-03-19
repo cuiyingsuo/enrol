@@ -1,0 +1,7 @@
+package com.cz.enrol.utils;
+
+public class TokenUtil {
+	public static String getToken(String pre){
+		return MD5Util.encryption(pre+ System.currentTimeMillis());
+	}
+}

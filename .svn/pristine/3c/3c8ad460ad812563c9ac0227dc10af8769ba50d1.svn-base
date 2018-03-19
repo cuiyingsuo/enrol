@@ -1,0 +1,49 @@
+package com.cz.enrol.utils;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.web.client.RestTemplate;
+
+/**
+ * 封装Spring的RestTemplate对象，进行针对本平台的优化
+ * <p>
+ * Created by leon_zhangxf on 2017-12-1.
+ */
+public class RestTemplateUtils {
+
+    /**
+     * 通过此方法获取一个优化过的RestTemplate实例
+     * @return
+     */
+    public static RestTemplate getRestTemplate() {
+        RestTemplate restTemplate = new RestTemplate();
+        reInitMessageConverter(restTemplate);
+        return restTemplate;
+    }
+
+    /**
+     * 初始化RestTemplate，RestTemplate会默认添加HttpMessageConverter
+     * <p>
+     * 添加的StringHttpMessageConverter非UTF-8
+     * 所以先要移除原有的StringHttpMessageConverter，
+     * 再添加一个字符集为UTF-8的StringHttpMessageConvert
+     */
+    private static void reInitMessageConverter(RestTemplate restTemplate) {
+        List<HttpMessageConverter<?>> converterList = restTemplate.getMessageConverters();
+        HttpMessageConverter<?> converterTarget = null;
+        for (HttpMessageConverter<?> item : converterList) {
+            if (item.getClass() == StringHttpMessageConverter.class) {
+                converterTarget = item;
+                break;
+            }
+        }
+
+        if (converterTarget != null) {
+            converterList.remove(converterTarget);
+        }
+        HttpMessageConverter<?> converter = new StringHttpMessageConverter(StandardCharsets.UTF_8);
+        converterList.add(converter);
+    }
+}

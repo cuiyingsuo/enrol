@@ -1,0 +1,118 @@
+package com.itcast.enrol.common.utils.payment;
+
+import java.security.Key;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 公钥私钥生成器
+ * <p>
+ * Created by leon_zhangxf on 2017-12-15.
+ */
+public class RSA2KeyGenerateUtils {
+
+    public static final String KEY_ALGORITHM = "RSA";
+
+    //public static final String SIGNATURE_ALGORITHM = "MD5withRSA";
+
+    private static final String PUBLIC_KEY = "RSAPublicKey";
+
+    private static final String PRIVATE_KEY = "RSAPrivateKey";
+
+    /**
+     * 从{@link RSA2KeyGenerateUtils#initKey()}生成的map中获得公钥
+     *
+     * @param keyMap
+     * @return
+     * @throws Exception
+     */
+    public static String getPublicKey(Map<String, Object> keyMap) throws Exception {
+        //获得map中的公钥对象 转为key对象
+        Key key = (Key) keyMap.get(PUBLIC_KEY);
+        //byte[] publicKey = key.getEncoded();
+        //编码返回字符串
+        return base64Encode(key.getEncoded());
+    }
+
+    /**
+     * 从{@link RSA2KeyGenerateUtils#initKey()}生成的map中获得私钥
+     *
+     * @param keyMap
+     * @return
+     * @throws Exception
+     */
+    public static String getPrivateKey(Map<String, Object> keyMap) throws Exception {
+        //获得map中的私钥对象 转为key对象
+        Key key = (Key) keyMap.get(PRIVATE_KEY);
+        //byte[] privateKey = key.getEncoded();
+        //编码返回字符串
+        return base64Encode(key.getEncoded());
+    }
+
+    /**
+     * base64 解码
+     *
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static byte[] base64Decode(String key) throws Exception {
+        return Base64.decodeBase64(key.getBytes());
+    }
+
+    /**
+     * base64 编码
+     *
+     * @param key
+     * @return
+     * @throws Exception
+     */
+    public static String base64Encode(byte[] key) throws Exception {
+        return new String(Base64.encodeBase64(key));
+    }
+
+    /**
+     * 生成RSA2私钥公钥并保存在一个map中
+     * {@link RSA2KeyGenerateUtils#PRIVATE_KEY} 私钥
+     * {@link RSA2KeyGenerateUtils#PUBLIC_KEY} 公钥
+     *
+     * @return
+     * @throws Exception
+     */
+    public static Map<String, Object> initKey() throws Exception {
+        //获得对象 KeyPairGenerator 参数 RSA 2048个字节
+        KeyPairGenerator keyPairGen = KeyPairGenerator.getInstance(KEY_ALGORITHM);
+        keyPairGen.initialize(2048);
+        //通过对象 KeyPairGenerator 获取对象KeyPair
+        KeyPair keyPair = keyPairGen.generateKeyPair();
+
+        //通过对象 KeyPair 获取RSA公私钥对象RSAPublicKey RSAPrivateKey
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+        RSAPrivateKey privateKey = (RSAPrivateKey) keyPair.getPrivate();
+        //公私钥对象存入map中
+        Map<String, Object> keyMap = new HashMap<String, Object>(2);
+        keyMap.put(PUBLIC_KEY, publicKey);
+        keyMap.put(PRIVATE_KEY, privateKey);
+        return keyMap;
+    }
+
+    public static void main(String[] args) {
+        Map<String, Object> keyMap;
+        try {
+            keyMap = initKey();
+            String privateKey = getPrivateKey(keyMap);
+            System.out.println("私钥：");
+            System.out.println(privateKey);
+            System.out.println("公钥：");
+            String publicKey = getPublicKey(keyMap);
+            System.out.println(publicKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+}

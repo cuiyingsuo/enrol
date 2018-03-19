@@ -1,0 +1,78 @@
+package com.itcast.enrol.management.service;
+
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.itcast.enrol.common.base.BasePage;
+import com.itcast.enrol.common.base.BaseService;
+import com.itcast.enrol.common.dao.organize.ClassMapper;
+import com.itcast.enrol.common.entity.EnrolClass;
+import com.itcast.enrol.management.vo.ClassEx;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+
+/**
+ * 班级表 服务类
+ **/
+@Service
+public class ManagerClassService extends BaseService<EnrolClass> {
+
+    @Autowired
+    private ClassMapper classDao;
+    
+    @Autowired
+    private ManagerMarketingService marketingService;
+
+    /**
+     * 查询班级列表（带校区、商品信息，商品详情页立即报名，规格弹框使用）
+     * @param goodsId	商品id
+     * @param campusId	校区id
+     * @return
+     * @throws ParseException 
+     */
+    public List<Map<String, Object>> queryClassListOfGoodsSpec(Long goodsId, Long campusId) throws ParseException {
+        Map<String, Long> params = new HashMap<String, Long>();
+        params.put("goodsId", goodsId);
+        params.put("campusId", campusId);
+        List<Map<String, Object>> classList = classDao.selectClassListOfGoodsSpec(params);
+
+        marketingService.goodsMarket(classList);
+        
+        for(Map<String,Object> classMap:classList){
+        	Object lastPrice = classMap.get("lastPrice");
+	        if(null==lastPrice){
+	        	classMap.put("lastPrice", classMap.get("price"));
+	        }
+        }
+        return classList;
+    }
+
+    /**
+     * 查询班级选项 返回字段（id,name）
+     *
+     * @param enrolClass
+     * @return
+     */
+    public List<Map> queryClassByMulitField(ClassEx enrolClass) {
+        return classDao.queryClassByMulitField(enrolClass);
+    }
+    
+    public BasePage<Map<String,String>> queryClassToPage(EnrolClass cla,int startNum, int pageSize){
+    	PageHelper.startPage(startNum, pageSize);
+    	List<Map<String,String>> classList = classDao.selectClassListToPage(cla);
+    	PageInfo<Map<String,String>> pageInfo = new PageInfo<Map<String,String>>(classList);
+
+        BasePage<Map<String,String>> basePage = new BasePage<Map<String,String>>();
+        basePage.setPageData(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startNum);
+        basePage.setCount(pageInfo.getTotal());
+        basePage.setTotalPage(pageInfo.getPages());
+    	return basePage;
+    }
+}

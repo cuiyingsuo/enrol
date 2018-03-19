@@ -1,0 +1,166 @@
+package com.cz.enrol.service;
+
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import com.cz.enrol.common.BaseMenu;
+import com.cz.enrol.dao.permission.RolePermissionMapper;
+import com.cz.enrol.exception.LoginException;
+import com.cz.enrol.utils.BeanUtils;
+import com.cz.enrol.utils.BusLogUtil;
+import com.cz.enrol.vo.UserEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.user.UserMapper;
+import com.cz.enrol.entity.User;
+import com.cz.enrol.utils.AesUtil;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+/**
+ * 用户表 服务类
+ **/
+@Service
+public class UserService extends BaseService<User> {
+
+    private static BusLogUtil busLogUtil = new BusLogUtil(UserService.class);
+
+    @Value("${enrol.user.login.key}")
+    private String key;
+    @Value("${enrol.user.defaut-password}")
+    private String defautPassword;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private RolePermissionMapper rolePermissionMapper;
+
+    /**
+     * 用户登录
+     *
+     * @param mobile
+     * @param password
+     * @return
+     */
+    public User userLogin(String mobile, String password) throws UnsupportedEncodingException {
+
+        User userCondition = new User();
+        userCondition.setMobile(mobile);
+        User user = userMapper.selectOne(userCondition);
+        //用户未注册
+        if (user == null) {
+            throw new LoginException("用户未注册!", 2002);
+        }
+        //用户状态已被禁用
+        if ("0".equals(user.getStatus())) {
+            throw new LoginException("该用户已经被禁用!", 2002);
+        }
+        byte[] bytes1 = AesUtil.decrypt(AesUtil.parseHexStr2Byte(user.getPassword()), key);
+        String hexStr = new String(bytes1, "UTF-8");
+        //密码验证未通过
+        if (!(mobile + password).equals(hexStr)) {
+            throw new LoginException("密码错误!", 2002);
+        }
+        return user;
+    }
+
+    /**
+     * 后台添加新用户
+     *
+     * @param userEx
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public User addUser(UserEx userEx) {
+
+        String mobile = userEx.getMobile();
+        String password = defautPassword;
+        //aes加密
+        byte[] aesBytes = AesUtil.encrypt(mobile + password, key);
+        //保存用户
+        User user = new User();
+        BeanUtils.copyProperties(userEx, user);
+        try {
+            String Str16 = AesUtil.parseByte2HexStr(aesBytes);
+            user.setPassword(Str16);
+        } catch (Exception e) {
+            busLogUtil.error("后台添加用户编码异常:{}", e.getMessage());
+            throw new RuntimeException("编码异常!");
+        }
+
+        user.setCreator(userEx.getCreator());
+        user.setCreateTime(System.currentTimeMillis());
+        user.setStatus((byte) 1);
+        user.setIsDel((byte) 0);
+        userMapper.insertSelective(user);
+        return user;
+    }
+
+    /**
+     * 组织用户角色 菜单信息
+     *
+     * @param userId
+     */
+    public List<BaseMenu> roleAndMenus(Long userId) {
+        List<Map<String, String>> rolesList = userMapper.roleByUser(userId);
+
+        if (CollectionUtils.isEmpty(rolesList)) {
+            throw new RuntimeException("未授权用户!");
+        }
+        
+        List<String> listRoldId = new ArrayList<String>();
+        for (Map<String, String> roleMap : rolesList) {
+        	listRoldId.add(String.valueOf(roleMap.get("id")));
+        }
+        String[] arrRoleId = listRoldId.toArray(new String[listRoldId.size()]);
+        
+        //查询对应的菜单及功能点
+        List<Map<String, String>> permissList = rolePermissionMapper.queryPermissionByRole(String.join(",", arrRoleId));
+        if (CollectionUtils.isEmpty(rolesList)) {
+            throw new RuntimeException("您没有任何菜单权限!");
+        }
+        
+        //首先过滤出 菜单类型 type：1
+        List<Map<String, String>> menuTypeList = permissList.stream().filter(child -> "1".equals(child.get("type"))).collect(Collectors.toList());
+        //过滤出url类型 type：2
+        List<Map<String, String>> urlTypeList = permissList.stream().filter(child -> "2".equals(child.get("type"))).collect(Collectors.toList());        
+        //一级menu集合
+        List<BaseMenu> baseMenus = new ArrayList<>();
+        
+        //组装2级 menu
+        for (Map<String, String> menuMap : menuTypeList) {
+        	
+            BaseMenu baseMenu = new BaseMenu();
+            baseMenu.setName(menuMap.get("name"));
+            baseMenu.setCode(menuMap.get("code"));
+            baseMenu.setType(menuMap.get("type"));
+            baseMenu.setUrl(menuMap.get("url"));
+            baseMenu.setOrder(Integer.parseInt(String.valueOf(menuMap.get("order"))));
+            
+            //二级子菜单
+            for (Map<String, String> urlMap : urlTypeList) {
+                if (urlMap.get("parentCode").equals(baseMenu.getCode())) {
+                    BaseMenu urlMenu = new BaseMenu();
+                    urlMenu.setName(urlMap.get("name"));
+                    urlMenu.setCode(urlMap.get("code"));
+                    urlMenu.setType(urlMap.get("type"));
+                    urlMenu.setUrl(urlMap.get("url"));
+                    urlMenu.setOrder(Integer.parseInt(String.valueOf(urlMap.get("order"))));
+                    baseMenu.getChilds().add(urlMenu);
+                }
+            }
+            
+            baseMenus.add(baseMenu);
+        }
+        
+        return baseMenus;
+    }
+
+}

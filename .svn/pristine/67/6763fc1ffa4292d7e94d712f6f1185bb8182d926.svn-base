@@ -1,0 +1,62 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.dict.EnrolDictMapper;
+import com.cz.enrol.entity.EnrolDict;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * 字典表 服务类
+ * 
+ **/
+@Transactional
+@Service
+public class EnrolDictService{
+
+	// 统一记录日志类
+	private Logger Log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private SqlSessionTemplate session;
+
+	// 当前业务数据操作接口dao
+	@Autowired
+	private EnrolDictMapper dictDao;
+
+	public EnrolDict selectByPrimaryKey(Long id) {
+		return dictDao.selectByPrimaryKey(id);
+	}
+
+	public int deleteByPrimaryKey(Long id) {
+		return dictDao.deleteByPrimaryKey(id);
+	}
+
+	public int insert(EnrolDict record) {
+		return dictDao.insert(record);
+	}
+
+	public int insertSelective(EnrolDict record) {
+		return dictDao.insertSelective(record);
+	}
+
+	public int updateByPrimaryKeySelective(EnrolDict record) {
+		return dictDao.updateByPrimaryKeySelective(record);
+	}
+
+	public int updateByPrimaryKey(EnrolDict record) {
+		return dictDao.updateByPrimaryKey(record);
+	}
+
+	public List<Map<String, String>> queryInfoByType(String type) {
+
+		return dictDao.selectInfoByType(type);
+	}
+
+}

@@ -1,0 +1,22 @@
+package com.cz.enrol.configure;
+
+import org.springframework.context.annotation.Bean;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * Created by liuzhongshuai on 2017/11/1.
+ */
+//@Configuration
+public class ThreadPoolConfigure {
+
+
+    @Bean
+    public ExecutorService executor() {
+        //TODO
+
+        ExecutorService executor = Executors.newFixedThreadPool(10);
+        return executor;
+    }
+}

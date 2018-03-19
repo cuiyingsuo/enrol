@@ -1,0 +1,10 @@
+package com.cz.enrol.dao.task;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Task;
+
+/**
+ * Created by liuzhongshuai on 2018/1/16.
+ */
+public interface TaskMapper extends BaseDao<Task> {
+}

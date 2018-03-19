@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.order.EnrolOrderMainMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolOrderMainResultMapResultMap"
+		type="com.apicloud.server.entity.enrol.EnrolOrderMain">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--合单号； -->
+		<result property="mergeOrderNo" column="merge_order_no" />
+		<!--订单金额 -->
+		<result property="orderPrice" column="order_price" />
+		<!--商品原价格 -->
+		<result property="costPrice" column="cost_price" />
+		<!--学员Id，对应enrol_student表的关键字Id -->
+		<result property="studentId" column="student_id" />
+		<!--学员名称 -->
+		<result property="studentName" column="student_name" />
+		<!--学员手机号 -->
+		<result property="studentMobile" column="student_mobile" />
+		<!--学科Id，对应enrol_subject表关键字Id; -->
+		<result property="subjectId" column="subject_id" />
+		<!--学科名字 -->
+		<result property="subjectName" column="subject_name" />
+		<!--校区Id,对应表enrol_campus关键字； -->
+		<result property="campusId" column="campus_id" />
+		<!--分校名称 -->
+		<result property="campusName" column="campus_name" />
+		<!--班级id，对应表enrol_class关键字Id； -->
+		<result property="classId" column="class_id" />
+		<!--班级名称 -->
+		<result property="className" column="class_name" />
+		<!--支付类型，0、 全款支付，1、分次支付，2、 全额贷款 -->
+		<result property="payType" column="pay_type" />
+		<!--营销策略Id，对应表enrol_marketing关键字； -->
+		<result property="marketingId" column="marketing_id" />
+		<!--营销策略名称 -->
+		<result property="marketingName" column="marketing_name" />
+		<!--支付渠道名称,如通联，百度； -->
+		<result property="payChannelName" column="pay_channel_name" />
+		<!--优惠金额 -->
+		<result property="prefAmount" column="pref_amount" />
+		<!--已支付 -->
+		<result property="paid" column="paid" />
+		<!--支付时间 -->
+		<result property="payTime" column="pay_time" />
+		<!--订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功) -->
+		<result property="status" column="status" />
+		<!--是否开具电子收据（0：否，1：是） -->
+		<result property="elecReceipt" column="elec_receipt" />
+		<!--收据地址 -->
+		<result property="receiptUrl" column="receipt_url" />
+		<!--收据号 -->
+		<result property="receiptNo" column="receipt_no" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!--编辑者 -->
+		<result property="editor" column="editor" />
+		<!--编辑时间 -->
+		<result property="editTime" column="edit_time" />
+		<!--商品Id，对应enrol_goods表主键； -->
+		<result property="goodsId" column="goods_id" />
+		<!-- 商品名称 -->
+		<result property="goodsName" column="goods_name" />
+		<!--贷款额度 -->
+		<result property="loanMoney" column="loan_money" />
+		<!--退费费用 -->
+		<result property="returnMoney" column="return_money" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, merge_order_no, order_price,cost_price, student_id, student_name,
+		student_mobile, subject_id, subject_name, campus_id, campus_name,
+		class_id, class_name, pay_type, marketing_id, marketing_name,
+		pay_channel_name, pref_amount, paid, pay_time, status, elec_receipt,
+		receipt_url, receipt_no, creator, create_time, editor, edit_time,
+		goods_id,goods_name, loan_money, return_money
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolOrderMain"
+		parameterType="java.lang.Long">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM enrol_order_main
+		WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除 -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		DELETE FROM enrol_order_main
+		WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolOrderMain">
+		INSERT INTO enrol_order_main
+		(id,merge_order_no,order_price,cost_price,student_id,student_name,student_mobile,subject_id,subject_name,campus_id,campus_name,class_id,class_name,pay_type,marketing_id,marketing_name,pay_channel_name,pref_amount,paid,pay_time,status,elec_receipt,receipt_url,receipt_no,creator,create_time,editor,edit_time,goods_id,goods_name,loan_money,return_money)
+		VALUES
+		(#{id},#{mergeOrderNo},#{orderPrice},#{costPrice},#{studentId},#{studentName},#{studentMobile},#{subjectId},#{subjectName},#{campusId},#{campusName},#{classId},#{className},#{payType},#{marketingId},#{marketingName},#{payChannelName},#{prefAmount},#{paid},#{payTime},#{status},#{elecReceipt},#{receiptUrl},#{receiptNo},#{creator},#{createTime},#{editor},#{editTime},#{goodsId},#{goodsName},#{loanMoney},#{returnMoney})
+	</insert>
+
+	<!-- 添加 （匹配有值的字段） -->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolOrderMain">
+		INSERT INTO enrol_order_main
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="mergeOrderNo != null">
+				merge_order_no,
+			</if>
+			<if test="orderPrice != null">
+				order_price,
+			</if>
+			<if test="costPrice != null">
+				cost_price,
+			</if>
+			<if test="studentId != null">
+				student_id,
+			</if>
+			<if test="studentName != null">
+				student_name,
+			</if>
+			<if test="studentMobile != null">
+				student_mobile,
+			</if>
+			<if test="subjectId != null">
+				subject_id,
+			</if>
+			<if test="subjectName != null">
+				subject_name,
+			</if>
+			<if test="campusId != null">
+				campus_id,
+			</if>
+			<if test="campusName != null">
+				campus_name,
+			</if>
+			<if test="classId != null">
+				class_id,
+			</if>
+			<if test="className != null">
+				class_name,
+			</if>
+			<if test="payType != null">
+				pay_type,
+			</if>
+			<if test="marketingId != null">
+				marketing_id,
+			</if>
+			<if test="marketingName != null">
+				marketing_name,
+			</if>
+			<if test="payChannelName != null">
+				pay_channel_name,
+			</if>
+			<if test="prefAmount != null">
+				pref_amount,
+			</if>
+			<if test="paid != null">
+				paid,
+			</if>
+			<if test="payTime != null">
+				pay_time,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="elecReceipt != null">
+				elec_receipt,
+			</if>
+			<if test="receiptUrl != null">
+				receipt_url,
+			</if>
+			<if test="receiptNo != null">
+				receipt_no,
+			</if>
+			<if test="creator != null">
+				creator,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="editor != null">
+				editor,
+			</if>
+			<if test="editTime != null">
+				edit_time,
+			</if>
+			<if test="goodsId != null">
+				goods_id,
+			</if>
+			<if test="goodsName != null">
+				goods_name,	
+			</if>
+			<if test="loanMoney != null">
+				loan_money,
+			</if>
+			<if test="returnMoney != null">
+				return_money,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="mergeOrderNo!=null">
+				#{mergeOrderNo},
+			</if>
+			<if test="orderPrice!=null">
+				#{orderPrice},
+			</if>
+			<if test="costPrice!=null">
+				#{costPrice},
+			</if>
+			<if test="studentId!=null">
+				#{studentId},
+			</if>
+			<if test="studentName!=null">
+				#{studentName},
+			</if>
+			<if test="studentMobile!=null">
+				#{studentMobile},
+			</if>
+			<if test="subjectId!=null">
+				#{subjectId},
+			</if>
+			<if test="subjectName!=null">
+				#{subjectName},
+			</if>
+			<if test="campusId!=null">
+				#{campusId},
+			</if>
+			<if test="campusName!=null">
+				#{campusName},
+			</if>
+			<if test="classId!=null">
+				#{classId},
+			</if>
+			<if test="className!=null">
+				#{className},
+			</if>
+			<if test="payType!=null">
+				#{payType},
+			</if>
+			<if test="marketingId!=null">
+				#{marketingId},
+			</if>
+			<if test="marketingName!=null">
+				#{marketingName},
+			</if>
+			<if test="payChannelName!=null">
+				#{payChannelName},
+			</if>
+			<if test="prefAmount!=null">
+				#{prefAmount},
+			</if>
+			<if test="paid!=null">
+				#{paid},
+			</if>
+			<if test="payTime!=null">
+				#{payTime},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="elecReceipt!=null">
+				#{elecReceipt},
+			</if>
+			<if test="receiptUrl!=null">
+				#{receiptUrl},
+			</if>
+			<if test="receiptNo!=null">
+				#{receiptNo},
+			</if>
+			<if test="creator!=null">
+				#{creator},
+			</if>
+			<if test="createTime!=null">
+				#{createTime},
+			</if>
+			<if test="editor!=null">
+				#{editor},
+			</if>
+			<if test="editTime!=null">
+				#{editTime},
+			</if>
+			<if test="goodsId!=null">
+				#{goodsId},
+			</if>
+			<if test="goodsName!=null">
+				#{goodsName},	
+			</if>
+			<if test="loanMoney!=null">
+				#{loanMoney},
+			</if>
+			<if test="returnMoney!=null">
+				#{returnMoney},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolOrderMain">
+		UPDATE enrol_order_main
+		<set>
+			<if test="mergeOrderNo != null">
+				merge_order_no = #{mergeOrderNo},
+			</if>
+			<if test="orderPrice != null">
+				order_price = #{orderPrice},
+			</if>
+			<if test="costPrice != null">
+				cost_price = #{costPrice},
+			</if>
+			<if test="studentId != null">
+				student_id = #{studentId},
+			</if>
+			<if test="studentName != null">
+				student_name = #{studentName},
+			</if>
+			<if test="studentMobile != null">
+				student_mobile = #{studentMobile},
+			</if>
+			<if test="subjectId != null">
+				subject_id = #{subjectId},
+			</if>
+			<if test="subjectName != null">
+				subject_name = #{subjectName},
+			</if>
+			<if test="campusId != null">
+				campus_id = #{campusId},
+			</if>
+			<if test="campusName != null">
+				campus_name = #{campusName},
+			</if>
+			<if test="classId != null">
+				class_id = #{classId},
+			</if>
+			<if test="className != null">
+				class_name = #{className},
+			</if>
+			<if test="payType != null">
+				pay_type = #{payType},
+			</if>
+			<if test="marketingId != null">
+				marketing_id = #{marketingId},
+			</if>
+			<if test="marketingName != null">
+				marketing_name = #{marketingName},
+			</if>
+			<if test="payChannelName != null">
+				pay_channel_name = #{payChannelName},
+			</if>
+			<if test="prefAmount != null">
+				pref_amount = #{prefAmount},
+			</if>
+			<if test="paid != null">
+				paid = #{paid},
+			</if>
+			<if test="payTime != null">
+				pay_time = #{payTime},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="elecReceipt != null">
+				elec_receipt = #{elecReceipt},
+			</if>
+			<if test="receiptUrl != null">
+				receipt_url = #{receiptUrl},
+			</if>
+			<if test="receiptNo != null">
+				receipt_no = #{receiptNo},
+			</if>
+			<if test="creator != null">
+				creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				edit_time = #{editTime},
+			</if>
+			<if test="goodsId != null">
+				goods_id = #{goodsId},
+			</if>
+			<if test="goodsName != null">
+				goods_name = #{goodsName},
+			</if>
+			<if test="loanMoney != null">
+				loan_money = #{loanMoney},
+			</if>
+			<if test="returnMoney != null">
+				return_money = #{returnMoney},
+			</if>
+
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolOrderMain">
+		UPDATE enrol_order_main
+		SET
+		merge_order_no = #{mergeOrderNo},
+		order_price = #{orderPrice},
+		cost_price = #{costPrice},
+		student_id = #{studentId},
+		student_name = #{studentName},
+		student_mobile = #{studentMobile},
+		subject_id = #{subjectId},
+		subject_name = #{subjectName},
+		campus_id = #{campusId},
+		campus_name = #{campusName},
+		class_id = #{classId},
+		class_name = #{className},
+		pay_type = #{payType},
+		marketing_id = #{marketingId},
+		marketing_name = #{marketingName},
+		pay_channel_name = #{payChannelName},
+		pref_amount = #{prefAmount},
+		paid = #{paid},
+		pay_time = #{payTime},
+		status = #{status},
+		elec_receipt = #{elecReceipt},
+		receipt_url = #{receiptUrl},
+		receipt_no = #{receiptNo},
+		creator = #{creator},
+		create_time = #{createTime},
+		editor = #{editor},
+		edit_time = #{editTime},
+		goods_id = #{goodsId},
+		goods_name = #{goodsName},
+		loan_money = #{loanMoney},
+		return_money = #{returnMoney}
+		WHERE id = #{id}
+	</update>
+	<!-- 根据学员id查询订单 -->
+	<select id="queryOrderByStudentId" resultType="java.util.Map"
+		parameterType="java.lang.Long">
+		SELECT
+		om.id AS id,
+		om.merge_order_no AS mergeOrderNo,
+		om.goods_name AS goodsName,
+		om.cost_price AS costPrice,
+		om.order_price AS orderPrice,
+		om.student_id AS studentId,
+		om.student_name AS studentName,
+		om.student_mobile AS studentMobile,
+		cam.address AS campusAddress,
+		om.class_name AS className,
+		cla.start_date AS startDate,
+		cla.class_time AS classTime,
+		cla.teach_mode_name AS teachModeName,
+		om.pay_type AS payType,
+		om.`status` AS `status`,
+		om.paid AS paid,
+		(om.order_price-om.paid) AS unpaid
+		FROM enrol_order_main om
+		LEFT JOIN enrol_class cla ON om.class_id=cla.id
+		LEFT JOIN enrol_campus cam ON om.campus_id=cam.id
+
+		where om.student_id = #{studentId}
+	</select>
+</mapper>

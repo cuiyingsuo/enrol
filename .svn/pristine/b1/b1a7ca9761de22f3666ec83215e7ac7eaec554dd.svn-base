@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.goods.EnrolGoodsClassMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolGoodsClassResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolGoodsClass">
+		<!--主键Id-->
+		<id property="id" column="主键Id" />
+		<!--商品Id-->
+		<result property="goodsId" column="goods_id" />
+		<!--班级Id-->
+		<result property="classId" column="class_id" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	goods_id,	class_id,	creator,	create_time
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolGoodsClass" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_goods_class
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_goods_class
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolGoodsClass">
+		 INSERT INTO enrol_goods_class
+ 		(id,goods_id,class_id,creator,create_time) 
+		 VALUES 
+ 		(#{id},#{goodsId},#{classId},#{creator},#{createTime}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolGoodsClass">
+		 INSERT INTO enrol_goods_class
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="goodsId != null">
+				 goods_id,
+			</if>
+			<if test="classId != null">
+				 class_id,
+			</if>
+			<if test="creator != null">
+				 creator,
+			</if>
+			<if test="createTime != null">
+				 create_time,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="goodsId!=null">
+				 #{goodsId},
+			</if>
+			<if test="classId!=null">
+				 #{classId},
+			</if>
+			<if test="creator!=null">
+				 #{creator},
+			</if>
+			<if test="createTime!=null">
+				 #{createTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolGoodsClass">
+		 UPDATE enrol_goods_class
+ 		 <set> 
+			<if test="goodsId != null">
+				 goods_id = #{goodsId},
+			</if>
+			<if test="classId != null">
+				 class_id = #{classId},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolGoodsClass">
+		 UPDATE enrol_goods_class
+		 SET 
+			 goods_id = #{goodsId},
+			 class_id = #{classId},
+			 creator = #{creator},
+			 create_time = #{createTime}
+		 WHERE id = #{id}
+	</update>
+	
+	<!-- 根据商品id查询 -->
+	<select id="selectByGoodsId" parameterType="java.lang.Long" resultMap="EnrolGoodsClassResultMapResultMap">
+		SELECT 
+		<include refid="Base_Column_List" />
+		FROM enrol_goods_class WHERE goods_id=1
+	</select>
+
+</mapper>

@@ -1,0 +1,73 @@
+package com.cz.enrol.dao.goods;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolGoods;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * EnrolGoodsMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolGoodsMapper extends BaseDao<EnrolGoods> {
+
+
+	/**
+	 * 
+	 * 查询（根据主键ID查询）
+	 * 
+	 **/
+	EnrolGoods selectByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 删除（根据主键ID删除）
+	 *
+	 **/
+	int deleteByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 添加
+	 *
+	 **/
+	int insert(EnrolGoods record);
+
+	/**
+	 *
+	 * 添加 （匹配有值的字段）
+	 *
+	 **/
+	int insertSelective(EnrolGoods record);
+
+	/**
+	 *
+	 * 修改 （匹配有值的字段）
+	 *
+	 **/
+	int updateByPrimaryKeySelective(EnrolGoods record);
+
+	/**
+	 *
+	 * 修改（根据主键ID修改）
+	 *
+	 **/
+	int updateByPrimaryKey(EnrolGoods record);
+	
+	/**
+	 * 根据学科查询商品及课程列表
+	 * @param subjectId
+	 * @return
+	 */
+	List<EnrolGoods> selectBySubjectId(Long subjectId);
+	
+	/**
+	 * 
+	 * 查询商品（课程）规格
+	 */
+	List<Map<String,Object>> selectGoodsSpec(Long goodsId);
+}

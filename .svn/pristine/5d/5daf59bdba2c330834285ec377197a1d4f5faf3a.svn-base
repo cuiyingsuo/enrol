@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.contract.ContractMapper">
+	<!--实体映射-->
+    <resultMap id="EnrolContractMapResultMap" type="com.cz.enrol.entity.Contract">
+        <!--关键字Id;-->
+        <id property="id" column="id"/>
+        <result property="orderMainNo" column="merge_order_no"/>
+        <result property="contractUrl" column="contract_url"/>
+        <result property="contractCode" column="contract_code"/>
+        <result property="contractStatus" column="contract_status"/>
+        <result property="tySignServiceId" column="ty_signServiceId"/>
+        <result property="contractSignTime" column="contract_sign_time"/>
+        <result property="contractCancelTime" column="contract_cancel_time"/>
+        <result property="tyCancelServiceId" column="ty_cancelServiceId"/>
+    </resultMap>
+    
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,merge_order_no,	contract_url,contract_code,contract_status,ty_signServiceId,contract_sign_time,contract_cancel_time,ty_cancelServiceId
+	</sql>
+
+	<select id="selectListByOrderMainNo" parameterType="java.lang.String" resultMap="EnrolContractMapResultMap">
+		SELECT  
+		<include refid="Base_Column_List"/>
+		FROM enrol_contract 
+		WHERE merge_order_no=#{orderMainNo} AND contract_status > 1
+	</select>
+	
+	<select id="selectContractLastTime" parameterType="java.lang.String" resultMap="EnrolContractMapResultMap">
+	SELECT 
+	<include refid="Base_Column_List"/>
+	FROM enrol_contract 
+	WHERE merge_order_no=#{orderMainNo}
+	ORDER BY create_time DESC LIMIT 0,1
+	</select>
+
+</mapper>

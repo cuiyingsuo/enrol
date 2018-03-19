@@ -1,0 +1,44 @@
+package com.cz.enrol.service.management;
+
+import com.cz.enrol.dao.banner.BannerMapper;
+import com.cz.enrol.entity.Banner;
+import com.cz.enrol.exception.AmountPromiseException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/21.
+ */
+@Service
+public class ManagerBannerService {
+
+
+    @Autowired
+    private BannerMapper bannerMapper;
+
+
+    /**
+     * 新增banner
+     *
+     * @param banner
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public Banner addBanner(Banner banner) {
+
+        int maxBannerCount = 5;
+        //查询现有可用banner数量，最多5个
+        Integer banCount = bannerMapper.getCountForEnable();
+        if (null != banCount && banCount.intValue() >= maxBannerCount) {
+            throw new AmountPromiseException("banner 最多为5个");
+        }
+        Long currTime = System.currentTimeMillis();
+        banner.setCreateTime(currTime);
+
+        bannerMapper.insert(banner);
+        return banner;
+    }
+
+}

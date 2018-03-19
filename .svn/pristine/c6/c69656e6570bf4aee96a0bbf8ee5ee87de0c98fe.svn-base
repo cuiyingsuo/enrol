@@ -1,0 +1,19 @@
+package com.cz.enrol.dao.organize;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Campus;
+
+/**
+ * 
+ * EnrolCampusMapper数据库操作接口类
+ * 
+ **/
+
+public interface CampusMapper extends BaseDao<Campus>{
+
+
+	public List<Map<String,Object>> selectCampusListBygoodsId(Long goodsId);
+}

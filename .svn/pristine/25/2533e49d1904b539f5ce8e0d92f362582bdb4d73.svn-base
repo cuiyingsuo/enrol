@@ -1,0 +1,63 @@
+package com.cz.enrol.utils;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/11/30.
+ */
+public class FileUtils {
+
+
+    /**
+     * 文件目录正则
+     */
+    private static String matches = "[A-Za-z]:\\\\[^:?\"><*]*";
+
+    /**
+     * 在指定文件夹创建文件
+     *
+     * @param dirPath  文件所在目录
+     * @param fileName 文件名称 含扩展名
+     * @param bytes    文件字节流
+     */
+    public static void createFile(String dirPath, String fileName, byte[] bytes) {
+
+        if (null == bytes || bytes.length <= 0) {
+            throw new RuntimeException("不能创建空文件!!");
+        }
+        if (!dirPath.matches(matches)) {
+            throw new RuntimeException("创建文件路径不合法!");
+        }
+        File fileDir = new File(dirPath);
+        // 判断目录或文件是否存在 不存在则创建
+        if (!fileDir.exists()) {
+            fileDir.mkdir();
+        }
+        //创建文件
+        File file = new File(dirPath + fileName);
+        // 判断文件是否存在
+        if (file.exists()) {
+            throw new RuntimeException("目标文件已存在" + dirPath + fileName);
+        }
+        FileOutputStream fileOutputStream = null;
+        try {
+            fileOutputStream = new FileOutputStream(file);
+            fileOutputStream.write(bytes);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fileOutputStream != null) {
+                try {
+                    fileOutputStream.flush();
+                    fileOutputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}

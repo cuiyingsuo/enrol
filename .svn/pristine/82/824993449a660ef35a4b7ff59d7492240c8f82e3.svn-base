@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.permission.EnrolRoleMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolRoleResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolRole">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--角色名称 -->
+		<result property="name" column="name" />
+		<!--所属校区（0：表示不区分校区） -->
+		<result property="campusId" column="campus_id" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!--编辑者 -->
+		<result property="editor" column="editor" />
+		<!--编辑时间 -->
+		<result property="editTime" column="edit_time" />
+		<!-- 编码 -->
+		<result property="code" column="code" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, name, campus_id, creator, create_time, editor,
+		edit_time,code
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolRole"
+		parameterType="java.lang.Long">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM enrol_role
+		WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除 -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		DELETE FROM
+		enrol_role
+		WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolRole">
+		INSERT INTO enrol_role
+		(id,name,campus_id,creator,create_time,editor,edit_time,code)
+		VALUES
+		(#{id},#{name},#{campusId},#{creator},#{createTime},#{editor},#{editTime},#{code})
+	</insert>
+
+	<!-- 添加 （匹配有值的字段） -->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolRole">
+		INSERT INTO enrol_role
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="campusId != null">
+				campus_id,
+			</if>
+			<if test="creator != null">
+				creator,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="editor != null">
+				editor,
+			</if>
+			<if test="editTime != null">
+				edit_time,
+			</if>
+			<if test="code != null">
+				code,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="name!=null">
+				#{name},
+			</if>
+			<if test="campusId!=null">
+				#{campusId},
+			</if>
+			<if test="creator!=null">
+				#{creator},
+			</if>
+			<if test="createTime!=null">
+				#{createTime},
+			</if>
+			<if test="editor!=null">
+				#{editor},
+			</if>
+			<if test="editTime!=null">
+				#{editTime},
+			</if>
+			<if test="code!=null">
+				#{code},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolRole">
+		UPDATE enrol_role
+		<set>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="campusId != null">
+				campus_id = #{campusId},
+			</if>
+			<if test="creator != null">
+				creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				edit_time = #{editTime},
+			</if>
+			<if test="code != null">
+				code = #{code},
+			</if>
+
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolRole">
+		UPDATE enrol_role
+		SET
+		name = #{name},
+		campus_id = #{campusId},
+		creator = #{creator},
+		create_time = #{createTime},
+		editor = #{editor},
+		edit_time =
+		#{editTime},
+		code = #{code}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

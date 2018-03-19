@@ -1,0 +1,159 @@
+package com.cz.enrol.utils;
+
+import java.security.MessageDigest;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.allinpay.util.HttpUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+
+/**
+ * 短信中心短信发送工具类
+ * @author zhangxiaofeng【leon_zhangxf@163.com】
+ * 
+ * url:http://smscenter-d.boxuegu.com/smscenter/postmessage
+ * 参数:
+ * 	mobile 		手机号码
+ *  content 	短信内容
+ *  channel 	渠道编码(在线系统为：online)
+ *  usage   	场景用途（找回密码，注册，登录）
+ *  type		短信类型(1，验证码，2，通知，3营销)
+ *  timestamp	时间戳(当前的UNIX时间戳(精确到秒)) System.currentTimeMillis() / 1000L
+ *  sign		签名md5(password_mobile_content_timestamp)
+ *  				测试密码:password=123456
+ */
+public class SMSSendUtil {
+
+	//usage   场景用途（找回密码，注册，登录）
+	public static final String USAGE_REGIST = "注册";
+	public static final String USAGE_LOGIN = "登录";
+	public static final String USAGE_FIND_PASSWORD_BACK = "找回密码";
+	
+	//type	短信类型(1，验证码，2，通知，3营销)
+	public static final Integer SMSTYPE_VERIFICATION_CODE = 1;//验证码
+	public static final Integer SMSTYPE_NOTIFICATION = 2;//通知
+	public static final Integer SMSTYPE_MARKETING = 3;//营销
+	
+	@SuppressWarnings("unchecked")
+	/**
+	 * 调用短信中心接口发送短信
+	 * @param signName 短信签名，如，“博学谷”,短信内容前缀会加上【博学谷】
+	 * @param mobile 手机号码
+	 * @param templeteid 发送短信模板ID
+	 * @param params 短信模板参数，与模板里的参数对应：错误例：{"vcode": "125455"}
+	 * @param usage 场景用途（找回密码，注册，登录）
+	 * 				SMSSendUtil.USAGE_REGIST = "注册";
+	 *  			SMSSendUtil.USAGE_LOGIN = "登录";
+	 *  			SMSSendUtil.USAGE_FIND_BACK_PASSWORD = "找回密码";
+	 * @param type 短信类型(1，验证码，2，通知，3营销)
+	 * 				SMSSendUtil.SMSTYPE_VERIFICATION_CODE = 1;//验证码
+	 *				SMSSendUtil.SMSTYPE_NOTIFICATION = 2;//通知
+	 *				SMSSendUtil.SMSTYPE_MARKETING = 3;//营销
+	 * @param channel 渠道id 	
+	 * 				参数获取：online.system_variate[name = message_provider_channelid].value
+	 * @param password 短信中心请求密码 
+	 * 				参数获取：online.system_variate[name = message_provider_password].value
+	 * @param requestUrl 短信中心接口请求url地址
+	 * 				参数获取：online.system_variate[name = message_provider_requestUrl].value
+	 * 
+	 * @return 请求接口返回信息
+	 * 			错误例：{"success": false,"errorMessage": "403","data": "禁止访问 "}
+	 * 			成功例：{"success":true,"errorMessage":"","data":""}
+	 */
+	public static String sendMessage(String mobile, String templeteid,String params, String usage, Integer type, String channel, String password, String requestUrl) {
+		
+		Map<String, String> param = new HashMap<String, String>();
+		//1.参数列表
+		Long timestamp = System.currentTimeMillis() / 1000L;
+		//签名加密：md5(password_mobile_content_timestamp)
+		
+		String sign = SMSSendUtil.MD5(password + "_" + mobile + "_" + templeteid+"_"+params + "_" + timestamp);
+		param.put("mobile", mobile);
+		param.put("templeteid", templeteid);
+		param.put("params", params);
+		
+		param.put("channel", channel);
+		param.put("usage", usage);
+		param.put("type", type.toString());
+		param.put("timestamp", timestamp.toString());
+		param.put("sign", sign);
+		
+		String msg="";
+		//3.短信发送
+		try {
+			msg = HttpUtils.doPost(requestUrl, param);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return msg;
+		/*//4.判断发送结果
+		ObjectMapper mapper = new ObjectMapper();
+		Map<String,Object> map = new HashMap<>(); 
+		try {
+			map = mapper.readValue(msg, Map.class);
+			ResponseObject response=new ResponseObject();
+			response.setErrorMessage(map.get("errorMessage").toString());
+			response.setSuccess(Boolean.valueOf(map.get("success").toString()));
+			response.setResultObject(map.get("data").toString());
+			return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+			ResponseObject response=new ResponseObject();
+			response.setErrorMessage("短信中心接口返回信息异常！");
+			response.setSuccess(false);
+			response.setResultObject("");
+			return response;
+		}*/
+		
+	}
+	
+	/**
+	 * 短信中心MD5加密算法
+	 * @param pwd
+	 * @return
+	 */
+	public final static String MD5(String pwd) {
+		// 用于加密的字符
+		char md5String[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+		try {
+			// 使用平台的默认字符集将此 String 编码为 byte序列，并将结果存储到一个新的 byte数组中
+			byte[] btInput = pwd.getBytes();
+
+			// 信息摘要是安全的单向哈希函数，它接收任意大小的数据，并输出固定长度的哈希值。
+			MessageDigest mdInst = MessageDigest.getInstance("MD5");
+
+			// MessageDigest对象通过使用 update方法处理数据， 使用指定的byte数组更新摘要
+			mdInst.update(btInput);
+
+			// 摘要更新之后，通过调用digest（）执行哈希计算，获得密文
+			byte[] md = mdInst.digest();
+
+			// 把密文转换成十六进制的字符串形式
+			int j = md.length;
+			char str[] = new char[j * 2];
+			int k = 0;
+			for (int i = 0; i < j; i++) { // i = 0
+				byte byte0 = md[i]; // 95
+				str[k++] = md5String[byte0 >>> 4 & 0xf]; // 5
+				str[k++] = md5String[byte0 & 0xf]; // F
+			}
+
+			// 返回经过加密后的字符串
+			return new String(str);
+
+		} catch (Exception e) {
+			return null;
+		}
+	}
+	public static void main(String[] args)
+	{
+		//c091922d2e8448a0
+		//ResponseObject response=SMSSendUtil.sendMessage("15311733826", "456852", USAGE_LOGIN, SMSTYPE_VERIFICATION_CODE, "yuanxiao", "123456", "http://smscenter-d.boxuegu.com/smscenter/postmessage");c091922d2e8448a0
+		String response=SMSSendUtil.sendMessage("15210173019","SMS_88050013","{\"vcode\":456852}", USAGE_LOGIN, SMSTYPE_VERIFICATION_CODE,"yuanxiao", "c091922d2e8448a0", "http://sms-center.boxuegu.com/smscenter/postsms");
+		
+		System.out.println(response);
+		
+	}
+}

@@ -1,0 +1,112 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_class_student")
+public class ClassStudent {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 班级Id
+     */
+    @Column(name = "class_id")
+    private Long classId;
+
+    /**
+     * 学生Id
+     */
+    @Column(name = "student_id")
+    private Long studentId;
+
+    /**
+     * 排座时间
+     */
+    @Column(name = "seat_time")
+    private Long seatTime;
+    /**
+     * 合同的文档名
+     */
+    @Column(name = "contract_pdf_name")
+    private String contractPdfName;
+
+    /**
+     * 创建人
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    @Column(name = "status")
+    private Integer status;
+    /**
+     * 数据状态
+     */
+    @Column(name = "data_status")
+    private Integer dataStatus;
+    
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public Long getClassId() {
+		return classId;
+	}
+	public void setClassId(Long classId) {
+		this.classId = classId;
+	}
+	public Long getStudentId() {
+		return studentId;
+	}
+	public void setStudentId(Long studentId) {
+		this.studentId = studentId;
+	}
+	public Long getSeatTime() {
+		return seatTime;
+	}
+	public void setSeatTime(Long seatTime) {
+		this.seatTime = seatTime;
+	}
+	public String getContractPdfName() {
+		return contractPdfName;
+	}
+	public void setContractPdfName(String contractPdfName) {
+		this.contractPdfName = contractPdfName;
+	}
+	public String getCreator() {
+		return creator;
+	}
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+	public Long getCreateTime() {
+		return createTime;
+	}
+	public void setCreateTime(Long createTime) {
+		this.createTime = createTime;
+	}
+	public Integer getStatus() {
+		return status;
+	}
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	public Integer getDataStatus() {
+		return dataStatus;
+	}
+	public void setDataStatus(Integer dataStatus) {
+		this.dataStatus = dataStatus;
+	}
+	
+	
+}

@@ -1,0 +1,18 @@
+package com.cz.enrol.service;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+
+/**
+ * 营销策略表 服务类
+ **/
+@Transactional
+@Service
+public class EnrolMarketingService {
+
+
+
+
+}

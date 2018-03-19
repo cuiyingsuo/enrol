@@ -1,0 +1,32 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+
+import com.cz.enrol.common.BaseService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cz.enrol.dao.subject.SubjectMapper;
+import com.cz.enrol.entity.Subject;
+
+/**
+ * 学科表 服务类
+ **/
+@Service
+public class SubjectService extends BaseService<Subject> {
+
+    @Autowired
+    private SubjectMapper subjectDao;
+
+    public Subject queryByPrimaryKey(Long id) {
+        return subjectDao.selectByPrimaryKey(id);
+    }
+
+    public List<Subject> querySubjectList() {
+        return subjectDao.selectAll();
+    }
+
+}

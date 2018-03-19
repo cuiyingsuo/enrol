@@ -1,0 +1,461 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+@Table(name = "enrol_campus")
+public class Campus {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 校区名称
+     */
+    private String name;
+
+    /**
+     * 校区地址
+     */
+    private String address;
+
+    /**
+     * 校长名
+     */
+    private String owner;
+
+    /**
+     * 联系电话
+     */
+    private String telphone;
+
+    /**
+     * 创建者
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    /**
+     * 校区介绍；
+     */
+    private String introduce;
+
+    /**
+     * 校区邮箱；
+     */
+    private String email;
+
+    /**
+     * 校区联系人；
+     */
+    private String contacts;
+    
+    /**
+     * 校区公司名称
+     */
+    @Column(name = "org_name")
+    private String orgName;
+    /**
+     * 社会信用代码
+     */
+    @Column(name = "org_socno")
+    private String orgSOCNo;
+    
+    /**
+     * 编号
+     */
+    @Column(name = "serial_code")
+    private String serialCode;
+
+    /**
+     * 校区管理员，对应enrol_user表关键字Id；
+     */
+    @Column(name = "manager_id")
+    private Long managerId;
+
+    /**
+     * 备注；
+     */
+    private String memo;
+    
+    /**
+     * 能否开电子发票
+     */
+    @Column(name = "e_invoice")
+    private Integer eInvoice;
+
+    /**
+     * 状态(0:停用,1:启用)
+     */
+    private Byte status;
+    
+    /**
+     * 天印生成的ca证书id
+     */
+    @Column(name = "ty_certId")
+    private String tyCertId;
+    
+    /**
+     * 分校通联支付商户号id
+     */
+    @Column(name = "merchant_id")
+    private String merchantId;
+    
+    /**
+     * 学习地点（培训地点）
+     */
+    @Column(name = "study_address")
+    private String studyAddress;
+
+
+	public String getStudyAddress() {
+		return studyAddress;
+	}
+
+	public void setStudyAddress(String studyAddress) {
+		this.studyAddress = studyAddress;
+	}
+
+	public String getTyCertId() {
+		return tyCertId;
+	}
+
+	public void setTyCertId(String tyCertId) {
+		this.tyCertId = tyCertId;
+	}
+
+	/**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+    
+    
+    
+
+    public String getSerialCode() {
+		return serialCode;
+	}
+
+	public void setSerialCode(String serialCode) {
+		this.serialCode = serialCode;
+	}
+
+	/**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取校区名称
+     *
+     * @return name - 校区名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置校区名称
+     *
+     * @param name 校区名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取校区地址
+     *
+     * @return address - 校区地址
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * 设置校区地址
+     *
+     * @param address 校区地址
+     */
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    /**
+     * 获取校长名
+     *
+     * @return owner - 校长名
+     */
+    public String getOwner() {
+        return owner;
+    }
+
+    /**
+     * 设置校长名
+     *
+     * @param owner 校长名
+     */
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    /**
+     * 获取联系电话
+     *
+     * @return telphone - 联系电话
+     */
+    public String getTelphone() {
+        return telphone;
+    }
+
+    /**
+     * 设置联系电话
+     *
+     * @param telphone 联系电话
+     */
+    public void setTelphone(String telphone) {
+        this.telphone = telphone;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * 获取校区介绍；
+     *
+     * @return introduce - 校区介绍；
+     */
+    public String getIntroduce() {
+        return introduce;
+    }
+
+    /**
+     * 设置校区介绍；
+     *
+     * @param introduce 校区介绍；
+     */
+    public void setIntroduce(String introduce) {
+        this.introduce = introduce;
+    }
+
+    /**
+     * 获取校区邮箱；
+     *
+     * @return email - 校区邮箱；
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * 设置校区邮箱；
+     *
+     * @param email 校区邮箱；
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
+     * 获取校区联系人；
+     *
+     * @return contacts - 校区联系人；
+     */
+    public String getContacts() {
+        return contacts;
+    }
+
+    /**
+     * 设置校区联系人；
+     *
+     * @param contacts 校区联系人；
+     */
+    public void setContacts(String contacts) {
+        this.contacts = contacts;
+    }
+
+    /**
+     * 获取校区管理员，对应enrol_user表关键字Id；
+     *
+     * @return manager_id - 校区管理员，对应enrol_user表关键字Id；
+     */
+    public Long getManagerId() {
+        return managerId;
+    }
+
+    /**
+     * 设置校区管理员，对应enrol_user表关键字Id；
+     *
+     * @param managerId 校区管理员，对应enrol_user表关键字Id；
+     */
+    public void setManagerId(Long managerId) {
+        this.managerId = managerId;
+    }
+
+    /**
+     * 获取备注；
+     *
+     * @return memo - 备注；
+     */
+    public String getMemo() {
+        return memo;
+    }
+
+    /**
+     * 设置备注；
+     *
+     * @param memo 备注；
+     */
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+    
+    public Integer geteInvoice() {
+		return eInvoice;
+	}
+
+	public void seteInvoice(Integer eInvoice) {
+		this.eInvoice = eInvoice;
+	}
+
+	/**
+     * 获取状态(0:停用,1:启用)
+     *
+     * @return status - 状态(0:停用,1:启用)
+     */
+    public Byte getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置状态(0:停用,1:启用)
+     *
+     * @param status 状态(0:停用,1:启用)
+     */
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+
+	public String getOrgSOCNo() {
+		return orgSOCNo;
+	}
+
+	public void setOrgSOCNo(String orgSOCNo) {
+		this.orgSOCNo = orgSOCNo;
+	}
+
+	public String getMerchantId() {
+		return merchantId;
+	}
+
+	public void setMerchantId(String merchantId) {
+		this.merchantId = merchantId;
+	}
+	
+	
+}

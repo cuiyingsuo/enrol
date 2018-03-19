@@ -1,0 +1,44 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.entity.BankAccount;
+import com.cz.enrol.service.BankAccountService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * @author liuzs
+ * Created by liuzhongshuai on 2018/1/19.
+ */
+@RestController
+@RequestMapping("/managenment/config")
+public class ManagerBaseConfigController{
+
+    @Autowired
+    private BankAccountService bankAccountService;
+
+
+    /**
+     * 后台补录订单选择收款校区
+     *
+     * @return {@link BaseBody}
+     */
+    @GetMapping("/selectAcceptCamputs")
+    public BaseBody selectAcceptCamputs() {
+        BaseBody baseBody = new BaseBody();
+
+        BankAccount baConditions = new BankAccount();
+        baConditions.setPayType(2);
+
+        List<BankAccount> bankAccountList = bankAccountService.select(baConditions);
+        baseBody.setContent(bankAccountList);
+
+        return baseBody;
+    }
+
+
+}

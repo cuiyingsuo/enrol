@@ -1,0 +1,304 @@
+package com.cz.enrol.service.ems;
+
+import com.cz.enrol.common.EmsClass;
+import com.cz.enrol.common.EmsClassBody;
+import com.cz.enrol.common.EmsClassTypeBody;
+import com.cz.enrol.common.EmsSubjectBody;
+import com.cz.enrol.dao.organize.CampusMapper;
+import com.cz.enrol.dao.organize.ClassMapper;
+import com.cz.enrol.dao.organize.ClassTypeMapper;
+import com.cz.enrol.dao.subject.SubjectMapper;
+import com.cz.enrol.entity.Campus;
+import com.cz.enrol.entity.ClassType;
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.entity.Subject;
+import com.cz.enrol.utils.BusLogUtil;
+import com.cz.enrol.utils.HttpHelper;
+import com.cz.enrol.utils.HttpUtil;
+
+import com.cz.enrol.utils.JsonUtil;
+import com.cz.enrol.vo.EmsSubject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.Date;
+
+
+/**
+ * @liuzs Created by liuzhongshuai on 2017/12/19.
+ */
+@Service
+public class SynchBaseDataForEms {
+
+    private static final BusLogUtil BUS_LOG = new BusLogUtil(SynchBaseDataForEms.class);
+
+    @Autowired
+    private SubjectMapper subjectMapper;
+
+    @Autowired
+    private CampusMapper campusMapper;
+
+    @Autowired
+    private ClassTypeMapper classTypeMapper;
+
+    @Autowired
+    private ClassMapper classMapper;
+
+
+    @Value("${ems.api.appid}")
+    private String emsAppId;
+
+    @Value("${ems.api.key}")
+    private String emsKey;
+
+
+    /**
+     * 同步学科
+     * UNITDOUBLET FACETOFACE
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void synchSubjectForEms() {
+        synSubByModel("UNITDOUBLET");
+        synSubByModel("FACETOFACE");
+    }
+
+
+    /**
+     * 同步班级类型
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void synchClassTypeForEms() {
+        //获取班级类型
+        String url = "https://ems.itcast.cn/api/dictionary/data.do";
+
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put("cid", emsAppId);
+        map.put("method", "classTypes");
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        String result = HttpUtil.httpPost(url, map);
+
+        EmsClassTypeBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsClassTypeBody.class);
+
+        if (emsSubjectBody == null) {
+            BUS_LOG.error("无法在ems获取班级类型信息!,无法同步班级类型信息!", "");
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            BUS_LOG.error("同步班级类型异常!", emsSubjectBody.getErrorMessage());
+            throw new RuntimeException(emsSubjectBody.getErrorMessage());
+        }
+        List<ClassType> emsClassTypes = emsSubjectBody.getResultObject();
+        //获取系统运营的学科
+        List<Subject> subjectList = subjectMapper.selectAll();
+        for (ClassType classType : emsClassTypes) {
+
+            if (getSubjectByCode(subjectList, classType.getSubjectId()).getCode() != null) {
+                classTypeMapper.insertSelective(classType);
+            }
+        }
+    }
+
+    /**
+     * 同步班级
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void synchClassForEms() throws ParseException {
+
+        int pageNo = 1;
+        while (true) {
+            EmsClassBody emsClassBody = requestClassTypes(String.valueOf(pageNo));
+
+            if (emsClassBody == null || emsClassBody.getResultObject().getClasses().size() == 0) {
+                break;
+            }
+            //取出班级信息
+            if (!CollectionUtils.isEmpty(emsClassBody.getResultObject().getClasses())) {
+                List<EmsClass> emsClassList = emsClassBody.getResultObject().getClasses();
+                //获取系统所有运营的校区
+                List<Campus> campusList = campusMapper.selectAll();
+                //获取系统运营的学科
+                List<Subject> subjectList = subjectMapper.selectAll();
+                //班级类型
+                List<ClassType> classTypeList = classTypeMapper.selectAll();
+
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+
+                for (EmsClass emsClass : emsClassList) {
+
+                    if (!("UNITDOUBLET".equals(emsClass.getTeachingModel()) || "FACETOFACE".equals(emsClass.getTeachingModel()))) {
+                        continue;
+                    }
+                    EnrolClass enrolClass = new EnrolClass();
+                    enrolClass.setId(emsClass.getId());
+                    enrolClass.setCampusCode(emsClass.getSchoolCode());
+                    enrolClass.setCampusId(getCampusByCode(campusList, emsClass.getSchoolCode()).getId());
+                    enrolClass.setBrandCode(emsClass.getBrand());
+                    enrolClass.setSubjectId(getSubjectByCode(subjectList, emsClass.getSubjectId()).getId());
+                    enrolClass.setCreateTime(System.currentTimeMillis());
+                    enrolClass.setStartDate(format.parse(emsClass.getStartDate()));
+                    enrolClass.setName(emsClass.getName());
+                    enrolClass.setTeachModeCode(emsClass.getTeachingModel());
+                    enrolClass.setTeachModeName("UNITDOUBLET".equals(emsClass.getTeachingModel()) ? "双元" : "面授");
+                    enrolClass.setLessonModel(emsClass.getLessonModel());
+                    enrolClass.setClassTypeCode(emsClass.getClassTypeId());
+                    enrolClass.setClassTypeName(getClassTypeById(classTypeList, emsClass.getClassTypeId()).getName());
+                    enrolClass.setPeriods(emsClass.getPhase());
+                    enrolClass.setEndDate(new Date());
+                    enrolClass.setPlan(100);
+                    enrolClass.setCurrent(50);
+                    enrolClass.setUserId(5);
+                    enrolClass.setUserNo(emsClass.getJobNumber());
+                    enrolClass.setUserName("admin");
+                    enrolClass.setCreator(emsClass.getCreatorName());
+                    enrolClass.setStatus(emsClass.getStatus().byteValue());
+                    enrolClass.setIsDel((byte) 0);
+                    classMapper.insertSelective(enrolClass);
+                }
+            }
+            ++pageNo;
+        }
+    }
+
+
+    /**
+     * 同步学科
+     *
+     * @param model
+     */
+    private void synSubByModel(String model) {
+        //获取学科地址
+        String url = "https://ems.itcast.cn/api/dictionary/data.do";
+
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put("cid", emsAppId);
+        map.put("method", "subjects");
+        map.put("model", model);
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        String result = HttpUtil.httpPost(url, map);
+
+        EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+
+        if (emsSubjectBody == null) {
+            throw new RuntimeException("无法在ems获取学科信息!,无法同步学科信息!");
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            throw new RuntimeException(emsSubjectBody.getErrorMessage());
+        }
+        List<EmsSubject> emsSubjects = emsSubjectBody.getResultObject();
+        for (EmsSubject emsSubject : emsSubjects) {
+
+            Subject subjectQuery = new Subject();
+            subjectQuery.setCode(emsSubject.getId());
+            Subject subjectResult = subjectMapper.selectOne(subjectQuery);
+            //修改 ，
+            if (subjectResult != null) {
+                subjectResult.setCode(emsSubject.getId());
+                subjectResult.setName(emsSubject.getName());
+                subjectResult.setTeachModeCode(emsSubject.getModel());
+                subjectResult.setCreator("system");
+                subjectResult.setMemo(model);
+                subjectResult.setCreateTime(System.currentTimeMillis());
+                subjectResult.setStatus((byte) 1);
+                subjectMapper.updateByPrimaryKeySelective(subjectResult);
+            } else {
+                Subject subject = new Subject();
+                subject.setCode(emsSubject.getId());
+                subject.setName(emsSubject.getName());
+                subject.setTeachModeCode(emsSubject.getModel());
+                subject.setCreator("system");
+                subject.setMemo(model);
+                subject.setCreateTime(System.currentTimeMillis());
+                subject.setStatus((byte) 1);
+                subjectMapper.insertSelective(subject);
+            }
+        }
+    }
+
+
+    private EmsClassBody requestClassTypes(String pageNo) {
+        String url = "https://ems.itcast.cn/api/clazz.do";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //得到当前时间
+        Date currentDate = new Date();
+        String startTime = dateFormat.format(currentDate);
+        //向后推三个月
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.add(Calendar.DATE, 90);
+        //计算得出三个月后的时间
+        String endTime = dateFormat.format(calendar.getTime());
+        //组织参数
+        Map<String, String> param = new LinkedHashMap<>(6);
+        param.put("cid", emsAppId);
+        param.put("countPerPage", "100");
+        param.put("edate", endTime);
+        param.put("method", "search");
+        param.put("pageNo", pageNo);
+        param.put("sdate", startTime);
+        param.put("ts", String.valueOf(System.currentTimeMillis()));
+        //生成签名
+        HttpHelper.handlerSigUrlByMd5(param, emsKey);
+        //发送请求，得到结果
+        String result = HttpUtil.httpPost(url, param);
+
+        EmsClassBody emsClassBody = JsonUtil.jsonToObject(result, EmsClassBody.class);
+
+        if (null == emsClassBody) {
+            BUS_LOG.error("同步班级信息异常", "");
+            return null;
+        }
+
+        if (emsClassBody.getSuccess() == false) {
+            BUS_LOG.error("同步班级信息异常:{}", emsClassBody.getErrorMessage());
+            return null;
+        }
+        return emsClassBody;
+    }
+
+
+    private Campus getCampusByCode(List<Campus> campuses, String code) {
+        if (CollectionUtils.isEmpty(campuses)) {
+            return new Campus();
+        }
+        for (Campus campus : campuses) {
+            if (campus.getSerialCode().equals(code)) {
+                return campus;
+            }
+        }
+        return new Campus();
+    }
+
+    private Subject getSubjectByCode(List<Subject> subjectList, String code) {
+        if (CollectionUtils.isEmpty(subjectList)) {
+            return new Subject();
+        }
+        for (Subject subject : subjectList) {
+            if (code.equals(subject.getCode())) {
+                return subject;
+            }
+        }
+        return new Subject();
+    }
+
+    private ClassType getClassTypeById(List<ClassType> classTypeList, String id) {
+        if (CollectionUtils.isEmpty(classTypeList)) {
+            return new ClassType();
+        }
+        for (ClassType classType : classTypeList) {
+            if (id.equals(classType.getId())) {
+                return classType;
+            }
+        }
+        return new ClassType();
+    }
+}

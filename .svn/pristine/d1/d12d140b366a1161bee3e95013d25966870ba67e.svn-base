@@ -1,0 +1,131 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.annotation.CheckIntValues;
+import com.cz.enrol.annotation.Session;
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ManageBaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.Marketing;
+import com.cz.enrol.service.MarketingService;
+import com.cz.enrol.vo.UserEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+/**
+ * Created by liuzhongshuai on 2017/11/8.
+ */
+@Validated
+@RestController
+@RequestMapping("/managenment/marketing")
+public class ManagerMarketingController {
+
+    @Autowired
+    private MarketingService marketingService;
+
+
+    /**
+     * 分页查询营销政策
+     *
+     * @return
+     */
+    @GetMapping("/queryMarketing")
+    public ManageBaseBody<Map> queryMarketing(@RequestParam(defaultValue = "1") Integer page, @RequestParam(defaultValue = "10") Integer limit) {
+
+        ManageBaseBody<Map> mapManageBaseBody = new ManageBaseBody<>();
+
+        BasePage basePage = marketingService.queryMarking(page, limit);
+
+        mapManageBaseBody.setData(basePage.getPageData());
+        mapManageBaseBody.setCount(basePage.getCount());
+        mapManageBaseBody.setCode(0);
+        return mapManageBaseBody;
+    }
+
+    /**
+     * 添加、编辑
+     *
+     * @param marketing
+     * @return
+     */
+    @PostMapping("/mergeMarketing")
+    public BaseBody mergeMarketing(@Session UserEx userEx, Marketing marketing) {
+        BaseBody baseBody = new BaseBody();
+
+        marketingService.mergeMarketing(marketing, userEx);
+        baseBody.setMessage("保存成功!");
+        return baseBody;
+    }
+
+    /**
+     * 删除营销
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delMarketing")
+    public BaseBody delMarketing(Long id) {
+        BaseBody baseBody = new BaseBody();
+
+        if (null == id) {
+            baseBody.setMessage("参数值不正确!");
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            return baseBody;
+        }
+        Marketing marketing = new Marketing();
+        marketing.setId(id);
+        marketing.setIsDel(0);
+
+        marketing = marketingService.selectOne(marketing);
+        if (null == marketing) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("查询不到要删除的数据!");
+            return baseBody;
+        }
+        marketing.setIsDel(1);
+
+        marketingService.updateByPk(marketing);
+
+        baseBody.setMessage("删除成功!");
+        return baseBody;
+    }
+
+
+    /**
+     * 启用或停用营销
+     *
+     * @return
+     */
+    @PutMapping("/enableMarketingOrNo")
+    public BaseBody enableMarketingOrNo(Long id, @CheckIntValues(ableNull = false, values = {0, 1}) Integer status) {
+        BaseBody baseBody = new BaseBody();
+
+        if (id == null || status == null) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("参数值不正确!");
+            return baseBody;
+        }
+        Marketing marketing = marketingService.selectByPrimaryKey(id);
+        if (marketing == null) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("查询不到要更改的数据!");
+            return baseBody;
+        }
+        //保证密等
+        if (marketing.getStatus().intValue() == status.intValue()) {
+            baseBody.setMessage("修改成功!");
+            return baseBody;
+        }
+        marketing.setStatus(status);
+
+        marketingService.updateByPk(marketing);
+
+        baseBody.setMessage("修改成功!");
+        return baseBody;
+    }
+
+
+}

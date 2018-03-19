@@ -1,0 +1,70 @@
+package com.cz.enrol.utils;
+
+import org.apache.poi.hssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by liuzhongshuai on 2017/11/1.
+ */
+public class XlsUtil {
+
+    /**
+     * 根据查询结果生成xls文件
+     */
+    public static XSSFWorkbook buildExcelDocument(List<Map<String, Object>> mapList, String... heads) {
+
+        if (null == mapList) {
+            throw new NullPointerException("导出的数据为null！");
+        }
+
+        if (mapList.get(0).size() != (heads.length)) {
+            throw new RuntimeException("表头与数据列数不匹配!");
+        }
+        //创建一个xls文件
+        XSSFWorkbook xls = new XSSFWorkbook();
+        //创建sheet
+        XSSFSheet hssfSheet = xls.createSheet("第一页");
+        //创建样式
+        XSSFCellStyle style = xls.createCellStyle();
+        //居中格式
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        //创建表头行
+        XSSFRow row = hssfSheet.createRow(0);
+
+        //创建序号列
+        XSSFCell cell = row.createCell(0);
+        cell.setCellValue("序号");
+        cell.setCellStyle(style);
+
+        //遍历表头
+        for (int i = 1; i <= heads.length; i++) {
+            // 设置表头
+            XSSFCell cell1 = row.createCell(i);
+            cell1.setCellValue(heads[i-1]);
+            cell1.setCellStyle(style);
+        }
+        //遍历查询结果
+        for (int i = 1; i <=mapList.size(); i++) {
+            XSSFRow currentRow = hssfSheet.createRow(i);
+            Map<String, Object> childMap = mapList.get((i - 1));
+            Object[] valueObject = childMap.values().toArray();
+
+            XSSFCell currentCell = currentRow.createCell(0);
+            currentCell.setCellValue(i);
+            currentCell.setCellStyle(style);
+
+            for (int ci = 1; ci <=heads.length; ci++) {
+                // 设置cell 值
+                hssfSheet.setColumnWidth(ci, 8000);
+                currentCell = currentRow.createCell(ci);
+                currentCell.setCellValue(String.valueOf(valueObject[ci - 1]));
+                currentCell.setCellStyle(style);
+            }
+        }
+        return xls;
+    }
+
+}

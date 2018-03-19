@@ -1,0 +1,26 @@
+package com.cz.enrol.dao.user;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Role;
+import com.cz.enrol.entity.User;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * EnrolUserMapper数据库操作接口类
+ **/
+
+public interface UserMapper extends BaseDao<User> {
+
+
+    /**
+     * 用户查询出角色
+     *
+     * @param userId
+     * @return
+     */
+    List<Map<String, String>> roleByUser(Long userId);
+
+
+}

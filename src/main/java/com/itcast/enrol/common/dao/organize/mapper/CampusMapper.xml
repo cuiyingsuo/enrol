@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.organize.CampusMapper">
+
+    <!--实体映射 -->
+    <resultMap id="EnrolCampusResultMapResultMap" type="com.itcast.enrol.common.entity.Campus">
+        <!--主键 -->
+        <id property="id" column="主键"/>
+        <!--校区名称 -->
+        <result property="name" column="name"/>
+        <!--校区地址 -->
+        <result property="address" column="address"/>
+        <!--校长名 -->
+        <result property="owner" column="owner"/>
+        <!--联系电话 -->
+        <result property="telphone" column="telphone"/>
+        <!--创建者 -->
+        <result property="creator" column="creator"/>
+        <!--创建时间 -->
+        <result property="createTime" column="create_time"/>
+        <!--编辑者 -->
+        <result property="editor" column="editor"/>
+        <!--编辑时间 -->
+        <result property="editTime" column="edit_time"/>
+        <!--校区介绍； -->
+        <result property="introduce" column="introduce"/>
+        <!--校区邮箱； -->
+        <result property="email" column="email"/>
+        <!--校区联系人； -->
+        <result property="contacts" column="contacts"/>
+        <!--校区管理员，对应enrol_user表关键字Id； -->
+        <result property="managerId" column="manager_id"/>
+        <!--备注； -->
+        <result property="memo" column="memo"/>
+        <!--状态(0:停用,1:启用) -->
+        <result property="status" column="status"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, name, address, owner, telphone, creator, create_time, editor,
+		edit_time, introduce, email, contacts, manager_id, memo, status
+	</sql>
+    <select id="selectCampusListBygoodsId" parameterType="java.lang.Long"
+            resultType="java.util.Map">
+		SELECT
+		cam.showname AS campusName,
+		cam.id AS campusId,
+		cam.address AS address
+
+		FROM enrol_campus cam,enrol_class cla,enrol_goods_class gc
+
+		WHERE gc.goods_id=#{goodsId} AND gc.class_id=cla.id AND cla.campus_id=cam.id
+		GROUP BY cam.id
+	</select>
+
+    <!--维护商品中查询列表-->
+    <select id="queryCampusListByStatus" parameterType="java.lang.Byte" resultType="java.util.Map">
+		SELECT
+		cam.id AS campusId,
+		cam.showname AS campusName
+		FROM enrol_campus cam
+		where cam.status=#{status}
+	</select>
+
+</mapper>

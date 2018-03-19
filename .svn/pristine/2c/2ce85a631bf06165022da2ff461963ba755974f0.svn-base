@@ -1,0 +1,61 @@
+package com.cz.enrol.service;
+
+
+import com.cz.enrol.dao.goods.EnrolGoodsClassMapper;
+import com.cz.enrol.entity.EnrolGoodsClass;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+
+/**
+ * 商品班级关系表 服务类
+ **/
+@Transactional
+@Service
+public class EnrolGoodsClassService {
+
+    //统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+
+    //当前业务数据操作接口dao
+    @Autowired
+    private EnrolGoodsClassMapper enrolGoodsClassMapper;
+
+
+    public EnrolGoodsClass selectByPrimaryKey(Long id) {
+        return enrolGoodsClassMapper.selectByPrimaryKey(id);
+    }
+
+    public int deleteByPrimaryKey(Long id) {
+        return enrolGoodsClassMapper.deleteByPrimaryKey(id);
+    }
+
+    public int insert(EnrolGoodsClass record) {
+        return enrolGoodsClassMapper.insert(record);
+    }
+
+    public int insertSelective(EnrolGoodsClass record) {
+        return enrolGoodsClassMapper.insertSelective(record);
+    }
+
+    public int updateByPrimaryKeySelective(EnrolGoodsClass record) {
+        return enrolGoodsClassMapper.updateByPrimaryKeySelective(record);
+    }
+
+    public int updateByPrimaryKey(EnrolGoodsClass record) {
+        return enrolGoodsClassMapper.updateByPrimaryKey(record);
+    }
+
+    public List<EnrolGoodsClass> queryByGoodsId(Long goodsId) {
+        // TODO Auto-generated method stub
+        EnrolGoodsClass enrolGoodsClass = new EnrolGoodsClass();
+        enrolGoodsClass.setGoodsId(goodsId);
+        return enrolGoodsClassMapper.select(enrolGoodsClass);
+    }
+}

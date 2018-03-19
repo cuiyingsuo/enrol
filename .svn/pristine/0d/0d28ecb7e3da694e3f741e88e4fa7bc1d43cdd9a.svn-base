@@ -1,0 +1,61 @@
+package com.cz.enrol.service;
+
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.order.OrderSubMapper;
+import com.cz.enrol.entity.OrderSub;
+
+/**
+ * 订单信息表（子表）； 服务类
+ **/
+@Service
+public class OrderSubService {
+
+	
+	@Autowired
+	private PayService payService;
+		
+	@Autowired
+	private OrderSubMapper orderSubDao;
+
+	/**
+	 * 查询分订单信息
+	 * 
+	 * @param id
+	 *            分订单id
+	 * @return
+	 */
+	public OrderSub queryByPrimaryKey(Long id) {
+		return orderSubDao.selectByPrimaryKey(id);
+	}
+
+	/**
+	 * 插入分订单
+	 * 
+	 * @param record
+	 *            分订单实体类
+	 * @return
+	 */
+	public int insertSelective(OrderSub record) {
+		return orderSubDao.insertSelective(record);
+	}
+	
+	public Map<String,Object> queryReceiptInfo(String orderSubNo){
+    	Map<String,Object> receiptInfo = orderSubDao.selectReceiptInfo(orderSubNo);
+    	
+    	Object receiptNoObj = receiptInfo.get("receiptNo");
+    	if(null==receiptNoObj){
+    		String receiptNo = payService.getReceiptNo();
+    		OrderSub orderSub = new OrderSub();
+    		orderSub.setReceiptNo(receiptNo);
+    		orderSubDao.updateByPrimaryKeySelective(orderSub);
+    		receiptInfo.put("receiptNo", receiptNo);
+    	}
+    	
+    	return receiptInfo;
+    }
+
+}

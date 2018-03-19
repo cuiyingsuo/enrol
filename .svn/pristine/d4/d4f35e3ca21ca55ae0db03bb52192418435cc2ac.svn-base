@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.dict.EnrolDictMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolDictResultMapResultMap" type="com.cz.enrol.entity.EnrolDict">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--名称-->
+		<result property="name" column="name" />
+		<!--字典类型-->
+		<result property="type" column="type" />
+		<!--字典code-->
+		<result property="code" column="code" />
+		<!--顺序，可选；-->
+		<result property="order" column="order" />
+		<!--父级Id，若有；-->
+		<result property="parentId" column="parent_id" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	type,	code,	order,	parent_id
+	</sql>
+
+	<select id="selectInfoByType" resultType="java.util.Map" parameterType="java.lang.String">
+		SELECT 
+			`code`,
+			`name`,
+			`order`,
+			parent_id AS parentId
+		FROM enrol_dict
+		WHERE type=#{type}
+	</select>
+</mapper>

@@ -1,0 +1,119 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ManageBaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.service.InvoiceService;
+import com.cz.enrol.utils.BusLogUtil;
+import com.cz.enrol.utils.XlsUtil;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * Created by liuzhongshuai on 2017/11/11.
+ */
+@RestController
+@RequestMapping("/managenment/invoice")
+public class MananerInviceController {
+
+
+    BusLogUtil busLogUtil = new BusLogUtil(MananerInviceController.class);
+
+    @Autowired
+    private InvoiceService invoiceService;
+
+    /**
+     * 发票条件分页查询
+     *
+     * @param conditions
+     * @return
+     */
+    @GetMapping("/queryInvoice")
+    public ManageBaseBody queryInvoice(Map<String, String> conditions) {
+
+        ManageBaseBody baseBody = new ManageBaseBody();
+
+        if (!conditions.containsKey("page")) {
+            conditions.put("page", "1");
+        }
+        if (!conditions.containsKey("limit")) {
+            conditions.put("limit", "10");
+        }
+        BasePage basePage = invoiceService.queryInvoiceToPage(conditions);
+
+        baseBody.setCode(0);
+        baseBody.setMsg("");
+        baseBody.setCount(basePage.getCount());
+        baseBody.setData(basePage.getPageData());
+
+        return baseBody;
+    }
+
+
+    /**
+     * 开发票 多选的情况下 id 以 ',' 拼接
+     *
+     * @param ids
+     * @return
+     */
+    @PutMapping("/invoiced")
+    public BaseBody invoiced(String ids) {
+
+        BaseBody baseBody = new BaseBody();
+
+        if (StringUtils.isEmpty(ids)) {
+            baseBody.setMessage("参数不正确!");
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            return baseBody;
+        }
+        invoiceService.invoiceClose(ids);
+        baseBody.setMessage("成功!");
+        return baseBody;
+    }
+
+
+    /**
+     * 导出发票
+     *
+     * @param conditions
+     */
+    @GetMapping("/importInvoice")
+    public void importInvoice(HttpServletResponse response, Map<String, String> conditions) throws UnsupportedEncodingException {
+
+        List<Map<String, Object>> list = invoiceService.queryInvoice(conditions);
+
+        //生成待下载文件
+        XSSFWorkbook xls = XlsUtil.buildExcelDocument(list, "学员编号ID", "校区/教学点", "学员姓名", "班级名称", "应交学费", "已交学费", "班主任姓名", "发票类型", "抬头类型", "发票抬头", "纳税人识别号","发票内容","开票金额","地址、电话","开户行及账号","电子邮箱","学员联系电话","备注");
+        //设置下载时客户端Excel的名称
+        String filename = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+        // 设置response参数，可以打开下载页面
+        response.reset();
+        response.setContentType("application/vnd.ms-excel;charset=utf-8");
+        response.setHeader("Content-Disposition", "attachment;filename=" + new String(("invoice(" + filename + ").xls").getBytes(), "utf-8"));
+
+        try (OutputStream ouputStream = response.getOutputStream()) {
+            xls.write(ouputStream);
+            ouputStream.flush();
+        } catch (IOException e) {
+            busLogUtil.error("文件导出异常:{}", e);
+        }
+
+
+    }
+}

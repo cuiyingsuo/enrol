@@ -1,0 +1,28 @@
+package com.cz.enrol.dao.marketing;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Marketing;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author liuzs
+ */
+public interface MarketingMapper extends BaseDao<Marketing> {
+
+
+    /**
+     * 营销管理 匹配
+     * @param marketing
+     * @return
+     */
+    List<Marketing> matchMarking(Marketing marketing);
+
+    /**
+     * 营销下拉选
+     *
+     * @return
+     */
+    List<Map<String, String>> marketingDownSelect();
+}

@@ -1,0 +1,308 @@
+package com.cz.enrol.controller;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BaseController;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.GoodsClass;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.service.GoodsClassService;
+import com.cz.enrol.service.OrderMainService;
+import com.cz.enrol.service.OrderSubService;
+import com.cz.enrol.utils.PriceUtil;
+
+/**
+ * 
+ * 订单信息表（主表）； 访问控制器类
+ * 
+ **/
+@RestController
+@RequestMapping("/orderController")
+public class OrderController extends BaseController {
+
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private OrderMainService orderMainService;
+	@Autowired
+	// 当前业务操作接口bo
+	private OrderSubService orderSubService;
+	@Autowired
+	private GoodsClassService gcService;
+
+	@Value("${server.token-key}")
+	private String loginToken;
+
+	/**
+	 * 查询主订单列表
+	 * 
+	 * @param mobile
+	 *            学生手机号码
+	 * @return
+	 */
+	@RequestMapping(value = "/getOrderMainList", method = RequestMethod.GET)
+	public BaseBody<List> getOrderMainList(@RequestParam String mobile) {
+		BaseBody<List> baseBody = new BaseBody<List>();
+
+		List<Map<String, Object>> orderMainList = orderMainService
+				.queryOrderByMobile(mobile);
+		if (null != orderMainList && orderMainList.size() > 0) {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(orderMainList);
+			baseBody.setMessage("查询成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(201);
+			baseBody.setMessage("查询无记录");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 查询分订单信息
+	 * 
+	 * @param id
+	 *            分订单（支付订单）id
+	 * @return
+	 */
+	@RequestMapping(value = "/getOrderSubInfo", method = RequestMethod.GET)
+	public BaseBody<OrderSub> getOrderSubInfo(@RequestParam Long id) {
+		BaseBody<OrderSub> baseBody = new BaseBody<OrderSub>();
+
+		OrderSub orderSubInfo = orderSubService.queryByPrimaryKey(id);
+		if (null != orderSubInfo) {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(orderSubInfo);
+			baseBody.setMessage("查询成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("查询无记录");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 查询分订单列表（主订单信息）
+	 * 
+	 * @param orderMainNo
+	 *            主订单编号
+	 * @return
+	 */
+	@RequestMapping(value = "/getOrderMainInfo", method = RequestMethod.GET)
+	public BaseBody<Map> getOrderMainInfo(@RequestParam String orderMainNo) {
+		BaseBody<Map> baseBody = new BaseBody<Map>();
+
+		Map<String, Object> orderMainInfo = orderMainService
+				.queryOrderMainInfoByNo(orderMainNo);
+		if (null != orderMainInfo && orderMainInfo.size() > 0) {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(orderMainInfo);
+			baseBody.setMessage("查询成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("查询无记录");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 订单确认页
+	 * 
+	 * @param classId
+	 *            班级id
+	 * @param goodsId
+	 *            商品id
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/confirmOrder", method = RequestMethod.GET)
+	public BaseBody<Map> confirmOrder(@RequestParam Long classId,
+			@RequestParam Long goodsId, HttpServletRequest request,
+			HttpServletResponse response) {
+		BaseBody<Map> baseBody = new BaseBody<Map>();
+
+		Map<String, Object> userInfo = getUserInfoByRedis(request
+				.getHeader(loginToken));
+		if (null == userInfo) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("用户未登录");
+			return baseBody;
+		}
+
+		String studentMobile = String.valueOf(userInfo.get("mobile"));
+		String studentName = String.valueOf(userInfo.get("name"));
+		Long studentId = Long.parseLong(String.valueOf(userInfo.get("id")));
+
+		List<GoodsClass> gcList = gcService.queryByGoodsId(goodsId);
+		// 判断所传参数商品id和班级id是否匹配
+		boolean isRightClass = false;
+		for (GoodsClass gc : gcList) {
+			if (gc.getClassId() == classId) {
+				isRightClass = true;
+			}
+		}
+		if (!isRightClass) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("商品信息与班级不匹配!");
+			return baseBody;
+		}
+		if (isRightClass) {
+			Map<String, Object> confirmOrderMap = orderMainService
+					.confirmMainOrder(classId, goodsId);
+			confirmOrderMap.put("studentMobile", studentMobile);
+			confirmOrderMap.put("studentName", studentName);
+			confirmOrderMap.put("studentId", studentId);
+			if (null != confirmOrderMap) {
+				baseBody.setSuccess(ReturnStatus.SUCCESS);
+				baseBody.setCode(200);
+				baseBody.setContent(confirmOrderMap);
+				baseBody.setMessage("查询成功");
+			}
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 提交主订单
+	 * 
+	 * @param classId
+	 *            班级id
+	 * @param goodsId
+	 *            商品id
+	 * @param payType
+	 *            支付类型
+	 * @param isReceipt
+	 *            是否开具电子发票
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/submitOrderMain", method = RequestMethod.POST)
+	public BaseBody<String> submitMainOrder(@RequestParam Long classId,
+			@RequestParam Long goodsId, @RequestParam int payType,
+			@RequestParam int isReceipt, HttpServletRequest request,
+			HttpServletResponse response) {
+		logger.info("classId={};goodsId={};paytype={};isReceipt={}",classId,goodsId,payType,isReceipt);
+		BaseBody<String> baseBody = new BaseBody<String>();
+		String token = request.getHeader(loginToken);
+
+		Map<String, Object> userInfo = getUserInfoByRedis(token);
+		if (null == userInfo) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(1002);
+			baseBody.setMessage("用户未登录");
+			return baseBody;
+		}
+
+		String studentMobile = String.valueOf(userInfo.get("mobile"));
+		String studentName = String.valueOf(userInfo.get("name"));
+		Long studentId = Long.parseLong(String.valueOf(userInfo.get("id")));
+
+		List<GoodsClass> gcList = gcService.queryByGoodsId(goodsId);
+		// 判断所传参数商品id和班级id是否匹配
+		boolean isRightClass = false;
+		for (GoodsClass gc : gcList) {
+			if (gc.getClassId() == classId) {
+				isRightClass = true;
+			}
+		}
+		if (!isRightClass) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("商品信息与班级不匹配!");
+			return baseBody;
+		}
+		OrderMain orderMain = orderMainService.submitMainOrder(studentId,
+				studentMobile, studentName, goodsId, classId, payType,
+				isReceipt);
+		if (null!=orderMain) {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(orderMain.getMergeOrderNo());
+			baseBody.setMessage("订单提交成功");
+		}else{
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(200);
+			baseBody.setMessage("订单提交失败");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 取消订单
+	 * 
+	 * @param orderId
+	 *            主订单id
+	 * @return
+	 */
+	@RequestMapping(value = "/cancelOrder", method = RequestMethod.POST)
+	public BaseBody cancelOrder(Long orderId) {
+		BaseBody<String> baseBody = new BaseBody<String>();
+		boolean isSuccess = orderMainService.cancelOrder(orderId);
+		if (isSuccess) {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setMessage("订单取消成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(200);
+			baseBody.setMessage("订单取消失败");
+		}
+		return baseBody;
+	}
+	/**
+	 * 获取凭证信息
+	 * @param orderMainNo
+	 * @return
+	 */
+	@RequestMapping(value = "/getReceipt", method = RequestMethod.GET)
+	public BaseBody getReceipt(@RequestParam String orderSubNo){
+		BaseBody<Map> baseBody = new BaseBody<Map>();
+		
+		Map<String,Object> receiptInfo = orderSubService.queryReceiptInfo(orderSubNo);
+		if (null==receiptInfo||receiptInfo.size()==0) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("找不到订单号相关订单信息");
+		} else {
+			//金额转为元，增加汉字金额
+			int price = Integer.valueOf(receiptInfo.get("orderPrice").toString());
+			BigDecimal bigDecimal = new BigDecimal(price);
+			float priceStr = bigDecimal.movePointLeft(2).floatValue();
+			String priceCN = PriceUtil.priceToCN(new BigDecimal(priceStr));
+			
+			receiptInfo.put("orderPrice", priceStr);
+			receiptInfo.put("priceCN", priceCN);
+			
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(receiptInfo);
+			baseBody.setMessage("获取电子收据信息成功");
+		}
+		return baseBody;
+	}
+}

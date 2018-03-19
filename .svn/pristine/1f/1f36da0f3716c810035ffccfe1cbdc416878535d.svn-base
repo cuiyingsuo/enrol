@@ -1,0 +1,57 @@
+package com.cz.enrol.utils;
+
+import org.apache.poi.hssf.usermodel.*;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by liuzhongshuai on 2017/11/1.
+ */
+public class XlsUtil {
+
+    /**
+     * 根据查询结果生成xls文件
+     */
+    public static HSSFWorkbook buildExcelDocument(List<Map<String, Object>> mapList, String... heads) {
+
+        if (null == mapList) {
+            throw new NullPointerException("导出的数据为null！");
+        }
+        //创建一个xls文件
+        HSSFWorkbook xls = new HSSFWorkbook();
+        //创建sheet
+        HSSFSheet hssfSheet = xls.createSheet("第一页");
+        //创建样式
+        HSSFCellStyle style = xls.createCellStyle();
+        //居中格式
+        style.setAlignment(HSSFCellStyle.ALIGN_CENTER);
+        //创建表头行
+        HSSFRow row = hssfSheet.createRow(0);
+        //遍历表头
+        for (int i = 0; i < heads.length; i++) {
+            // 设置表头
+            HSSFCell cell = row.createCell(i);
+            cell.setCellValue(heads[i]);
+            cell.setCellStyle(style);
+        }
+        //遍历查询结果
+        for (int i = 1; i <= mapList.size(); i++) {
+            HSSFRow currentRow = hssfSheet.createRow(i);
+            Map<String, Object> childMap = mapList.get((i - 1));
+            Object[] valueObject = childMap.values().toArray();
+
+            HSSFCell currentCell = currentRow.createCell(0);
+            currentCell.setCellValue(i);
+            currentCell.setCellStyle(style);
+
+            for (int ci = 0; ci < (heads.length-1); ci++) {
+                // 设置cell 值
+                currentCell = currentRow.createCell(ci + 1);
+                currentCell.setCellValue(String.valueOf(valueObject[ci]));
+                currentCell.setCellStyle(style);
+            }
+        }
+        return xls;
+    }
+}

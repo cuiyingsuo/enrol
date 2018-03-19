@@ -1,0 +1,31 @@
+package com.cz.enrol;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.system.ApplicationPidFileWriter;
+import org.springframework.boot.system.EmbeddedServerPortFileWriter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+
+/**
+ * @Autohor liuzhongshuai
+ * Created by liuzhongshuai on 2017/10/19.
+ */
+@SpringBootApplication
+@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, RedisAutoConfiguration.class})
+public class EnrolStarter {
+
+
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException, InterruptedException {
+        SpringApplication app = new SpringApplication(EnrolStarter.class);
+        app.addListeners(new ApplicationPidFileWriter());
+        app.addListeners(new EmbeddedServerPortFileWriter());
+        app.run(args);
+
+    }
+}

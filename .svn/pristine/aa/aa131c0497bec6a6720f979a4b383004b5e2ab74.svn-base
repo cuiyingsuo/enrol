@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.marketing.MarketingMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolMarketingResultMapResultMap" type="com.cz.enrol.entity.Marketing">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--营销政策；-->
+		<result property="strategy" column="strategy" />
+		<!--优惠条件-->
+		<result property="condition" column="condition" />
+		<!--优惠金额(分）-->
+		<result property="reductionMoney" column="reduction_money" />
+		<!--期限-->
+		<result property="reductionTerm" column="reduction_term" />
+		<!--是否启用，0未启用，1已启用；-->
+		<result property="isEnable" column="is_enable" />
+		<!--是否删除，0未删除，1已删除；-->
+		<result property="isDelete" column="is_delete" />
+		<!--是否发布，0未发布，1已发布；-->
+		<result property="isPublish" column="is_publish" />
+		<!--备注；-->
+		<result property="memo" column="memo" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	strategy,	condition,	reduction_money,	reduction_term,	is_enable,	is_delete,	is_publish,	memo
+	</sql>
+
+	<!-- 根据班级id查询 -->
+	<select id="selectByClassId" parameterType="java.lang.Long" resultType="java.util.Map">
+		SELECT 
+			mar.id AS marketingId,
+			mar.strategy AS strategy,
+			mar.`condition` AS `condition`,
+			mar.reduction_money AS reductionMoney,
+			mar.reduction_term AS renductionTerm,
+			mar.memo AS memo 
+		FROM enrol_marketing mar,enrol_marketing_class mc 
+		WHERE mar.id=mc.marketing_id AND mc.class_id=#{classId} AND mar.is_enable=1 AND mar.is_delete=0	AND mar.is_publish=1
+	</select>
+</mapper>

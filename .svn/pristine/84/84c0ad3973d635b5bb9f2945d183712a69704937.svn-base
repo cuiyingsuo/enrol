@@ -1,0 +1,62 @@
+package com.cz.enrol.utils;
+
+import com.cz.enrol.entity.User;
+import com.cz.enrol.exception.FileNullException;
+import com.cz.enrol.vo.UserEx;
+import org.springframework.data.redis.core.HashOperations;
+
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class TokenUtil {
+    public static String getToken(String pre) {
+        return MD5Util.encryption(pre + System.currentTimeMillis());
+    }
+
+
+    /**
+     * 用户登录后保存信息到redis
+     *
+     * @param user
+     * @param times
+     * @return token
+     */
+    public static String setUserEx(User user, int times) {
+        Map<String, String> userInfoMap = new HashMap<String, String>(3);
+        userInfoMap.put("userId", String.valueOf(user.getId()));
+        userInfoMap.put("userName", user.getName());
+        userInfoMap.put("mobile", user.getMobile());
+        HashOperations<String, String, String> hashOperations = RedisUtil.getRedisTemplate().opsForHash();
+        String md5Token = MD5Util.encryption(user.getMobile() + "_userInfo");
+
+        hashOperations.putAll(md5Token, userInfoMap);
+        RedisUtil.expire(md5Token, times);
+
+        return md5Token;
+    }
+
+    /**
+     * redis 获取登录信息
+     *
+     * @param token
+     * @return
+     */
+    public static UserEx getUserEx(String token) {
+
+        if (null == token) {
+            throw new FileNullException("参数 mobile is null!");
+        }
+        HashOperations<String, String, String> hashOperations = RedisUtil.getRedisTemplate().opsForHash();
+        String userId = hashOperations.get(token, "userId");
+        String userName = hashOperations.get(token, "userName");
+        String mobile = hashOperations.get(token, "mobile");
+        UserEx userEx = new UserEx();
+        userEx.setId(Long.parseLong(userId));
+        userEx.setName(userName);
+        userEx.setMobile(mobile);
+
+        return userEx;
+    }
+
+}

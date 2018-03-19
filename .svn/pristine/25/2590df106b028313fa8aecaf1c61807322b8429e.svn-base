@@ -1,0 +1,38 @@
+datasource:
+  type: com.alibaba.druid.pool.DruidDataSource
+  master:
+    url: jdbc:mysql://172.17.0.93:3306/enrol?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 100
+    initialSize: 20
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQueryTimeout: 900000
+    validationQuery: SELECT SYSDATE() from dual
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+
+#logback 日志输出设置
+spring:
+  redis:
+    database: 0
+    host: 172.17.0.91
+    port: 6379
+    timeout: 2000
+    password:
+    pool:
+      maxActive: 100
+      maxWait: 10000
+      maxIdle: 8
+      minIdle: 0
+
+server:
+  port: 8088

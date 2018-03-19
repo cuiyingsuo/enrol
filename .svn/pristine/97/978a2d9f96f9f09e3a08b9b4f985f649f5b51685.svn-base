@@ -1,0 +1,46 @@
+package com.cz.enrol.configure;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+
+/**
+ * @Author liuzhongshuai
+ * Created by liuzhongshuai on 2017/10/20.
+ */
+@Configuration
+public class InterceptorConfigure extends WebMvcConfigurerAdapter {
+
+
+    @Value("${server.context-path}")
+    private String contextPath;
+
+    /**
+     * 前端登录验证
+     *
+     * @return
+     */
+    @Bean
+    public HandlerInterceptor getStudentLoginInterceptor() {
+        return new LoginInterceptorForStudent();
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 前台登录验证
+        registry.addInterceptor(getStudentLoginInterceptor()).addPathPatterns("/**/orderController/**");
+        registry.addInterceptor(getStudentLoginInterceptor()).addPathPatterns("/**/myInfoController/**");
+        registry.addInterceptor(getStudentLoginInterceptor()).addPathPatterns("/**/payController/**");
+        registry.addInterceptor(getStudentLoginInterceptor()).addPathPatterns("/**/invoiceController/**");
+        //后台登录验证
+        registry.addInterceptor(getStudentLoginInterceptor()).addPathPatterns("/**/managenment/**")
+                .excludePathPatterns("/**/managenment/user/userLogin").excludePathPatterns("/**/managenment/user/validateCodeRef");
+
+        super.addInterceptors(registry);
+    }
+
+
+}

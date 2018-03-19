@@ -1,0 +1,38 @@
+package com.cz.enrol.dao.student;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolStudent;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
+
+/**
+ * 
+ * EnrolStudentMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolStudentMapper extends BaseDao<EnrolStudent> {
+
+
+
+	/**
+	 *
+	 * 根据学员手机查询密码
+	 *
+	 */
+	EnrolStudent queryStudentByMobile(String mobile);
+	/**
+	 *
+	 * @param params
+	 * @return
+	 */
+	int updatePasswordByMobile(Map<String, String> params);
+	/**
+	 * 根据手机号更新学生信息
+	 * @param es
+	 * @return
+	 */
+	int updateByMobileSelective(Map<String, Object> params);
+	
+}

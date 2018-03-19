@@ -1,0 +1,72 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.dao.goods.GoodsClassMapper;
+import com.cz.enrol.entity.GoodsClass;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.goods.GoodsMapper;
+import com.cz.enrol.entity.Goods;
+
+/**
+ * 商品表 服务类
+ **/
+@Service
+public class GoodsService {
+
+    @Autowired
+    private GoodsMapper goodsDao;
+
+    @Autowired
+    private GoodsClassMapper goodsClassMapper;
+
+    public Goods queryByPrimaryKey(Long id) {
+        return goodsDao.selectByPrimaryKey(id);
+    }
+
+    public List<Map<String, Object>> queryBySubjectId(Long subjectId) {
+        List<Map<String, Object>> goodsList = goodsDao.selectGoodsListBySubjectId(subjectId);
+        return goodsList;
+    }
+
+    public List<Map<String, Object>> queryGoodsSpec(Long goodsId) {
+        List<Map<String, Object>> goodsSpec = goodsDao.selectGoodsSpec(goodsId);
+
+        return goodsSpec;
+    }
+
+    public Map<String, Object> queryGoodsInfo(Long goodsId) {
+        Map<String, Object> goodsMap = goodsDao.selectGoodsInfo(goodsId);
+        return goodsMap;
+    }
+
+    /**
+     * 条件查询商品列表
+     *
+     * @param conditions
+     * @return
+     */
+    public BasePage<Map<String, Object>> queryByConditions(int startPage, int pageSize, Map<String, String> conditions) {
+
+        PageHelper.startPage(startPage, pageSize);
+        List resultList = goodsClassMapper.queryGoodsForClass(conditions);
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(resultList);
+
+        BasePage<Map<String, Object>> basePage = new BasePage<Map<String, Object>>();
+        basePage.setPageDate(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startPage);
+        basePage.setTotalPage(pageInfo.getPages());
+
+        return basePage;
+    }
+}

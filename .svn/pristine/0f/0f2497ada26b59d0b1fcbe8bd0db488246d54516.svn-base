@@ -1,0 +1,54 @@
+package com.cz.enrol.dao.dict;
+
+import com.cz.enrol.entity.EnrolDict;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * EnrolDictMapper数据库操作接口类
+ **/
+
+public interface EnrolDictMapper {
+
+
+    /**
+     * 查询（根据主键ID查询）
+     **/
+    EnrolDict selectByPrimaryKey(@Param("id") Long id);
+
+    /**
+     * 删除（根据主键ID删除）
+     **/
+    int deleteByPrimaryKey(@Param("id") Long id);
+
+    /**
+     * 添加
+     **/
+    int insert(EnrolDict record);
+
+    /**
+     * 添加 （匹配有值的字段）
+     **/
+    int insertSelective(EnrolDict record);
+
+    /**
+     * 修改 （匹配有值的字段）
+     **/
+    int updateByPrimaryKeySelective(EnrolDict record);
+
+    /**
+     * 修改（根据主键ID修改）
+     **/
+    int updateByPrimaryKey(EnrolDict record);
+
+    /**
+     * 根据类型查询字典集合
+     *
+     * @param type
+     * @return
+     */
+    List<Map<String, String>> selectInfoByType(String type);
+
+}

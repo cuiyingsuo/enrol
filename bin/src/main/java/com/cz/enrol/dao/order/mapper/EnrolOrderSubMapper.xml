@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.order.EnrolOrderSubMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolOrderSubResultMapResultMap"
+		type="com.apicloud.server.entity.enrol.EnrolOrderSub">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--订单号； -->
+		<result property="orderNo" column="order_no" />
+		<!--订单价格 -->
+		<result property="orderPrice" column="order_price" />
+		<!--支付时间 -->
+		<result property="payTime" column="pay_time" />
+		<!--订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功) -->
+		<result property="status" column="status" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!--编辑者 -->
+		<result property="editor" column="editor" />
+		<!--编辑时间 -->
+		<result property="editTime" column="edit_time" />
+		<!---->
+		<result property="mergeOrderNo" column="merge_order_no" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, order_no, order_price, pay_time, status, creator, create_time,
+		editor, edit_time, merge_order_no
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolOrderSub"
+		parameterType="java.lang.Long">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM enrol_order_sub
+		WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除 -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		DELETE FROM enrol_order_sub
+		WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolOrderSub">
+		INSERT INTO enrol_order_sub
+		(id,order_no,order_price,pay_time,status,creator,create_time,editor,edit_time,merge_order_no)
+		VALUES
+		(#{id},#{orderNo},#{orderPrice},#{payTime},#{status},#{creator},#{createTime},#{editor},#{editTime},#{mergeOrderNo})
+	</insert>
+
+	<!-- 添加 （匹配有值的字段） -->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolOrderSub">
+		INSERT INTO enrol_order_sub
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="orderNo != null">
+				order_no,
+			</if>
+			<if test="orderPrice != null">
+				order_price,
+			</if>
+			<if test="payTime != null">
+				pay_time,
+			</if>
+			<if test="status != null">
+				status,
+			</if>
+			<if test="creator != null">
+				creator,
+			</if>
+			<if test="createTime != null">
+				create_time,
+			</if>
+			<if test="editor != null">
+				editor,
+			</if>
+			<if test="editTime != null">
+				edit_time,
+			</if>
+			<if test="mergeOrderNo != null">
+				merge_order_no,
+			</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="orderNo!=null">
+				#{orderNo},
+			</if>
+			<if test="orderPrice!=null">
+				#{orderPrice},
+			</if>
+			<if test="payTime!=null">
+				#{payTime},
+			</if>
+			<if test="status!=null">
+				#{status},
+			</if>
+			<if test="creator!=null">
+				#{creator},
+			</if>
+			<if test="createTime!=null">
+				#{createTime},
+			</if>
+			<if test="editor!=null">
+				#{editor},
+			</if>
+			<if test="editTime!=null">
+				#{editTime},
+			</if>
+			<if test="mergeOrderNo!=null">
+				#{mergeOrderNo},
+			</if>
+		</trim>
+	</insert>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolOrderSub">
+		UPDATE enrol_order_sub
+		<set>
+			<if test="orderNo != null">
+				order_no = #{orderNo},
+			</if>
+			<if test="orderPrice != null">
+				order_price = #{orderPrice},
+			</if>
+			<if test="payTime != null">
+				pay_time = #{payTime},
+			</if>
+			<if test="status != null">
+				status = #{status},
+			</if>
+			<if test="creator != null">
+				creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				edit_time = #{editTime},
+			</if>
+			<if test="mergeOrderNo != null">
+				merge_order_no = #{mergeOrderNo},
+			</if>
+
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolOrderSub">
+		UPDATE enrol_order_sub
+		SET
+		order_no = #{orderNo},
+		order_price = #{orderPrice},
+		pay_time = #{payTime},
+		status = #{status},
+		creator = #{creator},
+		create_time = #{createTime},
+		editor = #{editor},
+		edit_time = #{editTime},
+		merge_order_no = #{mergeOrderNo}
+		WHERE id = #{id}
+	</update>
+	<select id="selectByMergeOrderNo" parameterType="java.lang.Long"
+		resultMap="EnrolOrderSubResultMapResultMap">
+		SELECT
+		sub.id AS id,
+		sub.merge_order_no AS orderNo,
+		sub.order_no AS subOrderNo,
+		om.create_time AS createTime,
+		sub.order_price AS orderPrice,
+		sub.pay_time AS payTime
+		FROM enrol_order_sub sub
+		LEFT JOIN enrol_order_main om ON sub.merge_order_no=om.merge_order_no
+		WHERE om.merge_order_no=#{orderNo}
+	</select>
+</mapper>

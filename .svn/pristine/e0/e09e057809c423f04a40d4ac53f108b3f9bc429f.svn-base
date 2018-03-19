@@ -1,0 +1,59 @@
+package com.cz.enrol.service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cz.enrol.dao.student.StudentMapper;
+import com.cz.enrol.entity.Student;
+
+/**
+ * 学员表 服务类
+ **/
+@Service
+public class StudentService {
+
+	// 统一记录日志类
+	private Logger log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private StudentMapper studentDao;
+
+	public Student queryStudentByMobile(String mobile) {
+		Student student = new Student();
+		student.setMobile(mobile);
+		return studentDao.selectOne(student);
+	}
+
+	public Student checkPassword(String mobile, String password) {
+		Student student = new Student();
+		student.setMobile(mobile);
+		Student studentInfo = studentDao.selectOne(student);
+		if (null == studentInfo||!studentInfo.getPassword().equals(password)) {
+			return null;
+		}
+		return studentInfo;
+	}
+
+	@Transactional
+	public int modifyPassword(String mobile, String password) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("mobile", mobile);
+		params.put("password", password);
+		int rel = studentDao.updatePasswordByMobile(params);
+		return rel;
+	}
+
+	@Transactional
+	public int updateByMobile(Student es) {
+		Student student = new Student();
+		student.setMobile(es.getMobile());
+		student=studentDao.selectOne(student);
+		es.setId(student.getId());
+		return studentDao.updateByPrimaryKeySelective(es);
+	}
+}

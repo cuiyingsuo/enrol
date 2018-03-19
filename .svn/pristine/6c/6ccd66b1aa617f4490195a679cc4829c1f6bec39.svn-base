@@ -1,0 +1,66 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * Created by liuzhongshuai on 2017/11/3.
+ */
+@RestController
+@RequestMapping("/managenment/menu")
+public class ManagerMenuController {
+
+
+    /**
+     * 通过角色获取菜单
+     *
+     * @param request
+     * @return
+     */
+    @GetMapping("/getMenu")
+    public BaseBody<String> getMenuByRole(HttpServletRequest request) {
+
+        BaseBody<String> baseBody = new BaseBody<>();
+
+        String menus = "<ul class='layui-nav layui-nav-tree site-demo-nav'> " +
+                "<li class='layui-nav-item layui-nav-itemed'> " +
+                "<a class='javascript:;' href='javascript:;'>首页</a> " +
+                "</li> <li class='layui-nav-item layui-nav-itemed'> " +
+                "<a class='javascript:;' href='javascript:;'>banner管理</a> </li> " +
+                "<li class='layui-nav-item layui-nav-itemed'>         " +
+                "<a class='javascript:;' href='javascript:;'>商品管理</a>  </li> " +
+                "<li class='layui-nav-item layui-nav-itemed'>        " +
+                " <a class='javascript:;' href='javascript:;'>营销管理</a>    " +
+                " </li>      <li class='layui-nav-item layui-nav-itemed'>    " +
+                " <a class='javascript:;' href='javascript:;'>订单管理" +
+                "<span class='layui-nav-more'></span></a>    " +
+                " <dl class='layui-nav-child'> <dd class=''> " +
+                "  <a href='asdf/asdf'>订单管理</a> </dd>  <dd class=''> " +
+                "  <a href='asdf/asdf'>补录订单</a>  </dd>  </dl> </li> <li class='layui-nav-item layui-nav-itemed'>" +
+                "    <a class='javascript:;' href='javascript:;'>资金流水管理<span class='layui-nav-more'></span></a> " +
+                "<dl class='layui-nav-child'>  <dd class=''>    <a href=''>  支付流水 </a>  </dd>  <dd class=''> <a href=''> " +
+                "退费流水 </a>  </dd> <dd class=''>  <a href=''>   补录流水  </a> </dd>   </dl>     </li>    " +
+                " <li class='layui-nav-item layui-nav-itemed'>  <a class='javascript:;' href='javascript:;'>学员管理<span class='layui-nav-more'></span></a>  " +
+                " <dl class='layui-nav-child'>  <dd class=''>    <a href=''>  录取学员管理    </a>   " +
+                "  </dd>     <dd class=''>  <a href=''>待录取学员管理 </a> </dd> </dl>   " +
+                "  </li>  <li class='layui-nav-item layui-nav-itemed'> " +
+                "<a class='javascript:;' href='javascript:;'>电子合同管理</a> </li> <li class='layui-nav-item layui-nav-itemed'>      " +
+                "   <a class='javascript:;' href='javascript:;'>基础数据<span class='layui-nav-more'></span></a>     " +
+                "    <dl class='layui-nav-child'>   <dd class=''>   <a href=''> 校区维护</a>  </dd>  " +
+                "  <dd class=''>  <a href=''>  学科维护 </a>  </dd>  <dd class=''>  <a href=''>  班级维护  </a> </dd>      " +
+                "   </dl>     </li>     <li class='layui-nav-item layui-nav-itemed'> " +
+                "<a class='javascript:;' href='javascript:;'>后台用户管理</a>  " +
+                " </li>     <li class='layui-nav-item layui-nav-itemed'>   " +
+                " <a class='javascript:;' href='javascript:;'>角色权限配置</a>  </li>   " +
+                "   <li class='layui-nav-item' style='height: 30px; text-align: center'></li>   " +
+                "  <span class='layui-nav-bar' style='height: 0px; top: 22.5px; opacity: 0;'></span> </ul>";
+
+        baseBody.setContent(menus);
+
+        return baseBody;
+    }
+}

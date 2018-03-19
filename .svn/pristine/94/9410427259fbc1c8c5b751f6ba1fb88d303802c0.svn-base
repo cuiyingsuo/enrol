@@ -1,0 +1,5 @@
+package com.cz.enrol.common;
+
+public interface DictType {
+	public static final String CHANNEL="channel_type";
+}

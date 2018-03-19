@@ -1,0 +1,61 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.entity.OrderFlow;
+import com.cz.enrol.vo.PayFlowQueryEx;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.order.OrderFlowMapper;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 订单支付流水表/资金流水表 服务类
+ **/
+@Service
+public class OrderFlowService extends BaseService<OrderFlow> {
+
+    @Autowired
+    private OrderFlowMapper orderFlowDao;
+
+
+    /**
+     * 分页查询支付流水
+     *
+     * @param payFlowQueryEx
+     * @return
+     */
+    public BasePage<Map> queryFlowToPage(PayFlowQueryEx payFlowQueryEx) {
+
+        PageHelper.startPage(payFlowQueryEx.getStartPage(), payFlowQueryEx.getPageSize());
+
+        List resultList = orderFlowDao.queryFlowToPage(payFlowQueryEx);
+
+        PageInfo<Map> pageInfo = new PageInfo<Map>(resultList);
+
+        BasePage basePage = new BasePage();
+        basePage.setPageData(pageInfo.getList());
+        basePage.setPageSize(payFlowQueryEx.getPageSize());
+        basePage.setCurrentPage(payFlowQueryEx.getStartPage());
+        basePage.setTotalPage(pageInfo.getPages());
+        return basePage;
+    }
+
+    /**
+     * 分页查询支付流水
+     *
+     * @param payFlowQueryEx
+     * @return
+     */
+    public List<Map<String, Object>> queryFlows(PayFlowQueryEx payFlowQueryEx) {
+        List resultList = orderFlowDao.queryFlowToPage(payFlowQueryEx);
+        return resultList;
+    }
+
+}

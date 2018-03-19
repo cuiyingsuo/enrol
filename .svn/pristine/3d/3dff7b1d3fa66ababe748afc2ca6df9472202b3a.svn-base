@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.organize.ClassMapper">
+
+    <!--实体映射 -->
+    <resultMap id="EnrolClassResultMapResultMap" type="com.cz.enrol.entity.EnrolClass">
+        <!--主键 -->
+        <id property="id" column="主键"/>
+        <!--班级名称 -->
+        <result property="name" column="name"/>
+        <!--校区Id，对应表enrol_campus关键字Id -->
+        <result property="campusId" column="campus_id"/>
+        <!--品牌Id -->
+        <result property="brandCode" column="brand_code"/>
+        <!--营销Id -->
+        <result property="marketingId" column="marketing_id"/>
+        <!--期数 -->
+        <result property="periods" column="periods"/>
+        <!--教学方式Id -->
+        <result property="teachModeCode" column="teach_mode_code"/>
+        <!--学科Id -->
+        <result property="subjectId" column="subject_id"/>
+        <!--课程类型Id -->
+        <result property="classTypeCode" column="class_type_code"/>
+        <!--开班时间 -->
+        <result property="startDate" column="start_date"/>
+        <!---->
+        <result property="endDate" column="end_date"/>
+        <!-- 课时 -->
+        <result property="classTime" column="class_time"/>
+        <!--计划招生数量 -->
+        <result property="plan" column="plan"/>
+        <!--实际招生数量 -->
+        <result property="current" column="current"/>
+        <!--学费 -->
+        <result property="discountPrice" column="discount_price"/>
+        <!--班主任Id，对应enrol_user表关键字Id； -->
+        <result property="userId" column="user_id"/>
+        <!--班主任名称 -->
+        <result property="userName" column="user_name"/>
+        <!--备注 -->
+        <result property="memo" column="memo"/>
+        <!--创建者 -->
+        <result property="creator" column="creator"/>
+        <!--创建时间 -->
+        <result property="createTime" column="create_time"/>
+        <!--编辑者 -->
+        <result property="editor" column="editor"/>
+        <!--编辑时间 -->
+        <result property="editTime" column="edit_time"/>
+        <!--班级介绍； -->
+        <result property="introduce" column="introduce"/>
+        <!--状态(0:停用,1:启用) -->
+        <result property="status" column="status"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, name, campus_id, brand_code, marketing_id, periods,
+		teach_mode_code,
+		subject_id, class_type_code, start_date,
+		end_date,class_time, plan,
+		current, discount_price, user_id, user_name,
+		memo, creator, create_time,
+		editor, edit_time, introduce, status
+	</sql>
+
+
+    <!-- 根据id列表查询班级列表 -->
+    <select id="queryByClassIdList" parameterType="java.util.List"
+            resultMap="EnrolClassResultMapResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from enrol_class
+        where status = 1 and id in
+        <foreach collection="list" index="index" item="item" open="("
+                 separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
+    <!-- 根据学科id查询班级列表 -->
+    <select id="quereyBySubjectId" parameterType="java.lang.Long"
+            resultMap="EnrolClassResultMapResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from enrol_class
+        where subject_id = #{subjectId} and status = 1 and
+        start_date > now() ORDER
+        BY start_date;
+    </select>
+
+    <!-- 查询班级信息，包含校区信息 -->
+    <select id="selectClassInfo" parameterType="java.util.Map"
+            resultType="java.util.Map">
+		SELECT
+		cla.id AS classId,
+		cla.`name` AS className,
+		cla.teach_mode_code AS teachModeCode,
+		cla.teach_mode_name AS
+		teachModeName,
+		cla.periods AS periods,
+		cla.subject_id AS subjectId,
+		sub.`name` AS subjectName,
+		cla.class_type_code AS classTypeCode,
+		cla.class_type_name AS classTypeName,
+		goods.price AS
+		discountPrice,
+		cla.start_date AS startDate,
+		cla.class_time AS classTime,
+		cla.plan AS planStudent,
+		cla.current AS currentStudent,
+		cam.id AS campusId,
+		cam.`name` AS campusName,
+		cam.address AS address,
+		cam.introduce AS introduce,
+		cam.serial_code AS campusCode
+		FROM enrol_class cla
+		LEFT JOIN enrol_campus cam ON cla.campus_id=cam.id
+		LEFT JOIN enrol_subject sub ON cla.subject_id=sub.id
+		LEFT JOIN enrol_goods_class gc ON cla.id=gc.class_id
+		LEFT JOIN enrol_goods goods ON goods.id=gc.goods_id
+		WHERE cla.id=#{classId} AND goods.id=#{goodsId};
+	</select>
+    <!-- 课程规格信息页班级列表 -->
+    <select id="selectClassListOfGoodsSpec" parameterType="java.util.Map"
+            resultType="java.util.Map">
+		SELECT
+		cla.id AS classId,
+		cla.`name` AS className,
+		goods.price AS price,
+		cla.start_date	AS startDate,
+		cla.class_time	AS classTime,
+		cam.address AS address,
+		cam.id AS campusId,
+		cla.subject_id AS subjectId,
+		cla.class_type_code AS classTypeCode,
+		cla.teach_mode_code AS teachModeCode,
+		cla.current,
+		cla.plan
+		FROM enrol_class cla,enrol_goods_class gc,enrol_goods goods,enrol_campus cam
+
+		WHERE cla.campus_id=#{campusId} AND gc.goods_id=#{goodsId} AND gc.goods_id=goods.id AND gc.class_id=cla.id AND cla.campus_id=cam.id
+
+	</select>
+
+    <!--商品管理中查询班级选项 -->
+    <select id="queryClassByMulitField" parameterType="com.cz.enrol.vo.ClassEx" resultType="java.util.Map">
+        SELECT ec.id as classId,ec.class_type_code as classTypeCode, ec.`name` as className
+        FROM enrol_class ec
+        WHERE
+        ec.status=1 AND FIND_IN_SET(ec.campus_id,#{campusIds})
+        <if test="subjectId!=null and subjectId!=''">
+            AND FIND_IN_SET(ec.subject_id,#{subjectId})
+        </if>
+        <if test="classTypeCode!=null and classTypeCode!='' ">
+            AND FIND_IN_SET(ec.class_type_code,#{classTypeCode})
+        </if>
+        <if test="teachModeCode!=null and teachModeCode!=''">
+            AND FIND_IN_SET(ec.teach_mode_code,#{teachModeCode})
+        </if>
+    </select>
+</mapper>

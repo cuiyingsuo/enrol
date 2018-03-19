@@ -1,0 +1,207 @@
+package com.cz.enrol.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.allinpay.ets.client.RequestOrder;
+import com.cz.enrol.dao.order.OrderMainMapper;
+import com.cz.enrol.dao.order.OrderSubMapper;
+import com.cz.enrol.dao.student.StudentMapper;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.entity.Student;
+import com.cz.enrol.utils.HttpRequest;
+import com.cz.enrol.utils.MD5Util;
+
+@Service
+public class AllinpayService {
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+	
+	@Value("${allin.reg-url}")
+	private String regUrl = "";
+	@Value("${allin.receive-url}")
+	private String receiveUrl;// 商户系统通知地址
+	@Value("${allin.key}")
+	private String key;
+	@Value("${allin.version}")
+	private String version;
+	@Value("${allin.merchant-id}")
+	private String merchantId;// 商户号
+
+	@Autowired
+	private OrderMainMapper orderMainDao;
+
+	@Autowired
+	private OrderSubMapper orderSubDao;
+
+	@Autowired
+	private StudentMapper studentDao;
+	
+	private String language = "1";
+	private String inputCharset = "1";
+	private String pickupUrl = "";// 取货地址
+	private String payType = "33";
+	private String signType = "0";
+	private String orderNo = "";
+	private String orderAmount = "";
+	private String orderDatetime = "";// 商户的订单提交时间
+	private String orderCurrency = "0";// 订单金额币种类型
+	private String orderExpireDatetime = "";
+	private String payerTelephone = "";
+	private String payerEmail = "";
+	private String payerName = "";
+	private String payerIDCard = "";
+	private String pid = "";
+	private String productName = "";// 商品名称
+	private String productId = "enrol";
+	private String productNum = "1";
+	private String productPrice = "";
+	private String productDesc = "";
+	private String ext1 = "";
+	private String ext2 = "";
+	private String extTL = "";
+	private String issuerId = "";// 发卡方代码
+	private String pan = "";
+	private String tradeNature = "SERVICES";// GOODS表示实物类型，SERVICES表示服务类型
+	private String sign = "";
+
+	// 拼接支付订单信息
+	public RequestOrder getRequestOrder(String userId, OrderSub orderSub,
+			OrderMain orderMain) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+
+		Student student = studentDao.selectByPrimaryKey(Long.parseLong(userId));
+		String allinpayUserid = student.getAllinpayUserid();
+		if (null == allinpayUserid || "".equals(allinpayUserid)) {
+			logger.info("去通联支付注册：merchantId={}", merchantId);
+			// 注册通联会员
+			allinpayUserid = allinpayRegister(signType, merchantId, "enrol"
+					+ userId, "1234567890");
+			if (null != allinpayUserid || !"".equals(allinpayUserid)) {
+				logger.info("注册通联支付会员成功：merchantId={}，allinpayUserid={}",
+						merchantId, allinpayUserid);
+				student.setAllinpayUserid(allinpayUserid);
+				studentDao.updateByPrimaryKeySelective(student);
+			}
+		}
+		if (null == allinpayUserid || "".equals(allinpayUserid)) {
+			return null;
+		}
+		logger.info("组装支付订单:userId={},orderSub={},orderMain={}", userId,
+				orderSub, orderMain);
+		// 构造订单请求对象，生成signMsg。
+		RequestOrder requestOrder = new RequestOrder();
+		if (null != inputCharset && !"".equals(inputCharset)) {
+			requestOrder.setInputCharset(Integer.parseInt(inputCharset));
+		}
+		requestOrder.setPickupUrl("");
+		requestOrder.setReceiveUrl(receiveUrl);
+		requestOrder.setVersion(version);
+		if (null != language && !"".equals(language)) {
+			requestOrder.setLanguage(Integer.parseInt(language));
+		}
+		requestOrder.setSignType(Integer.parseInt(signType));
+		requestOrder.setPayType(Integer.parseInt(payType));
+		requestOrder.setIssuerId(issuerId);
+		requestOrder.setMerchantId(merchantId);
+		requestOrder.setPayerName(payerName);
+		requestOrder.setPayerEmail(payerEmail);
+		requestOrder.setPayerTelephone(payerTelephone);
+		requestOrder.setPayerIDCard(payerIDCard);
+		requestOrder.setPid(pid);
+		requestOrder.setOrderNo(orderSub.getOrderNo());
+		requestOrder.setOrderAmount(orderSub.getOrderPrice().longValue());
+		requestOrder.setOrderCurrency(orderCurrency);
+		Date date = new Date(orderSub.getCreateTime());
+		requestOrder.setOrderDatetime(sdf.format(date));
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.add(Calendar.HOUR_OF_DAY, 1);
+		requestOrder.setOrderExpireDatetime(sdf.format(date));
+		requestOrder.setProductName(orderMain.getGoodsName());
+
+		requestOrder.setProductPrice(orderSub.getOrderPrice().longValue());
+
+		if (null != productNum && !"".equals(productNum)) {
+			requestOrder.setProductNum(Integer.parseInt(productNum));
+		}
+		requestOrder.setProductId(productId);
+		requestOrder.setProductDesc(orderMain.getSubjectName());
+		requestOrder.setExt1("<USER>" + allinpayUserid + "</USER>");
+		requestOrder.setExt2(ext2);
+		requestOrder.setExtTL(extTL);// 通联商户拓展业务字段，在v2.2.0版本之后才使用到的，用于开通分账等业务
+		requestOrder.setPan(pan);
+		requestOrder.setTradeNature(tradeNature);
+		requestOrder.setKey(key); // key为MD5密钥，密钥是在通联支付网关会员服务网站上设置。
+
+		String strSrcMsg = requestOrder.getSrc(); // 此方法用于debug，测试通过后可注释。
+		String strSignMsg = requestOrder.doSign(); // 签名，设为signMsg字段值。
+		logger.info(strSrcMsg);
+		requestOrder.setSignMsg(strSignMsg);
+
+		return requestOrder;
+	}
+	/**
+	 * 通联h5支付注册会员
+	 * @param signType
+	 * @param merchantId
+	 * @param partnerUserId
+	 * @param key
+	 * @return
+	 */
+	private String allinpayRegister(String signType, String merchantId,
+			String partnerUserId, String key) {
+		String result = "";
+		String src = getSignSrc(signType, merchantId, partnerUserId, key);
+		String signMsg = MD5Util.encryption(src).toUpperCase().trim();
+		result = getSignSrcAndSignMsg(signType, merchantId, partnerUserId,
+				signMsg);
+		System.out.println(result + "提交地址=" + regUrl);
+		String callBack = HttpRequest.sendGet(regUrl, result);
+		System.out.println("返回报文：callBack=" + callBack + "\n");
+		result = getUserIdByJson(callBack);
+		return result;
+	}
+
+	// 原串 的首尾要加上 & & 这个很重要
+	private String getSignSrc(String signType, String merchantId,
+			String partnerUserId, String key) {
+		String result = "";
+		result = "&signType=" + signType + "&merchantId=" + merchantId
+				+ "&partnerUserId=" + partnerUserId + "&key=" + key + "&";
+		return result;
+	}
+
+	// 通过Md5获得源串
+	private String getSignSrcAndSignMsg(String signType, String merchantId,
+			String partnerUserId, String signMsg) {
+		String result = "";
+		result = "signType=" + signType + "&merchantId=" + merchantId
+				+ "&partnerUserId=" + partnerUserId + "&signMsg=" + signMsg
+				+ "";
+		return result;
+	}
+
+	private String getUserIdByJson(String return_msg) {
+		String result = "";
+		JSONObject object;
+		try {
+			object = new JSONObject(return_msg);
+			result = object.optString("userId");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return result;
+
+	}
+}

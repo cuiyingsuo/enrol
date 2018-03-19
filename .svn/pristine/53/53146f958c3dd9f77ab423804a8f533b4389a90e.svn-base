@@ -1,0 +1,296 @@
+package com.cz.enrol.entity;
+
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Table(name = "enrol_order_flow")
+public class OrderFlow {
+    /**
+     * 关键字Id;
+     */
+    @Id
+    @Column(name = "pay_id")
+    private Long payId;
+
+    /**
+     * 合单ID
+     */
+    @Column(name = "marge_order_no")
+    private String margeOrderNo;
+
+    /**
+     * 订单Id
+     */
+    @Column(name = "order_no")
+    private String orderNo;
+
+    /**
+     * 支付类型
+     */
+    @Column(name = "payment_type")
+    private String paymentType;
+
+    /**
+     * 支付的金额(分)
+     */
+    private Integer amount;
+
+    /**
+     * 支付用户；对应enrol_student表关键字Id;
+     */
+    @Column(name = "pay_user_id")
+    private Long payUserId;
+
+    /**
+     * 支付描述；
+     */
+    @Column(name = "pay_description")
+    private String payDescription;
+
+    /**
+     * 交易的流水号；
+     */
+    @Column(name = "flow_id")
+    private String flowId;
+
+    /**
+     * 支付状态，0:失败、1:成功；
+     */
+    private Integer status;
+
+    @Column(name = "pay_channel_code")
+    private String payChannelCode;
+
+    @Column(name = "pay_channel_name")
+    private String payChannelName;
+
+
+    @Column(name = "receivables_campus_code")
+    private String receivablesCampusCode;
+
+    /**
+     * 记录时间；
+     */
+    @Column(name = "create_datetime")
+    private Date createDatetime;
+
+    /**
+     * 获取关键字Id;
+     *
+     * @return pay_id - 关键字Id;
+     */
+    public Long getPayId() {
+        return payId;
+    }
+
+    /**
+     * 设置关键字Id;
+     *
+     * @param payId 关键字Id;
+     */
+    public void setPayId(Long payId) {
+        this.payId = payId;
+    }
+
+    /**
+     * 获取合单ID
+     *
+     * @return marge_order_no - 合单ID
+     */
+    public String getMargeOrderNo() {
+        return margeOrderNo;
+    }
+
+    /**
+     * 设置合单ID
+     *
+     * @param margeOrderNo 合单ID
+     */
+    public void setMargeOrderNo(String margeOrderNo) {
+        this.margeOrderNo = margeOrderNo;
+    }
+
+    /**
+     * 获取订单Id
+     *
+     * @return order_no - 订单Id
+     */
+    public String getOrderNo() {
+        return orderNo;
+    }
+
+    /**
+     * 设置订单Id
+     *
+     * @param orderNo 订单Id
+     */
+    public void setOrderNo(String orderNo) {
+        this.orderNo = orderNo;
+    }
+
+    /**
+     * 获取支付类型
+     *
+     * @return payment_type - 支付类型
+     */
+    public String getPaymentType() {
+        return paymentType;
+    }
+
+    /**
+     * 设置支付类型
+     *
+     * @param paymentType 支付类型
+     */
+    public void setPaymentType(String paymentType) {
+        this.paymentType = paymentType;
+    }
+
+    /**
+     * 获取支付的金额(分)
+     *
+     * @return amount - 支付的金额(分)
+     */
+    public Integer getAmount() {
+        return amount;
+    }
+
+    /**
+     * 设置支付的金额(分)
+     *
+     * @param amount 支付的金额(分)
+     */
+    public void setAmount(Integer amount) {
+        this.amount = amount;
+    }
+
+    /**
+     * 获取支付用户；对应enrol_student表关键字Id;
+     *
+     * @return pay_user_id - 支付用户；对应enrol_student表关键字Id;
+     */
+    public Long getPayUserId() {
+        return payUserId;
+    }
+
+    /**
+     * 设置支付用户；对应enrol_student表关键字Id;
+     *
+     * @param payUserId 支付用户；对应enrol_student表关键字Id;
+     */
+    public void setPayUserId(Long payUserId) {
+        this.payUserId = payUserId;
+    }
+
+    /**
+     * 获取支付描述；
+     *
+     * @return pay_description - 支付描述；
+     */
+    public String getPayDescription() {
+        return payDescription;
+    }
+
+    /**
+     * 设置支付描述；
+     *
+     * @param payDescription 支付描述；
+     */
+    public void setPayDescription(String payDescription) {
+        this.payDescription = payDescription;
+    }
+
+    /**
+     * 获取交易的流水号；
+     *
+     * @return flow_id - 交易的流水号；
+     */
+    public String getFlowId() {
+        return flowId;
+    }
+
+    /**
+     * 设置交易的流水号；
+     *
+     * @param flowId 交易的流水号；
+     */
+    public void setFlowId(String flowId) {
+        this.flowId = flowId;
+    }
+
+    /**
+     * 获取支付状态，0:失败、1:成功；
+     *
+     * @return status - 支付状态，0:失败、1:成功；
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置支付状态，0:失败、1:成功；
+     *
+     * @param status 支付状态，0:失败、1:成功；
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
+     * @return pay_channel_id
+     */
+    public String getPayChannelCode() {
+        return payChannelCode;
+    }
+
+    /**
+     * @param payChannelId
+     */
+    public void setPayChannelCode(String payChannelCode) {
+        this.payChannelCode = payChannelCode;
+    }
+
+    /**
+     * @return pay_channel_name
+     */
+    public String getPayChannelName() {
+        return payChannelName;
+    }
+
+    /**
+     * @param payChannelName
+     */
+    public void setPayChannelName(String payChannelName) {
+        this.payChannelName = payChannelName;
+    }
+
+
+    public String getReceivablesCampusCode() {
+        return receivablesCampusCode;
+    }
+
+    public void setReceivablesCampusCode(String receivablesCampusCode) {
+        this.receivablesCampusCode = receivablesCampusCode;
+    }
+
+    /**
+     * 获取记录时间；
+     *
+     * @return create_datetime - 记录时间；
+     */
+    public Date getCreateDatetime() {
+        return createDatetime;
+    }
+
+    /**
+     * 设置记录时间；
+     *
+     * @param createDatetime 记录时间；
+     */
+    public void setCreateDatetime(Date createDatetime) {
+        this.createDatetime = createDatetime;
+    }
+}

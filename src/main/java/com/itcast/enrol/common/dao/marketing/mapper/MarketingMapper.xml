@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.marketing.MarketingMapper">
+
+    <!--实体映射-->
+    <resultMap id="marketResultList" type="com.itcast.enrol.common.entity.Marketing">
+        <id property="id" column="主键"/>
+        <result property="name" column="name"/>
+        <result property="durationTypeCode" column="duration_type_code"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="creator" column="creator"/>
+        <result property="creatorId" column="creator_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="editor" column="editor"/>
+        <result property="editeTime" column="edite_time"/>
+        <result property="reductionPrice" column="reduction_price"/>
+        <result property="subjectIds" column="subject_ids"/>
+        <result property="classTypeCodes" column="class_type_codes"/>
+        <result property="classTypeNames" column="class_type_names"/>
+        <result property="durationTypeName" column="duration_type_name"/>
+        <result property="teachModelCodes" column="teach_model_codes"/>
+        <result property="teachModelNames" column="teach_model_names"/>
+        <result property="campusIds" column="campus_ids"/>
+        <result property="isDel" column="is_del"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	strategy,	condition,	reduction_money,	reduction_term,	is_enable,	is_delete,	is_publish,	memo
+	</sql>
+
+    <!--营销政策下拉选-->
+    <select id="marketingDownSelect" resultType="java.util.Map">
+        select em.id ,em.`name` from enrol_marketing em where em.status=1 and em.is_del=0
+    </select>
+
+    <!--查询营销政策 -->
+    <select id="matchMarking" parameterType="com.itcast.enrol.common.entity.Marketing" resultMap="marketResultList">
+                  SELECT
+            *
+        FROM
+            enrol_marketing em
+        WHERE
+            em.is_del = 0
+        AND em.`status` = 1
+        AND FIND_IN_SET(#{campusIds},em.campus_ids)
+        AND FIND_IN_SET(#{subjectIds},em.subject_ids)
+        AND FIND_IN_SET(#{classTypeCodes},em.class_type_codes)
+        AND FIND_IN_SET(#{teachModelCodes},em.teach_model_codes)
+        ORDER BY em.reduction_price DESC
+    </select>
+
+
+</mapper>

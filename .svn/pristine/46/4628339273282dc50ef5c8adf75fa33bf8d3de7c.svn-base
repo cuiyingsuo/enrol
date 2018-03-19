@@ -1,0 +1,33 @@
+package com.cz.enrol;
+
+import java.io.PrintStream;
+
+import org.springframework.boot.Banner;
+import org.springframework.core.env.Environment;
+
+public class BannerSpring implements Banner {
+
+	@Override
+	public void printBanner(Environment arg0, Class<?> arg1, PrintStream ps) {
+		// TODO Auto-generated method stub
+		String version = "v1.0";
+		ps.println(" _    _    _____     _      ______    _");
+		
+		
+		ps.println("(_) _| |_ /  ___)  // \\\\  /  _____) _| |_");
+		
+		
+		ps.println("| |(_   _)| (     //___\\\\ \\  \\___  (_   _)");
+		
+		ps.println("| |  | |  | (     ||___||  \\____  \\  | |");
+		
+		ps.println("| |  | |_ | (__   //   \\\\  ______)/  | |_");
+		
+		ps.println("|_|  |___)\\_____)//     \\\\(_______)  |___)");
+		
+		ps.println("itcast enrol（springboot+mybatis+mysql）"+version);
+		
+		ps.println();
+	}
+
+}

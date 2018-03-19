@@ -1,0 +1,16 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.user.UserRoleMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 用户角色表 服务类
+ **/
+@Service
+public class UserRoleService {
+
+	@Autowired
+	private UserRoleMapper userRoleDao;
+
+}

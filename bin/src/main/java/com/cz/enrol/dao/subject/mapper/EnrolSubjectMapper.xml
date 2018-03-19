@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.apicloud.server.base.enrol.dao.EnrolSubjectMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolSubjectResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolSubject">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--学科名称-->
+		<result property="name" column="name" />
+		<!--学科状态(0:关闭，1:开启)-->
+		<result property="status" column="status" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+		<!--学科介绍-->
+		<result property="introduce" column="introduce" />
+		<!--备注；-->
+		<result property="memo" column="memo" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	status,	creator,	create_time,	editor,	edit_time,	introduce,	memo
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolSubject" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_subject
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_subject
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolSubject">
+		 INSERT INTO enrol_subject
+ 		(id,name,status,creator,create_time,editor,edit_time,introduce,memo) 
+		 VALUES 
+ 		(#{id},#{name},#{status},#{creator},#{createTime},#{editor},#{editTime},#{introduce},#{memo}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolSubject">
+		 INSERT INTO enrol_subject
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="name != null">
+				 name,
+			</if>
+			<if test="status != null">
+				 status,
+			</if>
+			<if test="creator != null">
+				 creator,
+			</if>
+			<if test="createTime != null">
+				 create_time,
+			</if>
+			<if test="editor != null">
+				 editor,
+			</if>
+			<if test="editTime != null">
+				 edit_time,
+			</if>
+			<if test="introduce != null">
+				 introduce,
+			</if>
+			<if test="memo != null">
+				 memo,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="name!=null">
+				 #{name},
+			</if>
+			<if test="status!=null">
+				 #{status},
+			</if>
+			<if test="creator!=null">
+				 #{creator},
+			</if>
+			<if test="createTime!=null">
+				 #{createTime},
+			</if>
+			<if test="editor!=null">
+				 #{editor},
+			</if>
+			<if test="editTime!=null">
+				 #{editTime},
+			</if>
+			<if test="introduce!=null">
+				 #{introduce},
+			</if>
+			<if test="memo!=null">
+				 #{memo},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolSubject">
+		 UPDATE enrol_subject
+ 		 <set> 
+			<if test="name != null">
+				 name = #{name},
+			</if>
+			<if test="status != null">
+				 status = #{status},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				 editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				 edit_time = #{editTime},
+			</if>
+			<if test="introduce != null">
+				 introduce = #{introduce},
+			</if>
+			<if test="memo != null">
+				 memo = #{memo},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolSubject">
+		 UPDATE enrol_subject
+		 SET 
+			 name = #{name},
+			 status = #{status},
+			 creator = #{creator},
+			 create_time = #{createTime},
+			 editor = #{editor},
+			 edit_time = #{editTime},
+			 introduce = #{introduce},
+			 memo = #{memo}
+		 WHERE id = #{id}
+	</update>
+	
+	<!-- 查询列表 -->
+	<select id="querySubjectList" resultMap="EnrolSubjectResultMapResultMap">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_subject
+		 WHERE status = 1 ORDER BY create_time ASC
+	</select>
+</mapper>

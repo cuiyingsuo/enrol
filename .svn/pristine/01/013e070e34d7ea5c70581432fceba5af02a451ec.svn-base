@@ -1,0 +1,24 @@
+package com.cz.enrol.dao.subject;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Subject;
+
+import java.util.List;
+
+
+/**
+ * 
+ * EnrolSubjectMapper数据库操作接口类
+ * 
+ **/
+
+public interface SubjectMapper extends BaseDao<Subject> {
+
+
+	
+	/**
+	 * 
+	 * 学科列表
+	 */
+	public List<Subject> selectSubjectList();
+}

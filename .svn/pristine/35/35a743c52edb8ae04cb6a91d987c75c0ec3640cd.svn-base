@@ -1,0 +1,161 @@
+package com.cz.enrol.entity;
+
+import java.math.BigDecimal;
+import javax.persistence.*;
+
+@Table(name = "enrol_class_type")
+public class ClassType {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
+
+    private Float discountprice;
+
+    private String name;
+
+    private Float normalprice;
+
+    private Boolean upgradestatu;
+
+    @Column(name = "subject_id")
+    private String subjectId;
+
+    @Transient
+    private Boolean isUpgrade;
+
+    private BigDecimal firstprice;
+
+    private BigDecimal lastprice;
+
+    private Integer days;
+
+
+    /**
+     * @return id
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     */
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    /**
+     * @return discountprice
+     */
+    public Float getDiscountprice() {
+        return discountprice;
+    }
+
+    /**
+     * @param discountprice
+     */
+    public void setDiscountprice(Float discountprice) {
+        this.discountprice = discountprice;
+    }
+
+    /**
+     * @return name
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @param name
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * @return normalprice
+     */
+    public Float getNormalprice() {
+        return normalprice;
+    }
+
+    /**
+     * @param normalprice
+     */
+    public void setNormalprice(Float normalprice) {
+        this.normalprice = normalprice;
+    }
+
+    /**
+     * @return upgradestatu
+     */
+    public Boolean getUpgradestatu() {
+        return upgradestatu;
+    }
+
+    /**
+     * @param upgradestatu
+     */
+    public void setUpgradestatu(Boolean upgradestatu) {
+        this.upgradestatu = upgradestatu;
+    }
+
+    /**
+     * @return subject_id
+     */
+    public String getSubjectId() {
+        return subjectId;
+    }
+
+    /**
+     * @param subjectId
+     */
+    public void setSubjectId(String subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    /**
+     * @return firstprice
+     */
+    public BigDecimal getFirstprice() {
+        return firstprice;
+    }
+
+    /**
+     * @param firstprice
+     */
+    public void setFirstprice(BigDecimal firstprice) {
+        this.firstprice = firstprice;
+    }
+
+    /**
+     * @return lastprice
+     */
+    public BigDecimal getLastprice() {
+        return lastprice;
+    }
+
+    /**
+     * @param lastprice
+     */
+    public void setLastprice(BigDecimal lastprice) {
+        this.lastprice = lastprice;
+    }
+
+    public Boolean getIsUpgrade() {
+        return isUpgrade;
+    }
+
+    public void setIsUpgrade(Boolean isUpgrade) {
+        this.isUpgrade = isUpgrade;
+    }
+
+
+    public Integer getDays() {
+        return days;
+    }
+
+    public void setDays(Integer days) {
+        this.days = days;
+    }
+}

@@ -1,0 +1,320 @@
+package com.cz.enrol.entity;
+
+import java.math.BigDecimal;
+import java.util.Date;
+import javax.persistence.*;
+
+@Table(name = "enrol_bill")
+public class Bill {
+    /**
+     * id 自增
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 分次订单编号，商户生成的
+     */
+    @Column(name = "sub_order_no")
+    private String subOrderNo;
+
+    /**
+     * 支付平台生成的支付流水号
+     */
+    @Column(name = "pay_flow_no")
+    private String payFlowNo;
+
+    /**
+     * 订单支付金额
+     */
+    @Column(name = "pay_amount")
+    private BigDecimal payAmount;
+
+    /**
+     * 手续费
+     */
+    private BigDecimal fee;
+
+    /**
+     * 支付方式编号
+     */
+    @Column(name = "pay_method_no")
+    private String payMethodNo;
+
+    /**
+     * 支付方式名称
+     */
+    @Column(name = "pay_method_name")
+    private String payMethodName;
+
+    /**
+     * 支付时间
+     */
+    @Column(name = "pay_time")
+    private String payTime;
+
+    /**
+     * 支付终端
+     */
+    @Column(name = "pay_terminal")
+    private String payTerminal;
+
+    /**
+     * 支付渠道
+     */
+    @Column(name = "pay_chnnel")
+    private String payChnnel;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Date createTime;
+
+    /**
+     * 修改时间
+     */
+    @Column(name = "modify_time")
+    private Date modifyTime;
+
+    /**
+     * 1:对账成功 0：对账失败
+     */
+    @Column(name = "check_status")
+    private Boolean checkStatus;
+
+    /**
+     * 获取id 自增
+     *
+     * @return id - id 自增
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置id 自增
+     *
+     * @param id id 自增
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取分次订单编号，商户生成的
+     *
+     * @return sub_order_no - 分次订单编号，商户生成的
+     */
+    public String getSubOrderNo() {
+        return subOrderNo;
+    }
+
+    /**
+     * 设置分次订单编号，商户生成的
+     *
+     * @param subOrderNo 分次订单编号，商户生成的
+     */
+    public void setSubOrderNo(String subOrderNo) {
+        this.subOrderNo = subOrderNo;
+    }
+
+    /**
+     * 获取支付平台生成的支付流水号
+     *
+     * @return pay_flow_no - 支付平台生成的支付流水号
+     */
+    public String getPayFlowNo() {
+        return payFlowNo;
+    }
+
+    /**
+     * 设置支付平台生成的支付流水号
+     *
+     * @param payFlowNo 支付平台生成的支付流水号
+     */
+    public void setPayFlowNo(String payFlowNo) {
+        this.payFlowNo = payFlowNo;
+    }
+
+    /**
+     * 获取订单支付金额
+     *
+     * @return pay_amount - 订单支付金额
+     */
+    public BigDecimal getPayAmount() {
+        return payAmount;
+    }
+
+    /**
+     * 设置订单支付金额
+     *
+     * @param payAmount 订单支付金额
+     */
+    public void setPayAmount(BigDecimal payAmount) {
+        this.payAmount = payAmount;
+    }
+
+    /**
+     * 获取手续费
+     *
+     * @return fee - 手续费
+     */
+    public BigDecimal getFee() {
+        return fee;
+    }
+
+    /**
+     * 设置手续费
+     *
+     * @param fee 手续费
+     */
+    public void setFee(BigDecimal fee) {
+        this.fee = fee;
+    }
+
+    /**
+     * 获取支付方式编号
+     *
+     * @return pay_method_no - 支付方式编号
+     */
+    public String getPayMethodNo() {
+        return payMethodNo;
+    }
+
+    /**
+     * 设置支付方式编号
+     *
+     * @param payMethodNo 支付方式编号
+     */
+    public void setPayMethodNo(String payMethodNo) {
+        this.payMethodNo = payMethodNo;
+    }
+
+    /**
+     * 获取支付方式名称
+     *
+     * @return pay_method_name - 支付方式名称
+     */
+    public String getPayMethodName() {
+        return payMethodName;
+    }
+
+    /**
+     * 设置支付方式名称
+     *
+     * @param payMethodName 支付方式名称
+     */
+    public void setPayMethodName(String payMethodName) {
+        this.payMethodName = payMethodName;
+    }
+
+    /**
+     * 获取支付时间
+     *
+     * @return pay_time - 支付时间
+     */
+    public String getPayTime() {
+        return payTime;
+    }
+
+    /**
+     * 设置支付时间
+     *
+     * @param payTime 支付时间
+     */
+    public void setPayTime(String payTime) {
+        this.payTime = payTime;
+    }
+
+    /**
+     * 获取支付终端
+     *
+     * @return pay_terminal - 支付终端
+     */
+    public String getPayTerminal() {
+        return payTerminal;
+    }
+
+    /**
+     * 设置支付终端
+     *
+     * @param payTerminal 支付终端
+     */
+    public void setPayTerminal(String payTerminal) {
+        this.payTerminal = payTerminal;
+    }
+
+    /**
+     * 获取支付渠道
+     *
+     * @return pay_chnnel - 支付渠道
+     */
+    public String getPayChnnel() {
+        return payChnnel;
+    }
+
+    /**
+     * 设置支付渠道
+     *
+     * @param payChnnel 支付渠道
+     */
+    public void setPayChnnel(String payChnnel) {
+        this.payChnnel = payChnnel;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取修改时间
+     *
+     * @return modify_time - 修改时间
+     */
+    public Date getModifyTime() {
+        return modifyTime;
+    }
+
+    /**
+     * 设置修改时间
+     *
+     * @param modifyTime 修改时间
+     */
+    public void setModifyTime(Date modifyTime) {
+        this.modifyTime = modifyTime;
+    }
+
+    /**
+     * 获取1:对账成功 0：对账失败
+     *
+     * @return check_status - 1:对账成功 0：对账失败
+     */
+    public Boolean getCheckStatus() {
+        return checkStatus;
+    }
+
+    /**
+     * 设置1:对账成功 0：对账失败
+     *
+     * @param checkStatus 1:对账成功 0：对账失败
+     */
+    public void setCheckStatus(Boolean checkStatus) {
+        this.checkStatus = checkStatus;
+    }
+}

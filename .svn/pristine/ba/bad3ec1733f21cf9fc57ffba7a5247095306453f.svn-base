@@ -1,0 +1,143 @@
+package com.cz.enrol.utils;
+
+import okhttp3.*;
+
+import javax.net.ssl.*;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+
+/**
+ * @author liuzs
+ */
+public class HttpUtil {
+
+    private HttpUtil(){
+
+    }
+
+    private final static BusLogUtil LOGGER = new BusLogUtil(HttpUtil.class);
+
+    private static OkHttpClient okHttpClient;
+
+    static {
+        final TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    }
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[]{};
+                    }
+                }
+        };
+        SSLContext sslContext;
+        SSLSocketFactory sslSocketFactory;
+        try {
+            sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            sslSocketFactory= sslContext.getSocketFactory();
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            builder.sslSocketFactory(sslSocketFactory);
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            HttpUtil.okHttpClient=builder.build();
+
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("初始化证书忽略ssl{}",e);
+        } catch (KeyManagementException e) {
+            LOGGER.error("初始化证书忽略ssl{}",e);
+        }
+
+    }
+
+    /**
+     * http get 有返回请求
+     *
+     * @param url
+     * @return
+     */
+    public static String httpGet(String url) {
+
+        Request request = new Request.Builder().url(url).build();
+        Call call = okHttpClient.newCall(request);
+        String result = "";
+        return returnHandler(call, result);
+    }
+
+    /**
+     * post 处理一般格式的数据到目标服务器
+     *
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpPost(String url, Map<String, String> param) {
+
+        FormBody.Builder builder=new FormBody.Builder();
+
+        for (Map.Entry<String, String> entry : param.entrySet()) {
+
+            builder.add(entry.getKey(),entry.getValue());
+        }
+
+        RequestBody requestBodyPost = builder.build();
+
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBodyPost)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        String result = "";
+        return returnHandler(call, result);
+    }
+
+
+    /**
+     * post json格式的数据到目标服务器
+     *
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpJsonPost(String url, Map<String, String> param) {
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(JSON, JsonUtil.toJson(param));
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        String result = "";
+        return returnHandler(call, result);
+    }
+
+
+    private static String returnHandler(Call call, String result) {
+        try {
+            Response response = call.execute();
+            if (200 != response.code()) {
+                LOGGER.error("http 请求 异常:{}", "返回状态码:" + response.code());
+                throw new RuntimeException("okHttp调用远程服务异常，状态码：" + response.code());
+            }
+            result = response.body().string();
+        } catch (IOException e) {
+            LOGGER.error("okHttp 请求 异常:{}", e);
+        } finally {
+            return result;
+        }
+    }
+
+
+}

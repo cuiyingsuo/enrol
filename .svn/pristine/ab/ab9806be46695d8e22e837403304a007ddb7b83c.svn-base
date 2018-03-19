@@ -1,0 +1,289 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_banner")
+public class Banner {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 名称
+     */
+    private String name;
+
+    /**
+     * 状态（0：待发布，1：已发布）
+     */
+    private Byte status;
+
+    /**
+     * 是否是封面(0:否,1:是)
+     */
+    @Column(name = "is_cover")
+    private Byte isCover;
+
+    /**
+     * 创建者
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    /**
+     * 跳转链接（若有）；
+     */
+    @Column(name = "redirect_url")
+    private String redirectUrl;
+
+    /**
+     * 显示位置，0对应首页顶部banner；
+     */
+    @Column(name = "show_pos")
+    private Integer showPos;
+
+    /**
+     * 图片base64存储内容
+     */
+    private String image;
+
+    /**
+     * 内容
+     */
+    private String content;
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取名称
+     *
+     * @return name - 名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置名称
+     *
+     * @param name 名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取状态（0：待发布，1：已发布）
+     *
+     * @return status - 状态（0：待发布，1：已发布）
+     */
+    public Byte getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置状态（0：待发布，1：已发布）
+     *
+     * @param status 状态（0：待发布，1：已发布）
+     */
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    /**
+     * 获取是否是封面(0:否,1:是)
+     *
+     * @return is_cover - 是否是封面(0:否,1:是)
+     */
+    public Byte getIsCover() {
+        return isCover;
+    }
+
+    /**
+     * 设置是否是封面(0:否,1:是)
+     *
+     * @param isCover 是否是封面(0:否,1:是)
+     */
+    public void setIsCover(Byte isCover) {
+        this.isCover = isCover;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * 获取跳转链接（若有）；
+     *
+     * @return redirect_url - 跳转链接（若有）；
+     */
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    /**
+     * 设置跳转链接（若有）；
+     *
+     * @param redirectUrl 跳转链接（若有）；
+     */
+    public void setRedirectUrl(String redirectUrl) {
+        this.redirectUrl = redirectUrl;
+    }
+
+    /**
+     * 获取显示位置，0对应首页顶部banner；
+     *
+     * @return show_pos - 显示位置，0对应首页顶部banner；
+     */
+    public Integer getShowPos() {
+        return showPos;
+    }
+
+    /**
+     * 设置显示位置，0对应首页顶部banner；
+     *
+     * @param showPos 显示位置，0对应首页顶部banner；
+     */
+    public void setShowPos(Integer showPos) {
+        this.showPos = showPos;
+    }
+
+    /**
+     * 获取图片base64存储内容
+     *
+     * @return image - 图片base64存储内容
+     */
+    public String getImage() {
+        return image;
+    }
+
+    /**
+     * 设置图片base64存储内容
+     *
+     * @param image 图片base64存储内容
+     */
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    /**
+     * 获取内容
+     *
+     * @return content - 内容
+     */
+    public String getContent() {
+        return content;
+    }
+
+    /**
+     * 设置内容
+     *
+     * @param content 内容
+     */
+    public void setContent(String content) {
+        this.content = content;
+    }
+}

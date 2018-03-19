@@ -1,0 +1,211 @@
+package com.cz.enrol.vo;
+
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
+/**
+ * 商品扩展类
+ *
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/23.
+ */
+public class GoodsEx {
+
+    /**
+     * 商品名称
+     */
+    @NotEmpty(message = "请填写商品名称!")
+    private String name;
+
+    /**
+     * 校区Id
+     */
+    @NotEmpty(message = "校区必选!")
+    private Long campusId;
+
+
+    @Min(value = 0, message = "课程原价值不正确")
+    private Integer price;
+
+    /**
+     * 学科名称
+     */
+    @NotEmpty(message = "学科必选!")
+    private Long subjectId;
+
+    /**
+     * 班级类型编码
+     */
+    @NotEmpty(message = "班级类型必选!")
+    private String calssTypeCode;
+
+    /**
+     * 授课模式编码
+     */
+    @NotEmpty(message = "授课模式必选!")
+    private String teachModeCode;
+
+    /**
+     * 班级id集合字符串id中间 用","链接
+     * 1001,1002,1008
+     */
+    private String classIdStrs;
+
+    /**
+     * 付款方式 多个方式 以 "," 连接
+     */
+    @NotEmpty(message = "付款方式必选!")
+    private String payType;
+
+    private String coverImg;
+
+    public String getCoverImg() {
+        return coverImg;
+    }
+
+    public void setCoverImg(String coverImg) {
+        this.coverImg = coverImg;
+    }
+
+    public String getDetailImg() {
+        return detailImg;
+    }
+
+    public void setDetailImg(String detailImg) {
+        this.detailImg = detailImg;
+    }
+
+    private String detailImg;
+
+    /**
+     * 是否支持全款支付
+     */
+    private Byte isFull=1;
+
+    public Byte getIsFull() {
+        return isFull;
+    }
+
+    public void setIsFull(Byte isFull) {
+        this.isFull = isFull;
+    }
+
+    public Byte getIsBatch() {
+        return isBatch;
+    }
+
+    public void setIsBatch(Byte isBatch) {
+        this.isBatch = isBatch;
+    }
+
+    public Byte getIsLoan() {
+        return isLoan;
+    }
+
+    public void setIsLoan(Byte isLoan) {
+        this.isLoan = isLoan;
+    }
+
+    /**
+     * 是否支持分次付款
+     */
+    private Byte isBatch=1;
+
+    /**
+     * 是否支持借贷
+     */
+    private  Byte isLoan=1;
+
+    /**
+     * 商品简介
+     */
+    private String goodsSummary;
+
+    /**
+     * 商品详情
+     */
+    private String goodsDetail;
+
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getCalssTypeCode() {
+        return calssTypeCode;
+    }
+
+    public void setCalssTypeCode(String calssTypeCode) {
+        this.calssTypeCode = calssTypeCode;
+    }
+
+    public String getTeachModeCode() {
+        return teachModeCode;
+    }
+
+    public void setTeachModeCode(String teachModeCode) {
+        this.teachModeCode = teachModeCode;
+    }
+
+    public String getClassIdStrs() {
+        return classIdStrs;
+    }
+
+    public void setClassIdStrs(String classIdStrs) {
+        this.classIdStrs = classIdStrs;
+    }
+
+    public String getPayType() {
+        return payType;
+    }
+
+    public void setPayType(String payType) {
+        this.payType = payType;
+    }
+
+    public String getGoodsSummary() {
+        return goodsSummary;
+    }
+
+    public void setGoodsSummary(String goodsSummary) {
+        this.goodsSummary = goodsSummary;
+    }
+
+    public String getGoodsDetail() {
+        return goodsDetail;
+    }
+
+    public void setGoodsDetail(String goodsDetail) {
+        this.goodsDetail = goodsDetail;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+}

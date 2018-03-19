@@ -1,0 +1,46 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.service.management.ManagerBannerService;
+import com.cz.enrol.service.management.ManagerGoodsService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Created by liuzhongshuai on 2017/10/23.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerGoodsController {
+
+
+    @Autowired
+    private ManagerGoodsService managerGoodsService;
+
+
+    @GetMapping("/goods")
+    public BaseBody<BasePage<Map<String, Object>>> queryGoodsList(@RequestParam Map<String, String> conditions) {
+
+        BaseBody<BasePage<Map<String, Object>>> basePageBaseBody = new BaseBody<BasePage<Map<String, Object>>>();
+
+        if (null == conditions) {
+            conditions = new HashMap<String, String>(16);
+            conditions.put("startPage", "1");
+            conditions.put("pageSize", "0");
+
+        }
+
+        BasePage<Map<String, Object>> basePage = managerGoodsService.queryByConditions(Integer.parseInt(conditions.get("startPage")), Integer.parseInt(conditions.get("pageSize")), conditions);
+
+        basePageBaseBody.setContent(basePage);
+        basePageBaseBody.setMessage("查询成功!");
+        return basePageBaseBody;
+    }
+}

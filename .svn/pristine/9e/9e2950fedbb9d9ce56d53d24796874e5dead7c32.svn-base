@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.order.EnrolOrderFlowMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolOrderFlowResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolOrderFlow">
+		<!--关键字Id;-->
+		<id property="payId" column="关键字Id;" />
+		<!--合单ID-->
+		<result property="margeOrderNo" column="marge_order_no" />
+		<!--订单Id-->
+		<result property="orderNo" column="order_no" />
+		<!--支付类型-->
+		<result property="paymentType" column="payment_type" />
+		<!--支付的金额(分)-->
+		<result property="amount" column="amount" />
+		<!--支付用户；对应enrol_student表关键字Id;-->
+		<result property="payUserId" column="pay_user_id" />
+		<!--支付描述；-->
+		<result property="payDescription" column="pay_description" />
+		<!--交易的流水号；-->
+		<result property="flowId" column="flow_id" />
+		<!--支付状态，0:失败、1:成功；-->
+		<result property="status" column="status" />
+		<!---->
+		<result property="payChannelId" column="pay_channel_id" />
+		<!---->
+		<result property="payChannelName" column="pay_channel_name" />
+		<!--记录时间；-->
+		<result property="createDatetime" column="create_datetime" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	marge_order_no,	order_no,	payment_type,	amount,	pay_user_id,	pay_description,	flow_id,	status,	pay_channel_id,	pay_channel_name,	create_datetime
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolOrderFlow" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_order_flow
+		 WHERE pay_id = #{payId}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_order_flow
+		 WHERE pay_id = #{payId}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolOrderFlow">
+		 INSERT INTO enrol_order_flow
+ 		(pay_id,marge_order_no,order_no,payment_type,amount,pay_user_id,pay_description,flow_id,status,pay_channel_id,pay_channel_name,create_datetime) 
+		 VALUES 
+ 		(#{payId},#{margeOrderNo},#{orderNo},#{paymentType},#{amount},#{payUserId},#{payDescription},#{flowId},#{status},#{payChannelId},#{payChannelName},#{createDatetime}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolOrderFlow">
+		 INSERT INTO enrol_order_flow
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="payId != null">
+				 pay_id,
+			</if>
+			<if test="margeOrderNo != null">
+				 marge_order_no,
+			</if>
+			<if test="orderNo != null">
+				 order_no,
+			</if>
+			<if test="paymentType != null">
+				 payment_type,
+			</if>
+			<if test="amount != null">
+				 amount,
+			</if>
+			<if test="payUserId != null">
+				 pay_user_id,
+			</if>
+			<if test="payDescription != null">
+				 pay_description,
+			</if>
+			<if test="flowId != null">
+				 flow_id,
+			</if>
+			<if test="status != null">
+				 status,
+			</if>
+			<if test="payChannelId != null">
+				 pay_channel_id,
+			</if>
+			<if test="payChannelName != null">
+				 pay_channel_name,
+			</if>
+			<if test="createDatetime != null">
+				 create_datetime,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="payId!=null">
+				 #{payId},
+			</if>
+			<if test="margeOrderNo!=null">
+				 #{margeOrderNo},
+			</if>
+			<if test="orderNo!=null">
+				 #{orderNo},
+			</if>
+			<if test="paymentType!=null">
+				 #{paymentType},
+			</if>
+			<if test="amount!=null">
+				 #{amount},
+			</if>
+			<if test="payUserId!=null">
+				 #{payUserId},
+			</if>
+			<if test="payDescription!=null">
+				 #{payDescription},
+			</if>
+			<if test="flowId!=null">
+				 #{flowId},
+			</if>
+			<if test="status!=null">
+				 #{status},
+			</if>
+			<if test="payChannelId!=null">
+				 #{payChannelId},
+			</if>
+			<if test="payChannelName!=null">
+				 #{payChannelName},
+			</if>
+			<if test="createDatetime!=null">
+				 #{createDatetime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolOrderFlow">
+		 UPDATE enrol_order_flow
+ 		 <set> 
+			<if test="margeOrderNo != null">
+				 marge_order_no = #{margeOrderNo},
+			</if>
+			<if test="orderNo != null">
+				 order_no = #{orderNo},
+			</if>
+			<if test="paymentType != null">
+				 payment_type = #{paymentType},
+			</if>
+			<if test="amount != null">
+				 amount = #{amount},
+			</if>
+			<if test="payUserId != null">
+				 pay_user_id = #{payUserId},
+			</if>
+			<if test="payDescription != null">
+				 pay_description = #{payDescription},
+			</if>
+			<if test="flowId != null">
+				 flow_id = #{flowId},
+			</if>
+			<if test="status != null">
+				 status = #{status},
+			</if>
+			<if test="payChannelId != null">
+				 pay_channel_id = #{payChannelId},
+			</if>
+			<if test="payChannelName != null">
+				 pay_channel_name = #{payChannelName},
+			</if>
+			<if test="createDatetime != null">
+				 create_datetime = #{createDatetime},
+			</if>
+
+ 		 </set>
+		 WHERE pay_id = #{payId}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolOrderFlow">
+		 UPDATE enrol_order_flow
+		 SET 
+			 marge_order_no = #{margeOrderNo},
+			 order_no = #{orderNo},
+			 payment_type = #{paymentType},
+			 amount = #{amount},
+			 pay_user_id = #{payUserId},
+			 pay_description = #{payDescription},
+			 flow_id = #{flowId},
+			 status = #{status},
+			 pay_channel_id = #{payChannelId},
+			 pay_channel_name = #{payChannelName},
+			 create_datetime = #{createDatetime}
+		 WHERE pay_id = #{payId}
+	</update>
+
+</mapper>

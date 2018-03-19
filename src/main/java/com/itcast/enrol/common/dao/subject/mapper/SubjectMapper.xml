@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.subject.SubjectMapper">
+
+    <!--实体映射-->
+    <resultMap id="EnrolSubjectResultMapResultMap" type="com.itcast.enrol.common.entity.Subject">
+        <!--主键-->
+        <id property="id" column="主键"/>
+        <!--学科名称-->
+        <result property="name" column="name"/>
+        <!--学科状态(0:关闭，1:开启)-->
+        <result property="status" column="status"/>
+        <!--创建者-->
+        <result property="creator" column="creator"/>
+        <!--创建时间-->
+        <result property="createTime" column="create_time"/>
+        <!--编辑者-->
+        <result property="editor" column="editor"/>
+        <!--编辑时间-->
+        <result property="editTime" column="edit_time"/>
+        <!--学科介绍-->
+        <result property="introduce" column="introduce"/>
+        <!--备注；-->
+        <result property="memo" column="memo"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	name,	status,	creator,	create_time,	editor,	edit_time,	introduce,	memo
+	</sql>
+
+
+    <!-- 查询列表 -->
+	<select id="selectSubjectList" resultMap="EnrolSubjectResultMapResultMap">
+		SELECT 
+			<include refid="Base_Column_List" />
+ 		FROM enrol_subject sub 
+ 		WHERE sub.status=1 AND sub.id IN (
+ 			SELECT goods.subject_id 
+ 			FROM enrol_goods goods,enrol_class cla,enrol_goods_class gc 
+ 			
+ 			WHERE goods.status=1 AND cla.status=1 AND cla.is_del=0 AND goods.id=gc.goods_id AND cla.id=gc.class_id
+ 		)
+ 		ORDER BY sub.id ASC
+	</select>
+
+    <!--查询学科下拉选 通过状态-->
+    <select id="querySubjectListByStatus" resultType="java.util.Map" parameterType="java.lang.Byte">
+		select t.id,t.`name` from enrol_subject t where t.`status`=#{status}
+	</select>
+</mapper>

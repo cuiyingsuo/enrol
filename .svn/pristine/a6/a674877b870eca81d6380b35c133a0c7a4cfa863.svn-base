@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.goods.GoodsHotMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolGoodsClassResultMapResultMap" type="com.cz.enrol.entity.GoodsHot">
+		<!--主键Id -->
+		<id property="id" column="主键Id" />
+		<!-- 商品id -->
+		<result property="goodsId" column="goods_id" />
+		<!--商品编号 -->
+		<result property="goodsNo" column="goods_no" />
+		<!--商品名称 -->
+		<result property="name" column="name" />
+		<!--商品价格 -->
+		<result property="price" column="price" />
+		<!--封面图片 -->
+		<result property="coverImg" column="cover_img" />
+		<!-- 商品简介 -->
+		<result property="synopsis" column="synopsis" />
+		<!-- 商品详情介绍 -->
+		<result property="detail" column="detail" />
+		<!-- 当前报名人数 -->
+		<result property="currentNum" column="current_num" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, goods_id,goods_no, name, price,
+		cover_img,synopsis,detail,current_num
+	</sql>
+
+	<!-- 统计热门课程 -->
+	<select id="countGoodsHot" resultType="java.util.Map">
+		SELECT
+		goods.id AS goodsId
+
+		FROM enrol_class cla,enrol_goods_class gc,enrol_goods goods
+		WHERE cla.`status`=1 AND cla.is_del=0 AND goods.`status`=1 AND goods.is_del=0 AND cla.id=gc.class_id AND gc.goods_id=goods.id
+
+		GROUP BY gc.goods_id
+		ORDER BY currentNum DESC LIMIT 1,3
+	</select>
+
+	<!-- 查询热门课程 -->
+	<select id="selectGHList" resultMap="EnrolGoodsClassResultMapResultMap">
+		SELECT
+		gh.goods_id AS goodsId,
+		goods.goods_no AS goodsNo,
+		goods.`name`,
+		goods.price,
+		goods.cover_img AS coverImg,
+		goods.synopsis,
+		goods.detail,
+		sum(cla.current) AS currentNum
+		FROM enrol_goods_hot gh,enrol_goods goods,enrol_class
+		cla,enrol_goods_class gc
+		WHERE 
+		gh.goods_id=goods.id AND goods.id=gc.goods_id 
+		AND cla.id=gc.class_id AND goods.`status`=1 
+		AND goods.is_del=0 AND cla.`status`=1 
+		AND cla.is_del=0
+		GROUP BY gh.goods_id
+	</select>
+
+</mapper>

@@ -1,0 +1,45 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.organize.EnrolClassMapper;
+import com.cz.enrol.entity.EnrolClass;
+
+/**
+ * 班级表 服务类
+ **/
+@Service
+public class EnrolClassService {
+
+	// 统一记录日志类
+	private Logger Log = LoggerFactory.getLogger("enrol");
+
+	// 当前业务数据操作接口dao
+	@Autowired
+	private EnrolClassMapper classDao;
+
+	public EnrolClass queryByPrimaryKey(Long id) {
+		return classDao.selectByPrimaryKey(id);
+	}
+
+	public List<EnrolClass> queryByClassIdList(List<Long> ids) {
+		return classDao.selectByClassIdList(ids);
+	}
+
+	public List<Map<String, Object>> queryByGoodsId(Long goodsId) {
+		// TODO Auto-generated method stub
+		return classDao.selectByGoodsId(goodsId);
+	}
+
+	public Map<String, Object> queryByClassId(Long classId) {
+		// TODO Auto-generated method stub
+		return classDao.selectByClassId(classId);
+	}
+
+}

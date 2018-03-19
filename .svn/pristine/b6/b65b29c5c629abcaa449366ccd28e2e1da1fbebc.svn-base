@@ -1,0 +1,58 @@
+package com.cz.enrol.dao.marketing;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolMarketingClass;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * 
+ * EnrolMarketingClassMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolMarketingClassMapper extends BaseDao<EnrolMarketingClass>{
+
+
+	/**
+	 * 
+	 * 查询（根据主键ID查询）
+	 * 
+	 **/
+	EnrolMarketingClass selectByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 删除（根据主键ID删除）
+	 *
+	 **/
+	int deleteByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 添加
+	 *
+	 **/
+	int insert(EnrolMarketingClass record);
+
+	/**
+	 *
+	 * 添加 （匹配有值的字段）
+	 *
+	 **/
+	int insertSelective(EnrolMarketingClass record);
+
+	/**
+	 *
+	 * 修改 （匹配有值的字段）
+	 *
+	 **/
+	int updateByPrimaryKeySelective(EnrolMarketingClass record);
+
+	/**
+	 *
+	 * 修改（根据主键ID修改）
+	 *
+	 **/
+	int updateByPrimaryKey(EnrolMarketingClass record);
+
+}

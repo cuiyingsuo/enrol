@@ -1,0 +1,102 @@
+package com.itcast.enrol.common.configure;
+
+import com.github.pagehelper.PageHelper;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.session.ExecutorType;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceBuilder;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
+import java.util.Properties;
+
+/**
+ * Created by liuzhongshuai on 2017/3/27.
+ */
+@Configuration
+@EnableTransactionManagement(order = 1)
+public class BaseConfigure {
+
+    private final static Logger logger = LoggerFactory.getLogger(BaseConfigure.class);
+
+    @Autowired
+    private Interceptor interceptor;
+
+    @Value("${mybatis.type-aliases-package}")
+    private String typeAliasesPackage;
+
+    @Value("${mybatis.mapper.locations}")
+    private org.springframework.core.io.Resource[] locationsPackage;
+
+    @Value("${datasource.type}")
+    private Class<? extends DataSource> dataSourceType;
+
+    @Value("${mybatis.mapper.basePackage}")
+    private String basePackage;
+
+    @Value("${mybatis.mapper.mappers}")
+    private String mappers;
+
+    /**
+     * 主数据源配置
+     *
+     * @return
+     */
+    @Bean(name = "dataSource", destroyMethod = "close", initMethod = "init")
+    @ConfigurationProperties(prefix = "datasource.master")
+    public DataSource masterDataSource() {
+        logger.info("{}:masterSource", "初始化主数据");
+        return DataSourceBuilder.create().type(dataSourceType).build();
+    }
+
+    @Bean(name = "sqlSessionFactory")
+    @ConditionalOnMissingBean
+    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setMapperLocations(this.locationsPackage);
+
+        sqlSessionFactoryBean.setPlugins(new Interceptor[]{interceptor});
+        logger.info("{}:sessionFactory", "初始化session工厂");
+        return sqlSessionFactoryBean.getObject();
+    }
+
+    @Bean(name = "sqlSessionTemplate")
+    @ConditionalOnMissingBean
+    public SqlSessionTemplate sqlSessionTemplate(SqlSessionFactory sqlSessionFactory) {
+        logger.info("{}:sqlSession", "初始化session模板");
+        return new SqlSessionTemplate(sqlSessionFactory, ExecutorType.BATCH);
+    }
+
+    @Bean(name = "transactionManager")
+    public DataSourceTransactionManager transactionManagers(DataSource dataSource) {
+        logger.info("{}:transactionManager", "事务管理器");
+        return new DataSourceTransactionManager(dataSource);
+    }
+
+    /**
+     * mybatis 分页插件
+     *
+     * @return
+     */
+    @Bean
+    public Interceptor pageHelper() {
+        Interceptor interceptor = new PageHelper();
+        Properties properties = new Properties();
+        properties.setProperty("dialect", "mysql");
+        interceptor.setProperties(properties);
+
+        return interceptor;
+    }
+}

@@ -1,0 +1,18 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.permission.RoleMapper;
+import com.cz.enrol.entity.Role;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+/**
+ * 角色表 服务类
+ **/
+@Service
+public class RoleService extends BaseService<Role> {
+
+    @Autowired
+    private RoleMapper roleDao;
+
+}

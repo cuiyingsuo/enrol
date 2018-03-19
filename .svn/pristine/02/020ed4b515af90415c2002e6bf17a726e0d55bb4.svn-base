@@ -1,0 +1,27 @@
+package com.cz.enrol.configure;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+/**
+ * Created by liuzhongshuai on 2017/11/1.
+ */
+@Component
+public class SchedulingConfigure {
+
+
+    /**
+     * 订单状态扫描
+     * 任务执行时间大于 配置 时间 时候 会 顺延
+     */
+    @Scheduled(fixedDelay = 1000 * 60 * 5)
+    public void myTest() {
+        System.out.println("asdf");
+    }
+
+    /*//任务执行时间大于 配置 时间时候 会放在队列
+    @Scheduled(fixedRate = 5000)
+    public void myTest1(){
+        System.out.println("asfasdfasdf");
+    }*/
+}

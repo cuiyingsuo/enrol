@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.student.StudentMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolStudentResultMapResultMap" type="com.itcast.enrol.common.entity.Student">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--学员名称-->
+		<result property="name" column="name" />
+		<!--密码-->
+		<result property="password" column="password" />
+		<!--头像-->
+		<result property="image" column="image" />
+		<!--是否重读(0:否，1:是)-->
+		<result property="isAgain" column="is_again" />
+		<!--学员状态-->
+		<result property="status" column="status" />
+		<!--是否院校(0:否，1:是)-->
+		<result property="isAcademy" column="is_academy" />
+		<!--性别-->
+		<result property="gender" column="gender" />
+		<!--手机号-->
+		<result property="mobile" column="mobile" />
+		<!--QQ号-->
+		<result property="qq" column="qq" />
+		<!--邮箱-->
+		<result property="email" column="email" />
+		<!--是否住宿(0:否,1:是)-->
+		<result property="isQuarter" column="is_quarter" />
+		<!-- 预计到校时间 -->
+		<result property="preComeTime"	column="pre_come_time"/>
+		<!--毕业时间-->
+		<result property="graduationTime" column="graduation_time" />
+		<!--毕业学校-->
+		<result property="school" column="school" />
+		<!--学历-->
+		<result property="education" column="education" />
+		<!--专业-->
+		<result property="major" column="major" />
+		<!--证件号码-->
+		<result property="cardNo" column="card_no" />
+		<!--证件地址-->
+		<result property="cardAddr" column="card_addr" />
+		<!--居住地-->
+		<result property="liveAddr" column="live_addr" />
+		<!--详细地址-->
+		<result property="liveAddrDetail" column="live_addr_detail" />
+		<!--联系人-->
+		<result property="contacts" column="contacts" />
+		<!--联系人的联系方式-->
+		<result property="contactsMobile" column="contacts_mobile" />
+		<!--来源渠道Code-->
+		<result property="fromChannelCode" column="from_channel_code" />
+		<!--来源渠道-->
+		<result property="fromChannel" column="from_channel" />
+		<!--出生日期-->
+		<result property="birthday" column="birthday" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	password,	image,	is_again,	status,	is_academy,	gender,	mobile,	qq,	email,	is_quarter,	pre_come_time,graduation_time,	school,	education,	major,	card_no,	card_addr,	live_addr,	live_addr_detail,	contacts,	contacts_mobile,	from_channel_code,	from_channel,	birthday,	creator,	create_time,	editor,	edit_time
+	</sql>
+	
+	<!-- 根据手机号修改 -->
+	<update id="updatePasswordByMobile" parameterType="java.util.Map">
+		UPDATE enrol_student
+		SET
+			password = #{password}
+		WHERE mobile = #{mobile}
+	</update>
+</mapper>

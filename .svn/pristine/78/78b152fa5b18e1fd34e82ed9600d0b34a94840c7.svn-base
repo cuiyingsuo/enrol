@@ -1,0 +1,18 @@
+package com.cz.enrol.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.student.ClassStudentMapper;
+import com.cz.enrol.entity.ClassStudent;
+
+/**
+ * 班级与学生关联表 服务类
+ **/
+@Service
+public class ClassStudentService extends BaseService<ClassStudent> {
+
+    @Autowired
+    private ClassStudentMapper classStudentDao;
+}

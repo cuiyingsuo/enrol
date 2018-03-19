@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.organize.EnrolPostMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolPostResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolPost">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--名称 -->
+		<result property="name" column="name" />
+		<!--岗位id -->
+		<result property="departmentId" column="department_id" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, name, campus_id
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolPost"
+		parameterType="java.lang.Long">
+		SELECT
+		<include refid="Base_Column_List" />
+		FROM enrol_post
+		WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除 -->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		DELETE FROM
+		enrol_post
+		WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolPost">
+		INSERT INTO enrol_post
+		(id,name,campus_id)
+		VALUES
+		(#{id},#{name},#{campusId})
+	</insert>
+
+	<!-- 添加 （匹配有值的字段） -->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolPost">
+		INSERT INTO enrol_post
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null">
+				id,
+			</if>
+			<if test="name != null">
+				name,
+			</if>
+			<if test="departmentId != null">
+				department_id,
+			</if>
+
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id!=null">
+				#{id},
+			</if>
+			<if test="name!=null">
+				#{name},
+			</if>
+			<if test="departmentId!=null">
+				#{departmentId},
+			</if>
+
+		</trim>
+	</insert>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolPost">
+		UPDATE enrol_post
+		<set>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="address != null">
+				department_id = #{departmentId},
+			</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+
+	<!-- 修 改 -->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolPost">
+		UPDATE enrol_post
+		SET
+		name = #{name},
+		department_id = #{departmentId}
+		WHERE id = #{id}
+	</update>
+
+</mapper>

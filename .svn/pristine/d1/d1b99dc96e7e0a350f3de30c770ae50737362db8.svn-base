@@ -1,0 +1,138 @@
+package com.cz.enrol.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.entity.GoodsClass;
+import com.cz.enrol.utils.GenerateSequenceUtil;
+import com.cz.enrol.vo.GoodsEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.dao.goods.GoodsClassMapper;
+import com.cz.enrol.dao.goods.GoodsMapper;
+import com.cz.enrol.entity.Goods;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 商品表 服务类
+ **/
+@Service
+public class GoodsService {
+
+    @Autowired
+    private GoodsMapper goodsDao;
+
+    @Autowired
+    private GoodsClassMapper goodsClassMapper;
+
+    @Autowired
+    private CampusService campusService;
+
+    public Goods queryByPrimaryKey(Long id) {
+        return goodsDao.selectByPrimaryKey(id);
+    }
+
+    /**
+     * 根据学科查询商品列表
+     *
+     * @param subjectId
+     * @return
+     */
+    public List<Map<String, Object>> queryBySubjectId(Long subjectId) {
+        List<Map<String, Object>> goodsList = goodsDao.selectGoodsListBySubjectId(subjectId);
+        return goodsList;
+    }
+
+    public BasePage<Map<String, Object>> queryGoodsPage(Long subjectId, int startPage, int pageSize) {
+        PageHelper.startPage(startPage, pageSize);
+        List goodsList = goodsDao.selectGoodsListBySubjectId(subjectId);
+
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(goodsList);
+
+        BasePage<Map<String, Object>> basePage = new BasePage<Map<String, Object>>();
+        basePage.setPageDate(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startPage);
+        basePage.setTotalPage(pageInfo.getPages());
+        return basePage;
+    }
+
+    public Map<String, Object> queryGoodsSpec(Long goodsId) {
+        Map<String, Object> goodsSpec = new HashMap<String, Object>();
+        Map<String, Object> goodsMap = goodsDao.selectGoodsInfo(goodsId);
+        List<Map<String, Object>> campusList = campusService.queryCampusListByGoodsId(goodsId);
+        goodsSpec.put("goodsInfo", goodsMap);
+        goodsSpec.put("campusList", campusList);
+        return goodsSpec;
+    }
+
+    public Map<String, Object> queryGoodsInfo(Long goodsId) {
+        Map<String, Object> goodsMap = goodsDao.selectGoodsInfo(goodsId);
+        return goodsMap;
+    }
+
+    /**
+     * 条件查询商品列表
+     *
+     * @param conditions
+     * @return
+     */
+    public BasePage<Map<String, Object>> queryByConditions(int startPage, int pageSize, Map<String, String> conditions) {
+
+        PageHelper.startPage(startPage, pageSize);
+        List resultList = goodsClassMapper.queryGoodsForClass(conditions);
+        PageInfo<Map<String, Object>> pageInfo = new PageInfo<Map<String, Object>>(resultList);
+
+        BasePage<Map<String, Object>> basePage = new BasePage<Map<String, Object>>();
+        basePage.setPageDate(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startPage);
+        basePage.setTotalPage(pageInfo.getPages());
+
+        return basePage;
+    }
+
+    /**
+     * 保存商品 时候  批量生成
+     *
+     * @param goodsEx
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void batchAddGoodsClass(GoodsEx goodsEx) {
+        //首先保存商品信息
+        Goods goods = new Goods();
+        goods.setCreateTime(System.currentTimeMillis());
+        goods.setDetail(goodsEx.getGoodsDetail());
+        goods.setName(goodsEx.getName());
+        goods.setPrice(goodsEx.getPrice());
+        Byte paySum = 3;
+        goods.setBatchMax(paySum);
+        goods.setIsBatch(goodsEx.getIsBatch());
+        goods.setIsFull(goodsEx.getIsFull());
+        goods.setIsLoan(goodsEx.getIsLoan());
+        goods.setGoodsNo(String.valueOf(GenerateSequenceUtil.generateSequenceNo()));
+        goods.setSubjectId(goodsEx.getSubjectId());
+        goods.setStatus((byte) 0);
+        goods.setCoverImg(goodsEx.getCoverImg());
+        goods.setDetailImg(goodsEx.getDetailImg());
+
+        goodsDao.insertSelective(goods);
+
+        String[] classIds = goodsEx.getClassIdStrs().split(",");
+
+        for (String classId : classIds) {
+            GoodsClass goodsClass = new GoodsClass();
+            goodsClass.setClassId(Long.parseLong(classId));
+            goodsClass.setCreateTime(System.currentTimeMillis());
+            goodsClass.setGoodsId(goods.getId());
+            goodsClassMapper.insertSelective(goodsClass);
+        }
+    }
+
+}

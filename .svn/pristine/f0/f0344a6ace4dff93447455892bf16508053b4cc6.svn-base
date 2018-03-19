@@ -1,0 +1,62 @@
+package com.cz.enrol.interceptor;
+
+import com.cz.enrol.common.BaseMenu;
+import com.cz.enrol.common.UserPermiss;
+import com.cz.enrol.exception.PermissException;
+import com.cz.enrol.utils.BeanUtils;
+import com.cz.enrol.utils.MD5Util;
+import com.cz.enrol.utils.RedisUtil;
+import com.cz.enrol.utils.TokenUtil;
+import com.cz.enrol.vo.UserEx;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/11/17.
+ *         管理端 用户鉴权
+ */
+public class PermissInterceptor extends HandlerInterceptorAdapter {
+
+    @Value("${server.context-path}")
+    private String contextPath;
+
+    @Value("${server.token-key}")
+    private String tokenKey;
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        String uriStr = request.getRequestURI().replace(contextPath, "");
+
+        String userToken = request.getHeader(tokenKey);
+        if (org.springframework.util.StringUtils.isEmpty(userToken)) {
+            userToken = request.getParameter(tokenKey);
+        }
+        UserEx userEx = TokenUtil.getUserEx(userToken);
+
+        String md5MenusStr = MD5Util.encryption(userEx.getMobile() + "_userPermsInfo");
+        byte[] menusObjectStr = (byte[]) RedisUtil.get(md5MenusStr);
+
+        Object obj = BeanUtils.objectDeserialization(menusObjectStr);
+
+        UserPermiss userPermiss = (UserPermiss) obj;
+        if (null == userPermiss) {
+            throw new RuntimeException("无权限!");
+        }
+        List<BaseMenu> baseMenuList = userPermiss.getUserPerms();
+
+        List list = baseMenuList.stream().filter(chile -> uriStr.equals(chile.getUrl())).collect(Collectors.toList());
+
+        if (list.size() > 0) {
+            return true;
+        }
+        throw new PermissException("您无该功能权限!", 50001);
+    }
+
+}

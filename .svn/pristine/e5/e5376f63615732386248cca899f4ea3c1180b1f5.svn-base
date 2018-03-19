@@ -1,0 +1,58 @@
+package com.cz.enrol.dao.permission;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolRole;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * 
+ * EnrolRoleMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolRoleMapper extends BaseDao<EnrolRole>{
+
+
+	/**
+	 * 
+	 * 查询（根据主键ID查询）
+	 * 
+	 **/
+	EnrolRole selectByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 删除（根据主键ID删除）
+	 *
+	 **/
+	int deleteByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 添加
+	 *
+	 **/
+	int insert(EnrolRole record);
+
+	/**
+	 *
+	 * 添加 （匹配有值的字段）
+	 *
+	 **/
+	int insertSelective(EnrolRole record);
+
+	/**
+	 *
+	 * 修改 （匹配有值的字段）
+	 *
+	 **/
+	int updateByPrimaryKeySelective(EnrolRole record);
+
+	/**
+	 *
+	 * 修改（根据主键ID修改）
+	 *
+	 **/
+	int updateByPrimaryKey(EnrolRole record);
+
+}

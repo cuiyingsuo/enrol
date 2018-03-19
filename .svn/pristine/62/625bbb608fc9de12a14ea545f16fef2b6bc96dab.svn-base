@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.user.EnrolUserMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolUserResultMapResultMap" type="com.cz.enrol.entity.EnrolUser">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--工号 -->
+		<result property="jobNo" column="job_no" />
+		<!--姓名 -->
+		<result property="name" column="name" />
+		<!--手机号 -->
+		<result property="mobile" column="mobile" />
+		<!--部门code -->
+		<result property="departmentCode" column="department_code" />
+		<!--密码 -->
+		<result property="password" column="password" />
+		<!--状态(0:禁用，1：启用) -->
+		<result property="status" column="status" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!--编辑者 -->
+		<result property="editor" column="editor" />
+		<!--编辑时间 -->
+		<result property="editTime" column="edit_time" />
+		<!--校区id -->
+		<result property="campusId" column="campus_id" />
+		<!--岗位id -->
+		<result property="postId" column="post_id" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, job_no, name, mobile, department_code, password,
+		status, creator,
+		create_time, editor, edit_time, campusId, postId
+	</sql>
+
+
+</mapper>

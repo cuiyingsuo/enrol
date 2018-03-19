@@ -1,0 +1,30 @@
+package com.cz.enrol.dao.order;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.OrderSub;
+
+/**
+ * 
+ * EnrolOrderSubMapper数据库操作接口类
+ * 
+ **/
+public interface OrderSubMapper extends BaseDao<OrderSub>{
+
+
+
+	/**
+	 * 根据主订单号查询分订单
+	 */
+	List<Map<String,Object>> selectByMergeOrderNo(String orderNo);
+	
+	/**
+	 * 查询凭证信息
+	 * @param orderSubNo
+	 * @return
+	 */
+	List<Map<String,Object>> selectReceiptInfo(String orderSubNo);
+
+}

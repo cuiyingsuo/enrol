@@ -1,0 +1,139 @@
+package com.cz.enrol.vo;
+
+/**
+ * Created by liuzhongshuai on 2017/10/27.
+ */
+public class OrderQueryEx {
+
+    /**
+     * 学科Id
+     */
+    private Long subjectId;
+
+    /**
+     * 班级类型
+     */
+    private String classTypeCode;
+
+    /**
+     * 授课类型
+     */
+    private String teachTypeCode;
+
+    /**
+     * 区域
+     */
+    private Long campusId;
+
+    /**
+     * 班级
+     */
+    private Long classId;
+
+    /**
+     * 支付方式
+     */
+    private Long payType;
+
+    /**
+     * 优惠策略
+     */
+    private Long marketId;
+
+
+    /**
+     * 订单状态
+     */
+    private Integer orderStatus;
+
+    /**
+     * 开始页、
+     */
+    private int startPage;
+
+    /**
+     * 每页大小
+     */
+    private int pageSize;
+
+
+    public int getStartPage() {
+        return startPage;
+    }
+
+    public void setStartPage(int startPage) {
+        this.startPage = startPage;
+    }
+
+    public int getPageSize() {
+        return pageSize;
+    }
+
+    public void setPageSize(int pageSize) {
+        this.pageSize = pageSize;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public String getClassTypeCode() {
+        return classTypeCode;
+    }
+
+    public void setClassTypeCode(String classTypeCode) {
+        this.classTypeCode = classTypeCode;
+    }
+
+    public String getTeachTypeCode() {
+        return teachTypeCode;
+    }
+
+    public void setTeachTypeCode(String teachTypeCode) {
+        this.teachTypeCode = teachTypeCode;
+    }
+
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    public Long getClassId() {
+        return classId;
+    }
+
+    public void setClassId(Long classId) {
+        this.classId = classId;
+    }
+
+    public Long getPayType() {
+        return payType;
+    }
+
+    public void setPayType(Long payType) {
+        this.payType = payType;
+    }
+
+    public Long getMarketId() {
+        return marketId;
+    }
+
+    public void setMarketId(Long marketId) {
+        this.marketId = marketId;
+    }
+
+    public Integer getOrderStatus() {
+        return orderStatus;
+    }
+
+    public void setOrderStatus(Integer orderStatus) {
+        this.orderStatus = orderStatus;
+    }
+}

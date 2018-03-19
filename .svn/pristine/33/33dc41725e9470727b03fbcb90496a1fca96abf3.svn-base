@@ -1,0 +1,17 @@
+package com.cz.enrol.dao.order;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolOrderFlow;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * 
+ * EnrolOrderFlowMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolOrderFlowMapper extends BaseDao<EnrolOrderFlow>{
+
+
+
+}

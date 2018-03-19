@@ -1,0 +1,11 @@
+package com.cz.enrol.service;
+
+
+public class EnrolPayService {
+
+	public int pay() {
+		
+		return 0;
+	}
+
+}

@@ -1,0 +1,294 @@
+package com.cz.enrol.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.allinpay.ets.client.PaymentResult;
+import com.allinpay.ets.client.RequestOrder;
+import com.allinpay.ets.client.SecurityUtil;
+import com.cz.enrol.dao.order.OrderMainMapper;
+import com.cz.enrol.dao.order.OrderSubMapper;
+import com.cz.enrol.dao.order.PaymentResultMapper;
+import com.cz.enrol.entity.OrderFlow;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.utils.GenerateSequenceUtil;
+
+@Service
+public class PayService {
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+
+	@Autowired
+	private OrderMainMapper orderMainDao;
+
+	@Autowired
+	private OrderSubMapper orderSubDao;
+	
+	@Autowired
+	private PaymentResultMapper paymentResultDao;
+
+	private String key = "1234567890";
+	private String version = "v1.0";
+	private String language = "1";
+	private String inputCharset = "1";
+	private String merchantId = "008340142150000";// 商户号
+	private String pickupUrl = "";// 取货地址
+	private String receiveUrl = "http://172.17.0.91:8088/payController/payResult";// 商户系统通知地址
+	private String payType = "0";
+	private String signType = "1";
+	private String orderNo = "";
+	private String orderAmount = "";
+	private String orderDatetime = "";// 商户的订单提交时间
+	private String orderCurrency = "0";// 订单金额币种类型
+	private String orderExpireDatetime = "";
+	private String payerTelephone = "";
+	private String payerEmail = "";
+	private String payerName = "";
+	private String payerIDCard = "";
+	private String pid = "";
+	private String productName = "";// 商品名称
+	private String productId = "enrol";
+	private String productNum = "1";
+	private String productPrice = "";
+	private String productDesc = "";
+	private String ext1 = "";
+	private String ext2 = "";
+	private String extTL = "";
+	private String issuerId = "";// 发卡方代码
+	private String pan = "";
+	private String tradeNature = "SERVICES";// GOODS表示实物类型，SERVICES表示服务类型
+	private String sign = "";
+
+	/**
+	 * 全款支付拼接支付订单信息
+	 * 
+	 * @param mobile
+	 *            手机号码
+	 * @param mergeOrderNo
+	 *            主订单号
+	 * @return
+	 */
+	@Transactional
+	public RequestOrder payFullRequestOrder(String mobile, String mergeOrderNo) {
+		OrderMain orderMain = new OrderMain();
+		orderMain.setMergeOrderNo(mergeOrderNo);
+		orderMain = orderMainDao.selectOne(orderMain);
+
+		OrderSub orderSub = new OrderSub();
+		String orderNo = String.valueOf(GenerateSequenceUtil.generateSequenceNo());
+		orderSub.setOrderNo(orderNo);
+		orderSub.setOrderPrice(orderMain.getOrderPrice());
+		orderSub.setStatus(0);
+		orderSub.setMergeOrderNo(mergeOrderNo);
+		orderSub.setCreateTime(System.currentTimeMillis());
+		orderSub.setCreator(mobile);
+		orderSubDao.insertSelective(orderSub);
+		logger.info("用户{}创建支付订单:{}", mobile,orderNo);
+		RequestOrder requestOrder = getRequestOrder(orderSub, orderMain);
+		return requestOrder;
+	}
+	/**
+	 * 分次支付拼接支付订单
+	 * @param mobile		手机号
+	 * @param payPrice		支付金额
+	 * @param mergeOrderNo	主订单号
+	 * @return
+	 */
+	@Transactional
+	public RequestOrder payPartRequestOrder(String mobile,int payPrice,String mergeOrderNo){
+		OrderMain orderMain = new OrderMain();
+		orderMain.setMergeOrderNo(mergeOrderNo);
+		orderMain = orderMainDao.selectOne(orderMain);
+
+		OrderSub orderSub = new OrderSub();
+		String orderNo = String.valueOf(GenerateSequenceUtil.generateSequenceNo());
+		orderSub.setOrderNo(orderNo);
+		orderSub.setOrderPrice(payPrice);
+		orderSub.setStatus(0);
+		orderSub.setMergeOrderNo(mergeOrderNo);
+		orderSub.setCreateTime(System.currentTimeMillis());
+		orderSub.setCreator(mobile);
+		
+		orderSubDao.insertSelective(orderSub);
+		logger.info("用户{}创建支付订单:{}", mobile,orderNo);
+		RequestOrder requestOrder = getRequestOrder(orderSub, orderMain);
+		return requestOrder;
+	}
+	// 拼接支付订单信息
+	private RequestOrder getRequestOrder(OrderSub orderSub, OrderMain orderMain) {
+
+		// 若直连telpshx渠道，payerTelephone、payerName、payerIDCard、pan四个字段不可为空
+		// 其中payerIDCard、pan需使用公钥加密（PKCS1格式）后进行Base64编码
+		if (null != payerIDCard && !"".equals(payerIDCard)) {
+			System.out.println(PayService.class.getResource("/"));
+			String path2 = PayService.class.getResource("/").toString();
+			System.out.println(path2);
+			try {
+				payerIDCard = SecurityUtil.encryptByPublicKey(
+						"D:/chanzhi/enrol/target/classes/cert/TLCert.cer",
+						payerIDCard);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (null != pan && !"".equals(pan)) {
+			try {
+				pan = SecurityUtil.encryptByPublicKey("/opt/conf/TLCert.cer",
+						pan);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 构造订单请求对象，生成signMsg。
+		RequestOrder requestOrder = new RequestOrder();
+		if (null != inputCharset && !"".equals(inputCharset)) {
+			requestOrder.setInputCharset(Integer.parseInt(inputCharset));
+		}
+		requestOrder.setPickupUrl("");
+		requestOrder.setReceiveUrl(receiveUrl);
+		requestOrder.setVersion(version);
+		if (null != language && !"".equals(language)) {
+			requestOrder.setLanguage(Integer.parseInt(language));
+		}
+		requestOrder.setSignType(Integer.parseInt(signType));
+		requestOrder.setPayType(Integer.parseInt(payType));
+		requestOrder.setIssuerId(issuerId);
+		requestOrder.setMerchantId(merchantId);
+		requestOrder.setPayerName(payerName);
+		requestOrder.setPayerEmail(payerEmail);
+		requestOrder.setPayerTelephone(payerTelephone);
+		requestOrder.setPayerIDCard(payerIDCard);
+		requestOrder.setPid(pid);
+		requestOrder.setOrderNo(orderSub.getOrderNo());
+		requestOrder.setOrderAmount(orderSub.getOrderPrice().longValue());
+		requestOrder.setOrderCurrency(orderCurrency);
+		Date date = new Date(orderSub.getCreateTime());
+		requestOrder.setOrderDatetime(sdf.format(date));
+		Calendar ca = Calendar.getInstance();
+		ca.setTime(date);
+		ca.add(Calendar.HOUR_OF_DAY, 1);
+		requestOrder.setOrderExpireDatetime(sdf.format(date));
+		requestOrder.setProductName(orderMain.getGoodsName());
+
+		requestOrder.setProductPrice(orderSub.getOrderPrice().longValue());
+
+		if (null != productNum && !"".equals(productNum)) {
+			requestOrder.setProductNum(Integer.parseInt(productNum));
+		}
+		requestOrder.setProductId(productId);
+		requestOrder.setProductDesc(orderMain.getSubjectName());
+		requestOrder.setExt1(ext1);
+		requestOrder.setExt2(ext2);
+		requestOrder.setExtTL(extTL);// 通联商户拓展业务字段，在v2.2.0版本之后才使用到的，用于开通分账等业务
+		requestOrder.setPan(pan);
+		requestOrder.setTradeNature(tradeNature);
+		requestOrder.setKey(key); // key为MD5密钥，密钥是在通联支付网关会员服务网站上设置。
+		
+		String strSrcMsg = requestOrder.getSrc(); // 此方法用于debug，测试通过后可注释。
+		String strSignMsg = requestOrder.doSign(); // 签名，设为signMsg字段值。
+		logger.info(strSrcMsg);
+		requestOrder.setSignMsg(strSignMsg);
+
+		return requestOrder;
+	}
+
+	/**
+	 * 修改订单
+	 * 
+	 * @param payResult
+	 *            支付回执验证结果实体类
+	 */
+	@Transactional
+	public void recordOrderInfo(PaymentResult payResult) {
+		String orderNo = payResult.getMchtRefundOrderNo();
+		
+		OrderSub orderSub = new OrderSub();
+		orderSub.setOrderNo(orderNo);
+		orderSub = orderSubDao.selectOne(orderSub);
+		
+		OrderFlow orderFlow = new OrderFlow();
+		
+		if (null!=orderSub) {
+			orderSub.setEditor("SYSTEM");
+			orderSub.setEditTime(System.currentTimeMillis());
+			orderSub.setPayTime(System.currentTimeMillis());
+			orderSub.setStatus(2);
+			//修改分订单信息
+			orderSubDao.updateByPrimaryKeySelective(orderSub);
+
+			//主订单状态修改
+			OrderMain orderMain = new OrderMain();
+			orderMain.setMergeOrderNo(orderSub.getMergeOrderNo());
+			orderMain = orderMainDao.selectOne(orderMain);
+			orderMain.setPaid(orderMain.getPaid() + orderSub.getOrderPrice());
+			if (orderMain.getPayType() == 0) {
+				//全款支付订单状态改为支付完成
+				if(orderMain.getPaid()==orderMain.getOrderPrice()){
+					logger.info("{}：主订单-{}，支付订单-{}，全款支付，成功",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo);
+					orderMain.setStatus(2);
+				}else{
+					//已付款金额不等于订单金额情况（全款支付不应该出现）
+					logger.info("{}：主订单-{}，支付订单-{}，全款支付，出错，未支付：{}",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo,orderMain.getOrderPrice()-orderMain.getPaid());
+					orderMain.setStatus(1);
+				}
+			} else {
+				if(orderMain.getPaid()==orderMain.getOrderPrice()){
+					logger.info("{}：主订单-{}，支付订单-{}，分次支付，成功.订单金额已全部支付",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo);
+					orderMain.setStatus(2);
+				}else{
+					logger.info("{}：主订单-{}，支付订单-{}，分次支付，成功.订单剩余未支付金额：{}",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo,(orderMain.getPaid()-orderMain.getOrderPrice()));
+					orderMain.setStatus(1);
+				}
+			}
+			//修改主订单信息
+			orderMainDao.updateByPrimaryKeySelective(orderMain);
+			
+			//记录流水
+			orderFlow.setAmount(Integer.parseInt(payResult.getOrderAmount()));
+			orderFlow.setCreateDatetime(new Date());
+			orderFlow.setMargeOrderNo(orderSub.getMergeOrderNo());
+			orderFlow.setOrderNo(payResult.getOrderNo());
+			orderFlow.setPayChannelId(31L);
+			orderFlow.setPayChannelName("通联支付");
+			orderFlow.setPayDescription("支付成功");
+			orderFlow.setPayId(orderSub.getId());
+			if(orderMain.getPayType()==0){
+				orderFlow.setPaymentType("全款支付");
+			}else if(orderMain.getPayType()==1){
+				orderFlow.setPaymentType("分次支付");
+			}else if(orderMain.getPayType()==2){
+				orderFlow.setPaymentType("贷款支付");
+			}
+			orderFlow.setPayUserId(orderMain.getStudentId());
+			orderFlow.setStatus(1);
+			
+		}else{
+			//记录流水
+			orderFlow.setAmount(Integer.parseInt(payResult.getOrderAmount()));
+			orderFlow.setCreateDatetime(new Date());
+			orderFlow.setOrderNo(payResult.getOrderNo());
+			orderFlow.setPayChannelId(31L);
+			orderFlow.setPayChannelName("通联支付");
+			orderFlow.setPayDescription("支付失败");
+
+			orderFlow.setStatus(0);
+			logger.info("{}：主订单-{}，查询不到支付订单-{}，",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo);
+		}
+		
+	}
+	@Transactional
+	public void recordPaymentResult(PaymentResult paymentResult){
+		paymentResultDao.insertSelective(paymentResult);
+	}
+}

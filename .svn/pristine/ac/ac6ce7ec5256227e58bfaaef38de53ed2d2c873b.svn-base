@@ -1,0 +1,14 @@
+package com.cz.enrol.service;
+
+import org.springframework.stereotype.Service;
+
+
+
+/**
+ * 营销策略表 服务类
+ **/
+@Service
+public class MarketingService {
+
+
+}

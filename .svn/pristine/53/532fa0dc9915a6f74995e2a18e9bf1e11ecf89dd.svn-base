@@ -1,0 +1,29 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.subject.SubjectMapper;
+import com.cz.enrol.entity.Subject;
+
+/**
+ * 学科表 服务类
+ **/
+@Service
+public class SubjectService extends BaseService<Subject> {
+
+    @Autowired
+    private SubjectMapper subjectDao;
+
+    public Subject queryByPrimaryKey(Long id) {
+        return subjectDao.selectByPrimaryKey(id);
+    }
+
+    public List<Subject> querySubjectList() {
+        return subjectDao.selectSubjectList();
+    }
+
+}

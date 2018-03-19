@@ -1,0 +1,16 @@
+package com.cz.enrol.dao.goods;
+
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolGoodsClass;
+
+/**
+ * 
+ * EnrolGoodsClassMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolGoodsClassMapper extends BaseDao<EnrolGoodsClass> {
+
+
+}

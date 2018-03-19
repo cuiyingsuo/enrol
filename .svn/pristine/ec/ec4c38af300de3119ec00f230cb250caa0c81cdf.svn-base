@@ -1,0 +1,144 @@
+package com.cz.enrol.controller;
+
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.service.StudentService;
+import com.cz.enrol.utils.MD5Util;
+import com.cz.enrol.utils.RedisUtil;
+
+/**
+ * 
+ * 学员表 访问控制器类
+ * 
+ **/
+@RestController
+@RequestMapping("/loginController")
+public class LoginController {
+	// 统一记录日志类
+	private Logger Log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	// 当前业务操作接口bo
+	private StudentService studentService;
+
+	/**
+	 * 登录
+	 * 
+	 * @param mobile
+	 *            手机号码
+	 * @param password
+	 *            密码
+	 * @param request
+	 * @param response
+	 * @param modelMap
+	 * @return
+	 */
+	@RequestMapping(value = "/login", method = RequestMethod.POST)
+	public BaseBody login(@RequestParam String mobile,
+			@RequestParam String password) {
+		BaseBody<String> baseBody = new BaseBody<String>();
+
+		// token值不存在或登录信息超时
+		int status = studentService.checkPassword(mobile, password);
+		if (status == 0) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("用户信息不存在");
+			Log.error("################# 用户  {} 不存在. ##################",
+					mobile);
+		}
+		if (status == 1) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("密码不正确");
+			Log.error("################# 用户  {} 密码不正确. ##################",
+					mobile);
+		}
+		if (status == 2) {
+			String token = MD5Util.encryption(mobile
+					+ System.currentTimeMillis());
+			String tokenValue = mobile;
+			try {
+				new RedisUtil().set(token, tokenValue, 30 * 60);
+			} catch (Exception e) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(200);
+				baseBody.setMessage("找不到缓存服务器");
+				Log.debug("{}------找不到缓存服务器", new Date());
+				e.printStackTrace();
+			}
+			Log.debug("################# 用户  {} 登录成功. ##################",
+					mobile);
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setData(token);
+			baseBody.setMessage("登录成功");baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setData(token);
+			baseBody.setMessage("登录成功");
+		}
+
+		return baseBody;
+	}
+
+	/**
+	 * 检查登录
+	 * 
+	 * 手机号码
+	 * 
+	 * @param request
+	 * @param response
+	 * @param modelMap
+	 * @return
+	 */
+	@RequestMapping(value = "/checkLogin", method = RequestMethod.GET)
+	public BaseBody<String> checkLogin(@RequestParam String token) {
+		BaseBody<String> baseBody = new BaseBody<String>();
+
+		if (new RedisUtil().hasKey(token)) {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setData(token);
+			baseBody.setMessage("用户已登录");
+		} else {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setMessage("用户未登录");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 退出登录
+	 * 
+	 * @param request
+	 * @param response
+	 * @param modelMap
+	 * @return
+	 */
+	@RequestMapping(value = "/offLogin", method = RequestMethod.POST)
+	public BaseBody<String> offLogin(@RequestParam String token) {
+		BaseBody<String> baseBody = new BaseBody<String>();
+
+		if (new RedisUtil().hasKey(token)) {
+			new RedisUtil().del(token);
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setMessage("退出登录成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setMessage("用户未登录");
+		}
+		return baseBody;
+	}
+}

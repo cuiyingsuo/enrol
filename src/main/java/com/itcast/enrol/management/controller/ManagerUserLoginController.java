@@ -1,0 +1,230 @@
+package com.itcast.enrol.management.controller;
+
+import java.awt.image.BufferedImage;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.itcast.enrol.common.annotation.Session;
+import com.itcast.enrol.common.base.BaseBody;
+import com.itcast.enrol.common.base.ReturnStatus;
+import com.itcast.enrol.common.base.UserPermiss;
+import com.itcast.enrol.common.entity.User;
+import com.itcast.enrol.common.utils.BeanUtils;
+import com.itcast.enrol.common.utils.BusLogUtil;
+import com.itcast.enrol.common.utils.MD5Util;
+import com.itcast.enrol.common.utils.RedisUtil;
+import com.itcast.enrol.common.utils.TokenUtil;
+import com.itcast.enrol.management.service.ManagerUserService;
+import com.itcast.enrol.management.vo.UserEx;
+import com.google.code.kaptcha.Producer;
+
+/**
+ * 后台用户登录，登出 ，修改密码，密码找回。。。
+ *
+ * @author liuzhongshuai
+ *         Created by liuzhongshuai on 2017/10/20.
+ */
+@RestController
+@RequestMapping("/managenment/user")
+public class ManagerUserLoginController {
+
+    private final BusLogUtil LOGGER = new BusLogUtil(ManagerUserLoginController.class);
+
+
+    @Autowired
+    private ManagerUserService userService;
+
+    @Autowired
+    private Producer captchaProducer;
+
+    @Value("${server.token-key}")
+    private String loginToken;
+
+    @Value("${enrol.user.defaut-password}")
+    private String defautPassword;
+
+
+    /**
+     * 用户登录
+     *
+     * @return
+     */
+    @PostMapping("/userLogin")
+    public BaseBody<String> userLogin(HttpServletRequest request, UserEx user, @RequestParam(defaultValue = "0") String validateCode) throws Exception {
+        BaseBody<String> baseBody = new BaseBody();
+
+        if ("0".equals(validateCode)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("验证码不正确!");
+            return baseBody;
+        }
+        String mobile = user.getMobile();
+        String password = user.getPassword();
+        if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("用户名或密码为空!");
+            return baseBody;
+        }
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("验证码超时,请刷新重试!");
+            return baseBody;
+        }
+        String cookieKey = "image_code_token";
+        String cookieValue = null;
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals(cookieKey)) {
+                cookieValue = cookie.getValue();
+                break;
+            }
+        }
+        //验证码验证
+        String vCpde = String.valueOf(RedisUtil.get(cookieValue + "_validateCode"));
+
+        if (!validateCode.equals(vCpde)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("验证码不正确!");
+            return baseBody;
+        }
+        //验证登录
+        User userResult = userService.userLogin(mobile, password);
+        //登录成功将用户信息 存入redis
+        String token = TokenUtil.setUserEx(userResult, 3600);
+        //查询该用户所有权限；
+        UserPermiss userPermiss = userService.roleAndMenus(userResult.getId());
+        //序列化
+        byte[] permsObjectStr = BeanUtils.objectSerialiable(userPermiss);
+        String md5PermsStr = MD5Util.encryption(userResult.getMobile() + TokenUtil.PERMISS_SUFFIX);
+        RedisUtil.set(md5PermsStr, permsObjectStr, (long) 4000);
+
+        baseBody.setContent(token);
+        baseBody.setMessage("登录成功!");
+        return baseBody;
+    }
+
+
+    /**
+     * 添加新后台用户
+     *
+     * @param userEx
+     * @return
+     */
+    @PostMapping("/addUser")
+    public BaseBody<User> addUser(HttpServletRequest request, UserEx userEx) {
+        BaseBody<User> baseBody = new BaseBody();
+
+        //查询该用户是否已经注册
+        User userCon = new User();
+        userCon.setMobile(userEx.getMobile());
+        List<User> userResult = userService.select(userCon);
+
+        if (!CollectionUtils.isEmpty(userResult)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("该用户已被添加过!");
+            baseBody.setCode(1001);
+            return baseBody;
+        }
+        String userToken = request.getHeader(loginToken);
+        if (StringUtils.isEmpty(userToken)) {
+            userToken = request.getParameter(loginToken);
+        }
+        userEx.setCreator(TokenUtil.getUserEx(userToken).getName());
+        userEx.setPassword(defautPassword);
+
+        User user = userService.addUser(userEx);
+        baseBody.setContent(user);
+        baseBody.setMessage("添加用户成功!");
+        return baseBody;
+    }
+
+
+    /**
+     * 后台修改密码
+     *
+     * @param oldPassword
+     * @param newPassword
+     * @return
+     */
+    @PutMapping("/modifyPassword")
+    public BaseBody modifyPassword(String oldPassword, String newPassword, @Session UserEx userEx) throws UnsupportedEncodingException {
+        BaseBody baseBody = new BaseBody();
+        if (StringUtils.isEmpty(oldPassword)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("请输入原密码!");
+            return baseBody;
+        }
+        if (StringUtils.isEmpty(newPassword)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("请输入新密码!");
+            return baseBody;
+        }
+        if (oldPassword.equals(newPassword)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("新密码与原密码不能相同!");
+            return baseBody;
+        }
+        //验证登录
+        User userResult = userService.userLogin(userEx.getMobile(), oldPassword);
+        userResult.setPassword(newPassword);
+        userResult.setEditTime(System.currentTimeMillis());
+        userResult.setEditor(userEx.getName());
+
+        userService.modifyPassword(userResult);
+
+        baseBody.setMessage("密码修改成功!");
+
+        return baseBody;
+    }
+
+    /**
+     * 刷新登录验证码
+     */
+    @GetMapping("/validateCodeRef")
+    public void validateCodeRef(HttpServletResponse response) {
+
+        String cookieKey = "image_code_token";
+        String cookieValue = String.valueOf(System.currentTimeMillis());
+
+        Cookie cookie = new Cookie(cookieKey, cookieValue);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 5);
+        response.addCookie(cookie);
+
+        String codeStr = captchaProducer.createText();
+        try {
+            RedisUtil.set(cookieValue + "_validateCode", codeStr.toString(), 300);
+            BufferedImage bi = captchaProducer.createImage(codeStr);
+
+            ServletOutputStream out = response.getOutputStream();
+            ImageIO.write(bi, "jpg", out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            LOGGER.error("获取验证码异常:{}", e);
+            e.printStackTrace();
+        }
+    }
+
+}

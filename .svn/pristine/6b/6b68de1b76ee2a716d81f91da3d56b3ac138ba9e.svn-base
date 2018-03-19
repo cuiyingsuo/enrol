@@ -1,0 +1,146 @@
+datasource:
+  type: com.alibaba.druid.pool.DruidDataSource
+  master:
+    url: jdbc:mysql://rm-bp1p8b1wksu13mu3v.mysql.rds.aliyuncs.com:3306/enrol?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull
+    username: kaifa
+    password: kaifa@1csgwjhn5#
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 200
+    initialSize: 50
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 30000
+    minEvictableIdleTimeMillis: 1000000
+    validationQueryTimeout: 900000
+    validationQuery: SELECT SYSDATE() from dual
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+
+#logback 日志输出设置
+spring:
+  redis:
+    database: 0
+    hostName: 192.168.0.192
+    port: 6379
+    timeout: 2000
+    password:
+    pool:
+      maxActive: 100
+      maxWait: 10000
+      maxIdle: 8
+      minIdle: 0
+
+server:
+  port: 8088
+
+
+#手机端登录地址
+enrol:
+  mobile:
+    loginUrl: https://enrol.itcast.cn/password_login.html
+
+
+#本地生成静态文件
+file:
+  #电子合同
+  contract:
+    #合同模板路径
+    tempUrl: D:/tmp/
+    #生成的合同保存路径
+    savePath: /home/data/
+    #天印系统中创建的项目id
+    projectId: 1000002
+    #项目秘钥
+    projectSecret: e97e3fb4e029ea26a8ae13693a7a4589
+    #天印签章服务器ip
+    serverIp: 192.168.0.189
+    #天印签章服务器端口
+    serverPor: 8080
+    #总公司天印系统编码
+    parentOrg: CZBK
+    #作废合同印章天印系统id
+    sealId: fd557063-9b1d-45e6-af98-87aaa200b2e8
+    personCancelSealId: ebf3155b-0596-4bd4-8a41-ba5205f2d909
+  #goods图
+  goodsImg:
+      basePath: /home/data/doc/goodsBanner/
+      goodsUri: /doc/goodsBanner/
+
+#实名认证
+person:
+  #请求url
+  urlPath: http://nsmlrealname.tsign.cn/realname/rest/external/person/idnoAuth 
+
+#短信
+sms:
+  #templeteid
+  templeteid: SMS_109560259
+  #channel
+  channel: enrol
+  #password
+  password: ae3ce4a121b729a2
+  #requestUrl
+  requestUrl: http://nsms-center.boxuegu.com/smscenter/postsms
+
+#通联支付配置
+allin:
+  #h5支付
+  h5-pay:
+    #测试参数
+    pay-test: 
+    #支付订单提交地址
+    pay-url: https://cashier.allinpay.com/mobilepayment/mobile/SaveMchtOrderServlet.action
+    #支付订单完成跳转地址
+    return-url: https://enrol.itcast.cn/my-order.html
+    #支付完成回调地址
+    receiveUrl: https://enrol.itcast.cn/enrol/payResultController/payResult
+    #通联会员注册地址
+    reg-url: http://cashier.allinpay.com/usercenter/merchant/UserInfo/reg.do
+    #加密使用key
+    key: 1234567890
+    #版本号
+    version: v1.0
+    #商户号
+    merchant-id: 
+  #信用卡分期
+  card-install:
+    #通联提供
+    app_key: testhn
+    #通联接口方法名
+    method: allinpay.order.orderinstall.add
+    #通联系统版本号
+    v: 1.0
+    #通联签名版本号
+    sign_v: 1
+    #在通联注册的商户号
+    mer_id: "999290053990002"
+    #贷款申请后，通联跳转我们的页面地址
+    return_url: enrol.itcast.cn/h5/index1.html
+    #秘钥地址
+    keyPath: /usr/local/enrol/libs/private.pfx
+    #公钥地址
+    publicKeyPath: /usr/local/enrol/libs/public.cer
+    #申请分期提交通联地址
+    reqUrl: http://140.207.41.162:8005/asaop/rest/api/
+#传智支付平台
+itcast-pay:
+  #支付平台调用地址
+  pay_url: http://proxy.boxuegu.com/pp-gateway-d/pp-gateway-d/gateway/unifyOrder
+  #appid
+  app_id: pp201801167OmvcrgD
+  #版本号
+  version: 1.0
+  #同步返回地址
+  return_url: http://enrol.itcast.cn/my-order.html
+  #异步返回地址
+  notify_url: http://enrol.itcast.cn/enrol/payResultController/payResult
+  #秘钥
+  private-key: MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQC5mEO2e7nrmR+qbTvAx/mSJVk3zAkjsV5W2csS/3UBf6ExqZSUrKtLOL6KsPs5xG1vlkgh86qnQ8MeaMis7mqCRN1oQnQeFoW05cxBYVwhFTMF2MREnQQSzG0+HUec3ZGztwcPNT6gK+GpvjGLs6yCuTWWxbwhxKPvTvEWqcKY/LgbYGdfblbcsiNbpvLAuIaZcHno2syHzQiSheleICQ6qlybOh4y31id7cHQNcIUDDFf7lCPLRHOYMlHrI6D6SAdXDhvEjs/5kj+N/TN4T3/iXoy1rSHwtiHhdCAqmi2pjlrmdj4xz5zS8pWrbOzWOwQ7y2zdTHU1LHvFrjMpRR3AgMBAAECggEAGsANknHG3GRXohLYd/Laz+u+LkKkVpasCEyf7n8PeEXTD/tnRP6WOeNV41ua+jqLo3e/sdUTFcS4jNuBgRtkEp6mYu6hGe0ZHHe6tvm3c7VAg2k48MLI4YTBgiBqP/vXklWhGNoNyrxIbFTTg1VEWhsj1DVv5lYXYti3+xJA0Bft81FWY37lucr3jeEvf9raVeXedWraqC9AzUl7Be3mjCpm+xzIsWj1Cz8v2D2ASoDvMdSKgDYD/74x/WIwaxWTHecsJpCCFE8hpQDW/3Ds9n+1mI8ipS400wU8ww/KRiLZg3Cu2TC4LkpLXpJyQ+eH/RCNWaqsikp9bB/tvZhKgQKBgQDkAKfpbwaBtiJ2H/zF8lAU84t5dsxWyVqjYUJ3bA7/JbXrrWGrgfi/x/KIpzlKRCJ5MUvkrsxtwl7bsNqv00T9/RcXCfjUFZm1ERFW2LTjD/0T72TDIrGdHeDVDy1dn33YogL1Jid4auuX5FcyUH2G2xFBCGMej5CJq218+xVcoQKBgQDQYoEop8sLf1OjPJ7PK3b3EzdTgO07SP3i+4pxQcY5PlcPKQqXRc4xhQzdI6NKOjnJBL4qDckVf/8QBPSCyBx1SZCUT+NYZmCUdvm8rt/PUyewInhOZfc2706WufFTj8hk9AZgmeKtSfLFUBYyunRN8PXe8vFips2temxr9rCCFwKBgQCOdg50n+er4pbTwhbZxBbfkHEkeuMgkv1sOlgicEVKjVCHKrVtSW+YvSFA22PDkKENooyuHb4kEp/cmzt5QwPHw3zK63MraTe6WCjCX/NeMN5Lt3f5KVNbPZD+71XEOuSSGGDKtoVRC1WbeZQ2Hu7f9T9pqAjuzntcWd22itgFIQKBgH3SbHAy2Eup5sNScAVhFiTbSnW2DAfW681o2k/GSjz4IjL6MfXi5TxLPNgtk4PXIlr47SWRS1AbB9QRWd25nE1JTO3wSrJupnQeXm6KHIMfj4AvX/reYGWgGxCxV0CAOZyTJ2KeqBq/4sE2uSCKKn2BN8QVZqCNXPUZTWvm+O6jAoGBANyKPhW1CImhAQKJrq1fdFUUn0Kfxc5s/LWNp0FP7XCYAFLKNS19jbgZZzW2CHZsUMvIDrn6pPvA3gNPsPS21p09IicLg68KVls+aKEBHl83ENty7Na9MbhTOJG6ovFET1D7Aw5NWfACyYn/1pfdEfiEAN8V/JfLgexREg99qpd7
+  #公钥
+  public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAirSttzhIu1rJeQReJlnfDx6wcFJEshAoYm0cA0u1ZYMWo1DQF0DmBKDsIGepmoabARM6a6Dh2KRK8h7j5LuzqopiW7NZC19L1hCAyKkTb+Il8ADJKCpjivkaPcEzWi8ahXtQKJGL9OO+qSjqOrTrKTX/a//Px6FNRFpU8/W5bGj+dJT8kptr7WnhRLT+7NCX0+fEiQjZWFZ1IBwZOKr/hEEp0hk8ADrjuEUdNoo/d3EVbQlwPjyLXxdiyo96oau2RGgmqRpvFsRxE6/6zXhAmVSqPwWCRCA3pMaWWtPdLvNUOdDwOJmbgzu0aruU48ZwwQNbs2HhglxERaipt6AbSwIDAQAB
+  #账单本地目录
+  bill-dir: /tmp/bill-result

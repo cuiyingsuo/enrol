@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.organize.PostMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolPostResultMapResultMap" type="com.cz.enrol.entity.EnrolPost">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--名称 -->
+		<result property="name" column="name" />
+		<!--岗位id -->
+		<result property="departmentId" column="department_id" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, name, campus_id
+	</sql>
+
+
+</mapper>

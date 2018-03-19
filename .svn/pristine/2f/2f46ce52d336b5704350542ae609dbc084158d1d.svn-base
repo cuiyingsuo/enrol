@@ -1,0 +1,17 @@
+package com.cz.enrol.dao.contract;
+
+import java.util.List;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Contract;
+
+/**
+ * ContractMapper数据库操作接口类
+ **/
+
+public interface ContractMapper extends BaseDao<Contract> {
+	
+	List<Contract> selectListByOrderMainNo(String orderMainNo);
+	
+	Contract selectContractLastTime(String orderMainNo);
+}

@@ -1,0 +1,53 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.entity.Subject;
+import com.cz.enrol.exception.FileValueNoMatchException;
+import com.cz.enrol.service.SubjectService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * @author liuzs
+ * Created by liuzhongshuai on 2017/10/24.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerSubjectController {
+
+    @Autowired
+    private SubjectService managerSubjectService;
+
+
+    /**
+     * 学科查询
+     *
+     * @param status
+     * @return
+     */
+    @GetMapping("/subject/queryList")
+    public BaseBody<List<Subject>> querySubjectList(String status) {
+
+        BaseBody<List<Subject>> baseBody = new BaseBody<List<Subject>>();
+        List<Subject> subjects = null;
+        //查询所有
+        if (null == status) {
+            subjects = managerSubjectService.selectAll();
+        } else {
+            if(!("0".equals(status)||"1".equals(status))){
+                throw  new FileValueNoMatchException("不支持的参数值!",10006);
+            }
+            //查询相应状态的学科列表
+            Subject subject = new Subject();
+            subject.setStatus(Byte.parseByte(status));
+            subjects = managerSubjectService.select(subject);
+        }
+        baseBody.setMessage("查询成功!");
+        baseBody.setContent(subjects);
+        return baseBody;
+    }
+}

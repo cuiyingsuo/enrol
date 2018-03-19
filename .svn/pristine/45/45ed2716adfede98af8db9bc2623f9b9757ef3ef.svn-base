@@ -1,0 +1,14 @@
+package com.cz.enrol.dao.enrol.org;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.enrol.Org;
+
+/**
+ * 
+ * enrol_org数据库接口
+ * 
+ **/
+
+public interface OrgMapper extends BaseDao<Org>{
+
+}

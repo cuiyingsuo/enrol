@@ -1,0 +1,44 @@
+package com.itcast.enrol.common.annotation;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/29.
+ */
+public class CheckEnumValidator implements ConstraintValidator<CheckIntValues, Integer> {
+
+    private int[] values;
+
+    private boolean ableNull;
+
+
+    @Override
+    public void initialize(CheckIntValues checkEnum) {
+        this.values = checkEnum.values();
+        this.ableNull = checkEnum.ableNull();
+    }
+
+    @Override
+    public boolean isValid(Integer integer, ConstraintValidatorContext constraintValidatorContext) {
+
+        if (this.ableNull == false && integer == null) {
+            return false;
+        }
+        //验证字段值 是否 在给定的 列举中
+        if (this.ableNull == false) {
+            boolean flag = false;
+            for (int i : this.values) {
+                if (integer.intValue() == i) {
+                    flag = true;
+                    break;
+                }
+            }
+            return flag;
+        } else {
+            return true;
+        }
+    }
+}

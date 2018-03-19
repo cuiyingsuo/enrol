@@ -1,0 +1,141 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.utils.BusLogUtil;
+import com.cz.enrol.vo.StuClassDetailVo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.student.ClassStudentMapper;
+import com.cz.enrol.entity.ClassStudent;
+import com.cz.enrol.entity.OrderMain;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+/**
+ * 班级与学生关联表 服务类
+ **/
+@Service
+public class ClassStudentService extends BaseService<ClassStudent> {
+
+
+    private BusLogUtil logger = new BusLogUtil(ClassStudentService.class);
+
+    @Autowired
+    private ClassStudentMapper classStudentDao;
+
+    /**
+     * 查询待入学学生对应的班级信息
+     *
+     * @param studentId
+     * @return
+     */
+    public List<Map> getBeSchoolForClass(Long studentId) {
+
+        return classStudentDao.getBeSchoolForClass(studentId);
+    }
+
+    /**
+     * 通过订单状态修改关联状态
+     *
+     * @param orderStatus
+     * @param classId
+     * @param studentId
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void updateByOrderStatus(int payTimes, int orderStatus, Long classId, Long studentId) {
+
+        ClassStudent classStudent = new ClassStudent();
+        classStudent.setClassId(classId);
+        classStudent.setStudentId(studentId);
+        logger.info("修改学生与班级关联信息：{},{},{},{}", payTimes, orderStatus, classId, studentId);
+        classStudent = classStudentDao.select(classStudent).get(0);
+        //订单状态与学员状态对应
+        switch (orderStatus) {
+            case 0:
+                //未支付-新注册
+                classStudent.setStatus(1);
+                break;
+            case 1:
+                //支付中-报名
+                classStudent.setStatus(2);
+                //首次支付加入排班时间
+                if (payTimes == 1) {
+                    classStudent.setSeatTime(System.currentTimeMillis());
+                }
+                break;
+            case 2:
+                //支付完成-报名
+                classStudent.setStatus(2);
+                break;
+            default:
+                classStudent.setStatus(1);
+        }
+
+        classStudentDao.updateByPrimaryKeySelective(classStudent);
+    }
+
+
+    /**
+     * 查询学生班级详情
+     *
+     * @param map
+     * @return
+     */
+    public List<StuClassDetailVo> stuClassDetail(Map<String, Long> map) {
+        return classStudentDao.stuClassDetail(map);
+    }
+
+
+    /**
+     * 开放或 废弃合同
+     *
+     * @param studentIds
+     * @param classId
+     * @param status
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void htOpenOrCloss(String studentIds, Long classId, Integer status) {
+
+        String[] studentArry = studentIds.split(",");
+
+        for (String studentId : studentArry) {
+            ClassStudent classStudent = new ClassStudent();
+            classStudent.setStudentId(Long.valueOf(studentId));
+            classStudent.setClassId(classId);
+
+            ClassStudent classStudentResult = this.selectOne(classStudent);
+            if (null == classStudentResult) {
+                throw new RuntimeException("查询不到 学员对应的班级，学员Id:" + studentId + ",班级Id:" + classId);
+            }
+            classStudentResult.setContractStatus(status);
+
+            this.updateByPk(classStudentResult);
+        }
+    }
+
+    /**
+     * 通过班级 展示学员
+     *
+     * @param classId
+     * @param stuStatus
+     * @return
+     */
+    public List<Map> showStuByClass(Long classId, Integer stuStatus) {
+
+        List<Map> mapList = classStudentDao.showStuByClass(classId);
+
+
+        if (!CollectionUtils.isEmpty(mapList) && null != stuStatus) {
+            mapList = mapList.stream().filter(s -> String.valueOf(s.get("status")).equals(stuStatus)).collect(Collectors.toList());
+        }
+
+        return mapList;
+    }
+}

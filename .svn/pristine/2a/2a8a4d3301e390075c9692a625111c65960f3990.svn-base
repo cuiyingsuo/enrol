@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.marketing.MarketingDeductionMapper">
+
+    <!--实体映射-->
+    <resultMap id="EnrolMarketingResultMapResultMap" type="com.cz.enrol.entity.MarketingDeduction">
+        <!--主键-->
+        <id property="id" column="主键"/>
+        <!--标题-->
+        <result property="title" column="title"/>
+        <!--应用维度-->
+        <result property="dimension" column="dimension"/>
+        <!--开始时间-->
+        <result property="startTime" column="start_time"/>
+        <!--结束时间-->
+        <result property="endTime" column="end_time"/>
+        <!--创建人-->
+        <result property="creator" column="creator"/>
+        <!--创建时间-->
+        <result property="createTime" column="create_time"/>
+        <!--修改人-->
+        <result property="editor" column="editor"/>
+        <!--修改时间-->
+        <result property="editeTime" column="edite_time"/>
+        <!--优惠金额(分）-->
+        <result property="reductionMoney" column="reduction_money"/>
+        <!--是否启用，0未启用，1已启用；-->
+        <result property="isEnable" column="is_enable"/>
+        <!--是否删除，0未删除，1已删除；-->
+        <result property="isDelete" column="is_delete"/>
+        <!--备注；-->
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="deductionForTarget" parameterType="java.lang.Long" resultMap="EnrolMarketingResultMapResultMap">
+		SELECT
+		emd.*
+		FROM
+		enrol_marketing_deduction_target emdt,
+		enrol_marketing_deduction emd
+		WHERE
+		emdt.marketing_deduction_id = emd.id
+		AND emd.is_delete = 0
+		AND emd.is_enable = 1 AND  emdt.dimension=1 AND emdt.target_id={#targetId} AND NOW() <![CDATA[ >]]> emd.start_time AND NOW() <![CDATA[ < ]]> emd.edit_time
+	</select>
+
+</mapper>

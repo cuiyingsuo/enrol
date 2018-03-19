@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.goods.GoodsClassMapper">
+
+    <!--实体映射-->
+    <resultMap id="EnrolGoodsClassResultMapResultMap" type="com.cz.enrol.entity.GoodsClass">
+        <!--主键Id-->
+        <id property="id" column="主键Id"/>
+        <!--商品Id-->
+        <result property="goodsId" column="goods_id"/>
+        <!--班级Id-->
+        <result property="classId" column="class_id"/>
+        <!--创建者-->
+        <result property="creator" column="creator"/>
+        <!--创建时间-->
+        <result property="createTime" column="create_time"/>
+    </resultMap>
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	goods_id,	class_id,	creator,	create_time
+	</sql>
+
+    <!-- 根据商品id查询 -->
+    <select id="selectByGoodsId" parameterType="java.lang.Long" resultMap="EnrolGoodsClassResultMapResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM enrol_goods_class WHERE goods_id=1
+    </select>
+
+    <!--商品管理 查询列表-->
+    <select id="queryGoodsForClass" parameterType="java.util.Map" resultType="java.util.Map">
+        SELECT
+        ec.id as classId,
+        eg.id as goodsId,
+        eg.goods_no as goodsNo
+        eg.`name`,
+        es.`name` as subjectName,
+        ec.class_type_name as classType,
+        ec.teach_mode_name as teachMode,
+        ecampus.`name` as campusName,
+        ec.periods,
+        ec.start_date as startDate,
+        eg.price,
+        ec.marketing_id as marketId,
+        ec.plan,
+        ec.current,
+        eg.`status`,
+        egc.create_time as createTime,
+        egc.creator
+        FROM
+        enrol_goods_class egc,
+        enrol_goods eg,
+        enrol_class ec,
+        enrol_subject es,
+        enrol_campus ecampus
+        WHERE
+        egc.class_id = ec.id
+        AND egc.goods_id = eg.id
+        AND es.id=ec.subject_id
+        AND ecampus.id=ec.campus_id
+        AND eg.is_del=0
+        AND eg.is_del=0
+        <if test="_parameter.containsKey('subjectId')">
+            AND es.id = #{subjectId}
+        </if>
+
+        <if test="_parameter.containsKey('classType')">
+            AND ec.class_type_code = #{classType}
+        </if>
+
+        <if test="_parameter.containsKey('teachModeCode')">
+            AND ec.teach_mode_code = #{teachModeCode}
+        </if>
+
+        <if test="_parameter.containsKey('campusId')">
+            AND ec.campusId = #{campusId}
+        </if>
+
+        <if test="_parameter.containsKey('name')">
+            AND eg.name like CONCAT(CONCAT('%', #{name}), '%')
+        </if>
+        ORDER BY egc.create_time desc
+    </select>
+</mapper>

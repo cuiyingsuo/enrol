@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.order.OrderSubMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolOrderSubResultMapResultMap"
+		type="com.itcast.enrol.common.entity.OrderSub">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--订单号； -->
+		<result property="orderNo" column="order_no" />
+		<!--订单价格 -->
+		<result property="orderPrice" column="order_price" />
+		<!--支付时间 -->
+		<result property="payTime" column="pay_time" />
+		<!--订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功) -->
+		<result property="status" column="status" />
+		<!--收据号 -->
+		<result property="receiptNo" column="receipt_no" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!--编辑者 -->
+		<result property="editor" column="editor" />
+		<!--编辑时间 -->
+		<result property="editTime" column="edit_time" />
+		<!---->
+		<result property="mergeOrderNo" column="merge_order_no" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, order_no, order_price, pay_time, status, creator, create_time,
+		editor, edit_time, merge_order_no
+	</sql>
+
+	<select id="selectByMergeOrderNo" parameterType="java.lang.String"
+		resultType="java.util.Map">
+		SELECT
+		sub.id AS id,
+		sub.order_no AS orderNo,
+		sub.order_price AS orderPrice,
+		sub.pay_time AS payTime,
+		sub.is_aft AS isAft
+		FROM enrol_order_sub sub
+		LEFT JOIN enrol_order_main om ON sub.merge_order_no=om.merge_order_no
+		LEFT JOIN enrol_goods goods ON om.goods_id=goods.id
+		WHERE om.merge_order_no=#{orderNo} AND sub.`status`=2
+	</select>
+	
+	<!-- 查询凭证信息 -->
+	<select id="selectReceiptInfo" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+		os.order_price AS orderPrice,
+		os.pay_time AS payTime,
+		om.pay_channel_name AS payChannelName,
+		om.student_id AS studentId,
+		om.student_name AS studentName,
+		os.receipt_no AS receiptNo,
+		om.class_name AS goodsName,
+		cam.seal_img AS sealImg,
+		om.elec_receipt AS receiptStatus,
+		os.is_aft AS isAft
+		FROM enrol_order_sub os,enrol_order_main om,enrol_campus cam
+		WHERE os.order_no=#{orderSubNo}
+		AND os.merge_order_no=om.merge_order_no 
+		AND om.campus_id=cam.id 
+		AND os.`status`=2 AND om.is_cancel=0
+	</select>
+</mapper>

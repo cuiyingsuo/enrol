@@ -1,0 +1,23 @@
+package com.cz.enrol.dao.marketing;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolMarketing;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Map;
+
+/**
+ * 
+ * EnrolMarketingMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolMarketingMapper extends BaseDao<EnrolMarketing>{
+
+	
+	/**
+	 * 
+	 * 根据班级id查询
+	 */
+	Map<String,Object> selectByClassId(Long classId);
+}

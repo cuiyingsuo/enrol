@@ -1,0 +1,16 @@
+package com.cz.enrol.dao.order;
+
+import com.allinpay.ets.client.PaymentResult;
+import com.cz.enrol.common.BaseDao;
+
+/**
+ * 
+ * EnrolOrderFlowMapper数据库操作接口类
+ * 
+ **/
+
+public interface PaymentResultMapper extends BaseDao<PaymentResult>{
+
+
+
+}

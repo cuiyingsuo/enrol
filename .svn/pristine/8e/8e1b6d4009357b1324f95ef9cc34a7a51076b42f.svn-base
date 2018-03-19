@@ -1,0 +1,23 @@
+package com.cz.enrol.dao.student;
+
+import java.util.Map;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Student;
+
+/**
+ * 
+ * EnrolStudentMapper数据库操作接口类
+ * 
+ **/
+
+public interface StudentMapper extends BaseDao<Student> {
+
+	/**
+	 *
+	 * @param params
+	 * @return
+	 */
+	int updatePasswordByMobile(Map<String, String> params);
+	
+}

@@ -1,0 +1,145 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.dao.marketing.MarketingMapper;
+import com.cz.enrol.dao.organize.ClassMapper;
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.entity.Marketing;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.utils.BeanUtils;
+import com.cz.enrol.vo.UserEx;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 营销策略表 服务类
+ **/
+@Service
+public class MarketingService extends BaseService<Marketing> {
+
+
+    @Autowired
+    private MarketingMapper marketingMapper;
+
+    @Autowired
+    private ClassMapper classMapper;
+
+
+    /**
+     * 查询非删除状态的营销数据
+     *
+     * @return
+     */
+    public BasePage queryMarking(Integer startPage, Integer pageSize) {
+
+        PageHelper.startPage(startPage, pageSize);
+
+        List<Map<String, String>> resultList = marketingMapper.queryMarking();
+
+        PageInfo<Map<String, String>> pageInfo = new PageInfo(resultList);
+
+        BasePage basePage = new BasePage();
+        basePage.setPageData(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startPage);
+        basePage.setTotalPage(pageInfo.getPages());
+        basePage.setCount(pageInfo.getTotal());
+        return basePage;
+    }
+
+    /**
+     * 添加、修改营销信息
+     *
+     * @param marketing
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void mergeMarketing(Marketing marketing, UserEx userEx) {
+
+        //唯一性验证 -> 学科、校区、班级类型、授课模式、期间类型、
+
+        if (marketing.getId() != null) {
+            Marketing marketingQueryResult = this.selectByPrimaryKey(marketing.getId());
+            if (null == marketingQueryResult) {
+                throw new RuntimeException("查询不到原记录");
+            }
+            BeanUtils.copyProperties(marketing, marketingQueryResult);
+            marketingQueryResult.setEditTime(new Date());
+            marketingQueryResult.setEditor(userEx.getName());
+            marketingQueryResult.setEditorId(userEx.getId());
+            this.updateByPk(marketingQueryResult);
+        } else {
+            //新增
+            marketing.setCreateTime(new Date());
+            marketing.setCreator(userEx.getName());
+            marketing.setCreatorId(userEx.getId());
+
+            this.insertSelective(marketing);
+        }
+    }
+
+    /**
+     * 订单优惠处理
+     *
+     * @param orderMain
+     * @param durationTypeCode:start_class_time/pay_date_time
+     * @return
+     */
+    public OrderMain orderMarket(OrderMain orderMain, String durationTypeCode) {
+
+        //订单优惠 减免
+        Marketing marketing = new Marketing();
+        marketing.setIsDel(0);
+        marketing.setStatus(1);
+        marketing.setCampusId(orderMain.getCampusId());
+        marketing.setSubjectId(orderMain.getSubjectId().intValue());
+
+        EnrolClass enrolClass = classMapper.selectByPrimaryKey(orderMain.getClassId());
+        if (null == enrolClass) {
+            throw new RuntimeException("班级信息不存在!");
+        }
+        marketing.setTeachModelCode(enrolClass.getTeachModeCode());
+        marketing.setClassTypeCode(enrolClass.getClassTypeCode());
+
+        marketing = marketingMapper.selectOne(marketing);
+        if (null != marketing&&marketing.getDurationTypeCode().equals(durationTypeCode)) {
+            Long currentTime = System.currentTimeMillis();
+            //优惠期间为开班时间
+            if ("start_class_time".equals(durationTypeCode)) {
+                currentTime = enrolClass.getStartDate().getTime();
+            } else if ("pay_date_time".equals(durationTypeCode)) {
+                currentTime = System.currentTimeMillis();
+            }
+            //优惠期间为支付时间
+            //判断订单 优惠开始时间是否 包含当前时间
+            Long startTime = marketing.getStartTime().getTime();
+            Long endTime = marketing.getEndTime().getTime();
+            if (currentTime > startTime && currentTime < endTime) {
+                //减价
+                orderMain.setOrderPrice(orderMain.getCostPrice().intValue() - marketing.getReductionPrice().intValue());
+                orderMain.setMarketingName(marketing.getName());
+                orderMain.setMarketingId(marketing.getId());
+                orderMain.setPrefAmount(marketing.getReductionPrice().intValue());
+            }
+        }
+        return orderMain;
+    }
+
+    /**
+     * 营销下拉选
+     * @return
+     */
+    public List<Map<String,String>> marketingDownSelect(){
+        return marketingMapper.marketingDownSelect();
+    }
+
+}

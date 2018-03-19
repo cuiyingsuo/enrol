@@ -1,0 +1,176 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_class_student")
+public class ClassStudent {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 班级Id
+     */
+    @Column(name = "class_id")
+    private Long classId;
+
+    /**
+     * 学生Id
+     */
+    @Column(name = "student_id")
+    private Long studentId;
+
+    /**
+     * 排座时间
+     */
+    @Column(name = "seat_time")
+    private Long seatTime;
+    /**
+     * 合同的文档名
+     */
+    @Column(name = "contract_pdf_name")
+    private String contractPdfName;
+
+    /**
+     * 创建人
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    @Column(name = "status")
+    private Integer status;
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取班级Id
+     *
+     * @return class_id - 班级Id
+     */
+    public Long getClassId() {
+        return classId;
+    }
+
+    /**
+     * 设置班级Id
+     *
+     * @param classId 班级Id
+     */
+    public void setClassId(Long classId) {
+        this.classId = classId;
+    }
+
+    /**
+     * 获取学生Id
+     *
+     * @return student_id - 学生Id
+     */
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    /**
+     * 设置学生Id
+     *
+     * @param studentId 学生Id
+     */
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
+    /**
+     * 获取排座时间
+     *
+     * @return seat_time - 排座时间
+     */
+    public Long getSeatTime() {
+        return seatTime;
+    }
+
+    /**
+     * 设置排座时间
+     *
+     * @param seatTime 排座时间
+     */
+    public void setSeatTime(Long seatTime) {
+        this.seatTime = seatTime;
+    }
+
+    
+    public String getContractPdfName() {
+		return contractPdfName;
+	}
+
+	public void setContractPdfName(String contractPdfName) {
+		this.contractPdfName = contractPdfName;
+	}
+
+	/**
+     * 获取创建人
+     *
+     * @return creator - 创建人
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建人
+     *
+     * @param creator 创建人
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+}

@@ -1,0 +1,45 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.service.ClassService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/24.
+ */
+@RestController
+@RequestMapping("/managenment/class")
+public class ManagerClassController {
+
+    @Autowired
+    private ClassService managerClassService;
+
+
+    /**
+     * 条件查询班级列表
+     *
+     * @param enrolClass
+     * @return
+     */
+    @GetMapping("/queryClassList")
+    public BaseBody<List<EnrolClass>> queryClassList(EnrolClass enrolClass) {
+        BaseBody<List<EnrolClass>> baseBody = new BaseBody<>();
+        if (null == enrolClass) {
+            enrolClass = new EnrolClass();
+        }
+        List<EnrolClass> enrolClasses = managerClassService.select(enrolClass);
+        baseBody.setContent(enrolClasses);
+        baseBody.setMessage("查询成功!");
+        return baseBody;
+    }
+
+
+
+}

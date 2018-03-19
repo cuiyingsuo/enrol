@@ -1,0 +1,17 @@
+package com.cz.enrol.dao.permission;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolRole;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * 
+ * EnrolRoleMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolRoleMapper extends BaseDao<EnrolRole>{
+
+
+
+}

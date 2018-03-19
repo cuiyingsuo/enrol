@@ -1,0 +1,62 @@
+package com.cz.enrol.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.student.ClassStudentMapper;
+import com.cz.enrol.entity.ClassStudent;
+import com.cz.enrol.entity.OrderMain;
+
+/**
+ * 班级与学生关联表 服务类
+ **/
+@Service
+public class ClassStudentService extends BaseService<ClassStudent> {
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+
+    @Autowired
+    private ClassStudentMapper classStudentDao;
+    
+    /**
+     * 通过订单状态修改关联状态
+     * @param orderStatus
+     * @param classId
+     * @param studentId
+     */
+    @Transactional
+    public void updateByOrderStatus(int payTimes,int orderStatus,Long classId,Long studentId){
+    	
+    	ClassStudent classStudent = new ClassStudent();
+    	classStudent.setClassId(classId);
+    	classStudent.setStudentId(studentId);
+    	logger.info("修改学生与班级关联信息：{},{},{},{}",payTimes,orderStatus,classId,studentId);
+    	classStudent = classStudentDao.select(classStudent).get(0);
+    	//订单状态与学员状态对应
+    	switch(orderStatus){
+    		case 0:
+    			//未支付-新注册
+    			classStudent.setStatus(1);
+    			break;
+    		case 1:
+    			//支付中-报名
+    			classStudent.setStatus(2);
+    			//首次支付加入排班时间
+    			if(payTimes==1){
+    				classStudent.setSeatTime(System.currentTimeMillis());
+    			}
+    			break;
+    		case 2:
+    			//支付完成-报名
+    			classStudent.setStatus(2);
+    			break;
+    		default:classStudent.setStatus(1);
+    	}
+
+    	classStudentDao.updateByPrimaryKeySelective(classStudent);
+    }
+}

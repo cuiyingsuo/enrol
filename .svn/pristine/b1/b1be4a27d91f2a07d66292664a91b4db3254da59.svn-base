@@ -1,0 +1,254 @@
+package com.cz.enrol.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import net.minidev.json.JSONObject;
+
+import org.apache.poi.ss.formula.functions.T;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.allinpay.ets.client.RequestOrder;
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.enrol.vo.StuInfoRedisVo;
+import com.cz.enrol.service.OrderMainService;
+import com.cz.enrol.service.PayService;
+
+/**
+ * 
+ * 支付访问接口
+ * 
+ * @author My
+ *
+ */
+@RestController
+@RequestMapping("/payController")
+public class PayController extends BaseController{
+	@Value("${allin.h5-pay.pay-url}")
+	private String serverUrl;
+
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private OrderMainService orderMainService;
+
+	@Autowired
+	private PayService payService;
+
+	@Value("${server.token-key-mobile}")
+	private String loginToken;
+
+	/**
+	 * 全款支付
+	 * 
+	 * @param orderMainNo
+	 *            主订单编码
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/payFull", method = RequestMethod.POST)
+	public BaseBody<T> payFull(@RequestParam String orderMainNo, HttpServletRequest request,
+			HttpServletResponse response) throws Exception {
+		logger.info("全款支付start：{}",orderMainNo);
+		
+		String userToken = request.getHeader(loginToken);
+		StuInfoRedisVo userInfo = getUserInfoByRedis(userToken);
+		
+		String mobile = userInfo.getMobile();
+
+		Map<String, Object> requestOrderMap = new HashMap<String, Object>();
+		requestOrderMap.put("serverUrl", serverUrl);
+
+		Map<String, Object> orderMainMap = orderMainService.queryOrderMainInfo(orderMainNo,mobile);
+
+		if (null != orderMainMap && orderMainMap.size() > 0) {
+			Map<String, Object> orderMainInfo = (Map<String, Object>) orderMainMap.get("orderMainInfo");
+
+			int status = Integer.parseInt(orderMainInfo.get("orderStatus").toString());
+
+			if (status == 2) {
+				return fail(ReturnStatus.STATUS_ERROR,"订单已支付完成，不可支付");
+			}
+			if (status == 3) {
+				return fail(ReturnStatus.STATUS_ERROR,"订单退费中，不可支付");
+			}
+			if (status == 4) {
+				return fail(ReturnStatus.STATUS_ERROR,"订单已退费，不可支付");
+			}
+		}
+
+		RequestOrder requestOrder = payService.payFullRequestOrder(String.valueOf(userInfo.getId()), mobile,orderMainNo);
+		
+		if (null != requestOrder) {
+			requestOrderMap.put("payOrderInfo", requestOrder);
+			logger.info("返回移动端支付信息：{}",orderMainNo);
+			return success(requestOrderMap);
+		} else {
+			return fail(ReturnStatus.STATUS_ERROR,"订单信息生成失败");
+		}
+	}
+
+	/**
+	 * 分次支付
+	 * 
+	 * @param orderMainNo
+	 *            主订单号
+	 * @param payPrice
+	 *            支付金额
+	 * @param request
+	 * @param response
+	 * @return
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/payPart", method = RequestMethod.POST)
+	public BaseBody<T> payPart(@RequestParam String orderMainNo, @RequestParam int payPrice,
+			HttpServletRequest request, HttpServletResponse response) throws Exception {
+		logger.info("请求分次支付：支付金额={}",payPrice);
+		
+		String userToken = request.getHeader(loginToken);
+		StuInfoRedisVo userInfo = getUserInfoByRedis(userToken);
+		
+		String mobile = userInfo.getMobile();
+		
+		BigDecimal myformat=new BigDecimal(payPrice);
+		int price = myformat.movePointRight(2).intValue();
+		
+		Map<String, Object> requestOrderMap = new HashMap<String, Object>();
+		requestOrderMap.put("serverUrl", serverUrl);
+		RequestOrder requestOrder = null;
+
+		Map<String, Object> orderMainMap = orderMainService.queryOrderMainInfo(orderMainNo,mobile);
+
+		if (null != orderMainMap && orderMainMap.size() > 0) {
+			Map<String, Object> orderMainInfo = (Map<String, Object>) orderMainMap.get("orderMainInfo");
+
+			int status = Integer.parseInt(orderMainInfo.get("orderStatus")
+					.toString());
+			int orderMainPrice = Integer.parseInt(orderMainInfo.get(
+					"orderPrice").toString());
+			int orderMainPaid = Integer.parseInt(orderMainInfo.get("paid")
+					.toString());
+			int payType = Integer.parseInt(orderMainInfo.get("payType")
+					.toString());
+
+			if (status == 2) {
+				return fail(ReturnStatus.STATUS_ERROR,"订单已支付完成，不可支付");
+			}
+			if (status == 3) {
+				return fail(ReturnStatus.STATUS_ERROR,"订单退费中，不可支付");
+			}
+			if (status == 4) {
+				return fail(ReturnStatus.STATUS_ERROR,"订单已退费，不可支付");
+			}
+			logger.info("分次支付：{}{}{}",orderMainPrice,orderMainPaid,price);
+			
+			if (((orderMainPrice - orderMainPaid) - price) < 0) {
+				return fail(ReturnStatus.STATUS_ERROR,"支付金额不得超过订单未支付金额");
+			}
+
+			String classTypeCode = orderMainInfo.get("classTypeCode").toString();
+			String classTypeName = orderMainInfo.get("classTypeName").toString();
+
+			if (payType == 1||payType==2) {
+				List<Map<String, Object>> payOrderList = (List<Map<String, Object>>) orderMainMap.get("payOrderList");
+				 
+				if (null == payOrderList || payOrderList.size() == 0) {
+					// 首次支付
+					if (classTypeCode.equals("class_detail_base")) {
+						if (price < 20000) {
+							return fail(ReturnStatus.PARAM_ERROR,"支付金额不低于200元");
+						}
+					}
+					if (classTypeCode.equals("class_detail_employment")) {
+						if (price < 50000) {
+							return fail(ReturnStatus.PARAM_ERROR,"支付金额不低于500元");
+						}
+					}
+
+				} else if (payOrderList.size() == 1) {
+					if(payType==2){
+						return fail(ReturnStatus.PARAM_ERROR,classTypeName+ "贷款订单不允许二次支付");
+					}
+					// 二次支付
+					if (classTypeCode.equals("class_detail_base")) {
+						if ((orderMainPrice - orderMainPaid - price) > 0) {
+							return fail(ReturnStatus.PARAM_ERROR,classTypeName
+									+ ":二次支付需支付订单剩余全部未支付金额："
+									+ (orderMainPrice - orderMainPaid));
+						}
+					}
+					if (classTypeCode.equals("class_detail_employment")) {
+						if ((orderMainPrice-orderMainPaid)>300000 && price < 300000) {
+							return fail(ReturnStatus.PARAM_ERROR,"支付金额不低于3000元");
+						}
+					}
+				} else {
+					// 三次支付
+					if ((orderMainPrice - orderMainPaid - price) > 0) {
+						return fail(ReturnStatus.PARAM_ERROR,classTypeName
+								+ ":三次支付需支付订单剩余全部未支付金额："
+								+ (orderMainPrice - orderMainPaid));
+					}
+				}
+
+				//调用支付单信息组装
+				requestOrder = payService.payPartRequestOrder(String.valueOf(userInfo.getId()), mobile,price, orderMainNo);
+
+			} else {
+				return fail(ReturnStatus.PARAM_ERROR,"订单为全额支付订单，不支持分次支付");
+			}
+		} else {
+			return fail(ReturnStatus.DATA_NULL,"获取订单信息失败");
+		}
+
+		if (null != requestOrder) {
+			requestOrderMap.put("requestOrder", requestOrder);
+
+			return success(requestOrderMap);
+		} 
+		
+		return fail(500,"支付信息生成失败");
+	}
+
+	/**
+	 * 申请信用卡分期
+	 * @param orderMainNo
+	 * @return
+	 */
+	//@RequestMapping(value = "/applyInstallment", method = RequestMethod.POST)
+	public void applyInstallment(@RequestParam String orderMainNo,
+			HttpServletRequest request, HttpServletResponse response){
+		response.setContentType("text/html;charset=UTF-8");
+		
+		String cardInstallmentInfo = payService.makeCardInstallmentInfo(orderMainNo);
+		logger.info("分期支付，提交支付方参数组装结束，生成页面代码：{}",cardInstallmentInfo);
+		
+		PrintWriter p=null;
+		try {
+			p = response.getWriter();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		p.println(cardInstallmentInfo);  
+        p.close();
+		
+	}
+}

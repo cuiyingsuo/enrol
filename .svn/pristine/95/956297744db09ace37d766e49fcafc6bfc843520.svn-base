@@ -1,0 +1,314 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_marketing")
+public class Marketing {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 营销政策；
+     */
+    private String strategy;
+
+    /**
+     * 优惠条件
+     */
+    private String condition;
+
+    /**
+     * 优惠金额(分）
+     */
+    @Column(name = "reduction_money")
+    private Integer reductionMoney;
+
+    /**
+     * 期限
+     */
+    @Column(name = "reduction_term")
+    private String reductionTerm;
+
+    /**
+     * 是否启用，0未启用，1已启用；
+     */
+    @Column(name = "is_enable")
+    private Integer isEnable;
+
+    /**
+     * 是否删除，0未删除，1已删除；
+     */
+    @Column(name = "is_delete")
+    private Integer isDelete;
+
+    /**
+     * 是否发布，0未发布，1已发布；
+     */
+    @Column(name = "is_publish")
+    private Integer isPublish;
+
+    /**
+     * 备注；
+     */
+    private String memo;
+
+    /**
+     * 创建者
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取营销政策；
+     *
+     * @return strategy - 营销政策；
+     */
+    public String getStrategy() {
+        return strategy;
+    }
+
+    /**
+     * 设置营销政策；
+     *
+     * @param strategy 营销政策；
+     */
+    public void setStrategy(String strategy) {
+        this.strategy = strategy;
+    }
+
+    /**
+     * 获取优惠条件
+     *
+     * @return condition - 优惠条件
+     */
+    public String getCondition() {
+        return condition;
+    }
+
+    /**
+     * 设置优惠条件
+     *
+     * @param condition 优惠条件
+     */
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }
+
+    /**
+     * 获取优惠金额(分）
+     *
+     * @return reduction_money - 优惠金额(分）
+     */
+    public Integer getReductionMoney() {
+        return reductionMoney;
+    }
+
+    /**
+     * 设置优惠金额(分）
+     *
+     * @param reductionMoney 优惠金额(分）
+     */
+    public void setReductionMoney(Integer reductionMoney) {
+        this.reductionMoney = reductionMoney;
+    }
+
+    /**
+     * 获取期限
+     *
+     * @return reduction_term - 期限
+     */
+    public String getReductionTerm() {
+        return reductionTerm;
+    }
+
+    /**
+     * 设置期限
+     *
+     * @param reductionTerm 期限
+     */
+    public void setReductionTerm(String reductionTerm) {
+        this.reductionTerm = reductionTerm;
+    }
+
+    /**
+     * 获取是否启用，0未启用，1已启用；
+     *
+     * @return is_enable - 是否启用，0未启用，1已启用；
+     */
+    public Integer getIsEnable() {
+        return isEnable;
+    }
+
+    /**
+     * 设置是否启用，0未启用，1已启用；
+     *
+     * @param isEnable 是否启用，0未启用，1已启用；
+     */
+    public void setIsEnable(Integer isEnable) {
+        this.isEnable = isEnable;
+    }
+
+    /**
+     * 获取是否删除，0未删除，1已删除；
+     *
+     * @return is_delete - 是否删除，0未删除，1已删除；
+     */
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    /**
+     * 设置是否删除，0未删除，1已删除；
+     *
+     * @param isDelete 是否删除，0未删除，1已删除；
+     */
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
+
+    /**
+     * 获取是否发布，0未发布，1已发布；
+     *
+     * @return is_publish - 是否发布，0未发布，1已发布；
+     */
+    public Integer getIsPublish() {
+        return isPublish;
+    }
+
+    /**
+     * 设置是否发布，0未发布，1已发布；
+     *
+     * @param isPublish 是否发布，0未发布，1已发布；
+     */
+    public void setIsPublish(Integer isPublish) {
+        this.isPublish = isPublish;
+    }
+
+    /**
+     * 获取备注；
+     *
+     * @return memo - 备注；
+     */
+    public String getMemo() {
+        return memo;
+    }
+
+    /**
+     * 设置备注；
+     *
+     * @param memo 备注；
+     */
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+}

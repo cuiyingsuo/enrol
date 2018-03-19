@@ -1,0 +1,553 @@
+package com.cz.enrol.entity;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+
+@Table(name = "enrol_marketing")
+public class Marketing {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 名称
+     */
+    @NotEmpty(message = "请填写活动名称")
+    private String name;
+
+    /**
+     * 优惠节点类型
+     */
+    @Column(name = "duration_type_code")
+    @NotEmpty(message = "请填写优惠节点类型")
+    private String durationTypeCode;
+
+    /**
+     * 活动开始时间
+     */
+    @Column(name = "start_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "请填写开始时间!")
+    private Date startTime;
+
+    /**
+     * 活动结束时间
+     */
+    @Column(name = "end_time")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    @NotNull(message = "请填写结束时间!")
+    private Date endTime;
+
+    /**
+     * 优惠价格
+     */
+    @Column(name = "reduction_price")
+    @NotNull(message = "请填写优惠价钱!")
+    private Long reductionPrice;
+
+    /**
+     * 学科 id
+     */
+    @Column(name = "subject_ids")
+    @NotEmpty(message = "请选择学科!")
+    private String subjectIds;
+
+    /**
+     * 班级类型
+     */
+    @Column(name = "class_type_codes")
+    @NotEmpty(message = "请选班级类型!")
+    private String classTypeCodes;
+
+    /**
+     * 班级类型名称
+     */
+    @Column(name = "class_type_names")
+    private String classTypeNames;
+
+    /**
+     * 优惠节点名称
+     */
+    @Column(name = "duration_type_name")
+    private String durationTypeName;
+
+    /**
+     * 授课模式 编码
+     */
+    @Column(name = "teach_model_codes")
+    @NotEmpty(message = "请选择授课模式!")
+    private String teachModelCodes;
+
+    /**
+     * 授课模式名称
+     */
+    @Column(name = "teach_model_names")
+    private String teachModelNames;
+
+    /**
+     * 校区Id
+     */
+    @Column(name = "campus_ids")
+    @NotEmpty(message = "请选择校区!")
+    private String campusIds;
+
+    /**
+     * 创建人名称
+     */
+    private String creator;
+
+    /**
+     * 创建人id
+     */
+    @Column(name = "creator_id")
+    private Long creatorId;
+
+    /**
+     * 修改人名称
+     */
+    private String editor;
+
+    /**
+     * 修改人id
+     */
+    @Column(name = "editor_id")
+    private Long editorId;
+
+    /**
+     * 0:停用 1：启用
+     */
+    private Integer status;
+
+    /**
+     * 0:未删除 1：已删除
+     */
+    @Column(name = "is_del")
+    private Integer isDel;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Date createTime;
+
+    /**
+     * 修改时间
+     */
+    @Column(name = "edit_time")
+    private Date editTime;
+
+    @Column(name = "campus_names")
+    private String campusNames;
+
+    @Column(name = "subject_names")
+    private String subjectNames;
+
+    /**
+     * @return id
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * @param id
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取名称
+     *
+     * @return name - 名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置名称
+     *
+     * @param name 名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取优惠节点类型
+     *
+     * @return duration_type_code - 优惠节点类型
+     */
+    public String getDurationTypeCode() {
+        return durationTypeCode;
+    }
+
+    /**
+     * 设置优惠节点类型
+     *
+     * @param durationTypeCode 优惠节点类型
+     */
+    public void setDurationTypeCode(String durationTypeCode) {
+        this.durationTypeCode = durationTypeCode;
+    }
+
+    /**
+     * 获取活动开始时间
+     *
+     * @return start_time - 活动开始时间
+     */
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * 设置活动开始时间
+     *
+     * @param startTime 活动开始时间
+     */
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    /**
+     * 获取活动结束时间
+     *
+     * @return end_time - 活动结束时间
+     */
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    /**
+     * 设置活动结束时间
+     *
+     * @param endTime 活动结束时间
+     */
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+    /**
+     * 获取优惠价格
+     *
+     * @return reduction_price - 优惠价格
+     */
+    public Long getReductionPrice() {
+        return reductionPrice;
+    }
+
+    /**
+     * 设置优惠价格
+     *
+     * @param reductionPrice 优惠价格
+     */
+    public void setReductionPrice(Long reductionPrice) {
+        this.reductionPrice = reductionPrice;
+    }
+
+    /**
+     * 获取学科 id
+     *
+     * @return subject_ids - 学科 id
+     */
+    public String getSubjectIds() {
+        return subjectIds;
+    }
+
+    /**
+     * 设置学科 id
+     *
+     * @param subjectIds 学科 id
+     */
+    public void setSubjectIds(String subjectIds) {
+        this.subjectIds = subjectIds;
+    }
+
+    /**
+     * 获取班级类型
+     *
+     * @return class_type_codes - 班级类型
+     */
+    public String getClassTypeCodes() {
+        return classTypeCodes;
+    }
+
+    /**
+     * 设置班级类型
+     *
+     * @param classTypeCodes 班级类型
+     */
+    public void setClassTypeCodes(String classTypeCodes) {
+        this.classTypeCodes = classTypeCodes;
+    }
+
+    /**
+     * 获取班级类型名称
+     *
+     * @return class_type_names - 班级类型名称
+     */
+    public String getClassTypeNames() {
+        return classTypeNames;
+    }
+
+    /**
+     * 设置班级类型名称
+     *
+     * @param classTypeNames 班级类型名称
+     */
+    public void setClassTypeNames(String classTypeNames) {
+        this.classTypeNames = classTypeNames;
+    }
+
+    /**
+     * 获取优惠节点名称
+     *
+     * @return duration_type_name - 优惠节点名称
+     */
+    public String getDurationTypeName() {
+        return durationTypeName;
+    }
+
+    /**
+     * 设置优惠节点名称
+     *
+     * @param durationTypeName 优惠节点名称
+     */
+    public void setDurationTypeName(String durationTypeName) {
+        this.durationTypeName = durationTypeName;
+    }
+
+    /**
+     * 获取授课模式 编码
+     *
+     * @return teach_model_codes - 授课模式 编码
+     */
+    public String getTeachModelCodes() {
+        return teachModelCodes;
+    }
+
+    /**
+     * 设置授课模式 编码
+     *
+     * @param teachModelCodes 授课模式 编码
+     */
+    public void setTeachModelCodes(String teachModelCodes) {
+        this.teachModelCodes = teachModelCodes;
+    }
+
+    /**
+     * 获取授课模式名称
+     *
+     * @return teach_model_names - 授课模式名称
+     */
+    public String getTeachModelNames() {
+        return teachModelNames;
+    }
+
+    /**
+     * 设置授课模式名称
+     *
+     * @param teachModelNames 授课模式名称
+     */
+    public void setTeachModelNames(String teachModelNames) {
+        this.teachModelNames = teachModelNames;
+    }
+
+    /**
+     * 获取校区Id
+     *
+     * @return campus_ids - 校区Id
+     */
+    public String getCampusIds() {
+        return campusIds;
+    }
+
+    /**
+     * 设置校区Id
+     *
+     * @param campusIds 校区Id
+     */
+    public void setCampusIds(String campusIds) {
+        this.campusIds = campusIds;
+    }
+
+    /**
+     * 获取创建人名称
+     *
+     * @return creator - 创建人名称
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建人名称
+     *
+     * @param creator 创建人名称
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建人id
+     *
+     * @return creator_id - 创建人id
+     */
+    public Long getCreatorId() {
+        return creatorId;
+    }
+
+    /**
+     * 设置创建人id
+     *
+     * @param creatorId 创建人id
+     */
+    public void setCreatorId(Long creatorId) {
+        this.creatorId = creatorId;
+    }
+
+    /**
+     * 获取修改人名称
+     *
+     * @return editor - 修改人名称
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置修改人名称
+     *
+     * @param editor 修改人名称
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取修改人id
+     *
+     * @return editor_id - 修改人id
+     */
+    public Long getEditorId() {
+        return editorId;
+    }
+
+    /**
+     * 设置修改人id
+     *
+     * @param editorId 修改人id
+     */
+    public void setEditorId(Long editorId) {
+        this.editorId = editorId;
+    }
+
+    /**
+     * 获取0:停用 1：启用
+     *
+     * @return status - 0:停用 1：启用
+     */
+    public Integer getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置0:停用 1：启用
+     *
+     * @param status 0:停用 1：启用
+     */
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    /**
+     * 获取0:未删除 1：已删除
+     *
+     * @return is_del - 0:未删除 1：已删除
+     */
+    public Integer getIsDel() {
+        return isDel;
+    }
+
+    /**
+     * 设置0:未删除 1：已删除
+     *
+     * @param isDel 0:未删除 1：已删除
+     */
+    public void setIsDel(Integer isDel) {
+        this.isDel = isDel;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取修改时间
+     *
+     * @return edit_time - 修改时间
+     */
+    public Date getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置修改时间
+     *
+     * @param editTime 修改时间
+     */
+    public void setEditTime(Date editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * @return campus_names
+     */
+    public String getCampusNames() {
+        return campusNames;
+    }
+
+    /**
+     * @param campusNames
+     */
+    public void setCampusNames(String campusNames) {
+        this.campusNames = campusNames;
+    }
+
+    /**
+     * @return subject_names
+     */
+    public String getSubjectNames() {
+        return subjectNames;
+    }
+
+    /**
+     * @param subjectNames
+     */
+    public void setSubjectNames(String subjectNames) {
+        this.subjectNames = subjectNames;
+    }
+}

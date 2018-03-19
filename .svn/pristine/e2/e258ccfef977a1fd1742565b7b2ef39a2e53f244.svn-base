@@ -1,0 +1,14 @@
+package com.cz.enrol.service.plugIns;
+
+
+/**
+ * 合同
+ * 
+ * @author My
+ *
+ */
+public class AgreementService {
+	public static void main(String[] args){
+	}
+
+}

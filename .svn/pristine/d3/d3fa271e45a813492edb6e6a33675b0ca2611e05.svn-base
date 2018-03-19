@@ -1,0 +1,75 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.organize.ClassMapper;
+import com.cz.enrol.entity.EnrolClass;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * 班级表 服务类
+ **/
+@Transactional
+@Service
+public class ClassService {
+
+    //统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    private SqlSessionTemplate session;
+
+    //当前业务数据操作接口dao
+    private ClassMapper dao;
+
+    private ClassMapper getDao() {
+        if (dao == null)
+            dao = session.getMapper(ClassMapper.class);
+        return dao;
+    }
+
+    public EnrolClass selectByPrimaryKey(Long id) {
+        return getDao().selectByPrimaryKey(id);
+    }
+
+    public int deleteByPrimaryKey(Long id) {
+        return getDao().deleteByPrimaryKey(id);
+    }
+
+    public int insert(EnrolClass record) {
+        return getDao().insert(record);
+    }
+
+    public int insertSelective(EnrolClass record) {
+        return getDao().insertSelective(record);
+    }
+
+    public int updateByPrimaryKeySelective(EnrolClass record) {
+        return getDao().updateByPrimaryKeySelective(record);
+    }
+
+    public int updateByPrimaryKey(EnrolClass record) {
+        return getDao().updateByPrimaryKey(record);
+    }
+
+    public List<EnrolClass> queryByClassIdList(List<Long> ids) {
+        return getDao().selectByClassIdList(ids);
+    }
+
+    public List<Map<String, Object>> queryByGoodsId(Long goodsId) {
+        // TODO Auto-generated method stub
+        return getDao().selectByGoodsId(goodsId);
+    }
+
+    public Map<String, Object> queryByClassId(Long classId) {
+        // TODO Auto-generated method stub
+        return getDao().selectByClassId(classId);
+    }
+
+}

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.permission.EnrolPermissionMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolPermissionResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolPermission">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--资源名称-->
+		<result property="name" column="name" />
+		<!--资源类型（1:menu,2:button）-->
+		<result property="type" column="type" />
+		<!--父节点Id-->
+		<result property="parentId" column="parent_id" />
+		<!---->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	type,	parent_id,	creator,	create_time,	editor,	edit_time
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolPermission" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_permission
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_permission
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolPermission">
+		 INSERT INTO enrol_permission
+ 		(id,name,type,parent_id,creator,create_time,editor,edit_time) 
+		 VALUES 
+ 		(#{id},#{name},#{type},#{parentId},#{creator},#{createTime},#{editor},#{editTime}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolPermission">
+		 INSERT INTO enrol_permission
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="name != null">
+				 name,
+			</if>
+			<if test="type != null">
+				 type,
+			</if>
+			<if test="parentId != null">
+				 parent_id,
+			</if>
+			<if test="creator != null">
+				 creator,
+			</if>
+			<if test="createTime != null">
+				 create_time,
+			</if>
+			<if test="editor != null">
+				 editor,
+			</if>
+			<if test="editTime != null">
+				 edit_time,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="name!=null">
+				 #{name},
+			</if>
+			<if test="type!=null">
+				 #{type},
+			</if>
+			<if test="parentId!=null">
+				 #{parentId},
+			</if>
+			<if test="creator!=null">
+				 #{creator},
+			</if>
+			<if test="createTime!=null">
+				 #{createTime},
+			</if>
+			<if test="editor!=null">
+				 #{editor},
+			</if>
+			<if test="editTime!=null">
+				 #{editTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolPermission">
+		 UPDATE enrol_permission
+ 		 <set> 
+			<if test="name != null">
+				 name = #{name},
+			</if>
+			<if test="type != null">
+				 type = #{type},
+			</if>
+			<if test="parentId != null">
+				 parent_id = #{parentId},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				 editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				 edit_time = #{editTime},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolPermission">
+		 UPDATE enrol_permission
+		 SET 
+			 name = #{name},
+			 type = #{type},
+			 parent_id = #{parentId},
+			 creator = #{creator},
+			 create_time = #{createTime},
+			 editor = #{editor},
+			 edit_time = #{editTime}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>

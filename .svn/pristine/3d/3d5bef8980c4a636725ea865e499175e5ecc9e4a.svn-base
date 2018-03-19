@@ -1,0 +1,59 @@
+package com.cz.enrol.service;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.utils.HttpRequest;
+import com.cz.enrol.utils.MD5Util;
+
+@Service
+public class AllinpayService {
+	public String url_enrol_test = "http://test.allinpay.com/usercenter/merchant/UserInfo/reg.do";
+
+	public String allinpayRegister(String signType, String merchantId,
+			String partnerUserId, String key) {
+		String result = "";
+		String src = getSignSrc(signType,merchantId,partnerUserId,key);
+		System.out.println("加密之前："+src);
+		String signMsg = MD5Util.encryption(src).toUpperCase().trim();
+		result = getSignSrcAndSignMsg(signType,merchantId,partnerUserId,signMsg);
+		System.out.println(result + "提交地址=" + url_enrol_test);
+		String callBack = HttpRequest.sendGet(url_enrol_test, result);
+		System.out.println("返回报文：callBack=" + callBack + "\n");
+		result = getUserIdByJson(callBack);
+		return result;
+	}
+
+	// 原串 的首尾要加上 & & 这个很重要
+	private String getSignSrc(String signType, String merchantId,
+			String partnerUserId, String key) {
+		String result = "";
+		result = "&signType=" + signType + "&merchantId=" + merchantId
+				+ "&partnerUserId=" + partnerUserId + "&key=" + key + "&";
+		return result;
+	}
+
+	// 通过Md5获得源串
+	private String getSignSrcAndSignMsg(String signType, String merchantId,
+			String partnerUserId, String signMsg) {
+		String result = "";
+		result = "signType=" + signType + "&merchantId=" + merchantId
+				+ "&partnerUserId=" + partnerUserId + "&signMsg=" + signMsg
+				+ "";
+		return result;
+	}
+
+	private String getUserIdByJson(String return_msg) {
+		String result = "";
+		JSONObject object;
+		try {
+			object = new JSONObject(return_msg);
+			result = object.optString("userId");
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return result;
+
+	}
+}

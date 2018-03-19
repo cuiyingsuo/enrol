@@ -1,0 +1,157 @@
+package com.cz.enrol.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.allinpay.ets.client.RequestOrder;
+import com.allinpay.ets.client.SecurityUtil;
+import com.cz.enrol.dao.order.OrderMainMapper;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.utils.GenerateSequenceUtil;
+
+@Service
+public class PayService {
+	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+	
+	@Autowired
+	private OrderMainMapper orderMainDao;
+	
+	String serverUrl = "http://service.allinpay.com/gateway/index.do?";
+	String key = "1234567890";
+	String version = "v1.0";
+	String language = "1";
+	String inputCharset = "1";
+	String merchantId = "100020091218001";//商户号
+	String pickupUrl = "";//取货地址
+	String receiveUrl = "http://172.17.0.91:8088/payController/payResult";//商户系统通知地址
+	String payType = "0";
+	String signType = "1";
+	String orderNo = "";
+	String orderAmount = "";
+	String orderDatetime = "";//商户的订单提交时间
+	String orderCurrency = "0";//订单金额币种类型
+	String orderExpireDatetime = "";
+	String payerTelephone = "";
+	String payerEmail = "";
+	String payerName = "";
+	String payerIDCard = "";
+	String pid = "";
+	String productName = "";//商品名称
+	String productId = "enrol";
+	String productNum = "1";
+	String productPrice = "";
+	String productDesc = "";
+	String ext1 = "";
+	String ext2 = "";
+	String extTL = "";
+	String issuerId = "";//发卡方代码
+	String pan = "";
+	String tradeNature = "SERVICES";//GOODS表示实物类型，SERVICES表示服务类型
+	String sign = "";
+
+	public RequestOrder pay(String mobile,String mergeOrderNo) {
+		OrderMain orderMain = new OrderMain();
+		orderMain.setMergeOrderNo(mergeOrderNo);
+		orderMain=orderMainDao.selectOne(orderMain);
+		
+		logger.info("用户{}创建支付订单,支付方式：全款支付",mobile);
+		OrderSub orderSub =new OrderSub();
+		orderSub.setOrderNo(String.valueOf(GenerateSequenceUtil.generateSequenceNo()));
+		orderSub.setOrderPrice(orderMain.getOrderPrice());
+		orderSub.setStatus(0);
+		orderSub.setMergeOrderNo(mergeOrderNo);
+		orderSub.setCreateTime(System.currentTimeMillis());
+		orderSub.setCreator(mobile);
+		RequestOrder requestOrder = getRequestOrder(orderSub,orderMain);
+		return requestOrder;
+	}
+	
+	private RequestOrder getRequestOrder(OrderSub orderSub,OrderMain orderMain){
+
+		// 若直连telpshx渠道，payerTelephone、payerName、payerIDCard、pan四个字段不可为空
+		// 其中payerIDCard、pan需使用公钥加密（PKCS1格式）后进行Base64编码
+		if (null != payerIDCard && !"".equals(payerIDCard)) {
+			System.out.println( PayService.class.getResource("/"));
+			String path2 = PayService.class.getResource("/").toString();
+			System.out.println(path2);
+			try {
+				payerIDCard = SecurityUtil.encryptByPublicKey(
+						"D:/chanzhi/enrol/target/classes/cert/TLCert.cer", payerIDCard);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (null != pan && !"".equals(pan)) {
+			try {
+				pan = SecurityUtil.encryptByPublicKey("/opt/conf/TLCert.cer",
+						pan);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 构造订单请求对象，生成signMsg。
+		RequestOrder requestOrder = new RequestOrder();
+		if (null != inputCharset && !"".equals(inputCharset)) {
+			requestOrder.setInputCharset(Integer.parseInt(inputCharset));
+		}
+		requestOrder.setPickupUrl(pickupUrl);
+		requestOrder.setReceiveUrl(receiveUrl);
+		requestOrder.setVersion(version);
+		if (null != language && !"".equals(language)) {
+			requestOrder.setLanguage(Integer.parseInt(language));
+		}
+		requestOrder.setSignType(Integer.parseInt(signType));
+		requestOrder.setPayType(Integer.parseInt(payType));
+		requestOrder.setIssuerId(issuerId);
+		requestOrder.setMerchantId(merchantId);
+		requestOrder.setPayerName(payerName);
+		requestOrder.setPayerEmail(payerEmail);
+		requestOrder.setPayerTelephone(payerTelephone);
+		requestOrder.setPayerIDCard(payerIDCard);
+		requestOrder.setPid(pid);
+		requestOrder.setOrderNo(orderSub.getOrderNo());
+		requestOrder.setOrderAmount(orderSub.getOrderPrice().longValue());
+		requestOrder.setOrderCurrency(orderCurrency);
+		Date date = new Date(orderSub.getCreateTime());
+		requestOrder.setOrderDatetime(sdf.format(date));
+		Calendar ca=Calendar.getInstance();
+		ca.setTime(date);
+		ca.add(Calendar.HOUR_OF_DAY, 1);
+		requestOrder.setOrderExpireDatetime(sdf.format(date));
+		requestOrder.setProductName(orderMain.getGoodsName());
+		
+		requestOrder.setProductPrice(orderSub.getOrderPrice().longValue());
+		
+		if (null != productNum && !"".equals(productNum)) {
+			requestOrder.setProductNum(Integer.parseInt(productNum));
+		}
+		requestOrder.setProductId(productId);
+		requestOrder.setProductDesc(orderMain.getSubjectName());
+		requestOrder.setExt1(ext1);
+		requestOrder.setExt2(ext2);
+		requestOrder.setExtTL(extTL);// 通联商户拓展业务字段，在v2.2.0版本之后才使用到的，用于开通分账等业务
+		requestOrder.setPan(pan);
+		requestOrder.setTradeNature(tradeNature);
+		requestOrder.setKey(key); // key为MD5密钥，密钥是在通联支付网关会员服务网站上设置。
+		
+
+		String strSrcMsg = requestOrder.getSrc(); // 此方法用于debug，测试通过后可注释。
+		String strSignMsg = requestOrder.doSign(); // 签名，设为signMsg字段值。
+		logger.info(strSrcMsg);
+		requestOrder.setSignMsg(strSignMsg);
+		
+		return requestOrder;
+	}
+
+}

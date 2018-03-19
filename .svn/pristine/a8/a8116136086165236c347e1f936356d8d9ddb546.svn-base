@@ -1,0 +1,10 @@
+package com.cz.enrol.dao.config;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.BankAccount;
+
+/**
+ * Created by liuzhongshuai on 2018/1/19.
+ */
+public interface BankAccountMapper extends BaseDao<BankAccount> {
+}

@@ -1,0 +1,114 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_department")
+public class Department {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 部门名称
+     */
+    private String name;
+
+    /**
+     * 校区Id
+     */
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    /**
+     * 部门类型
+     */
+    private String type;
+
+    public String getDepartmentCode() {
+        return departmentCode;
+    }
+
+    public void setDepartmentCode(String departmentCode) {
+        this.departmentCode = departmentCode;
+    }
+
+    /**
+     * 部门编码
+     */
+    private String departmentCode;
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取部门名称
+     *
+     * @return name - 部门名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置部门名称
+     *
+     * @param name 部门名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取校区Id
+     *
+     * @return campus_id - 校区Id
+     */
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    /**
+     * 设置校区Id
+     *
+     * @param campusId 校区Id
+     */
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    /**
+     * 获取部门类型
+     *
+     * @return type - 部门类型
+     */
+    public String getType() {
+        return type;
+    }
+
+    /**
+     * 设置部门类型
+     *
+     * @param type 部门类型
+     */
+    public void setType(String type) {
+        this.type = type;
+    }
+}

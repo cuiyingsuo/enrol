@@ -1,0 +1,26 @@
+package com.cz.enrol.service.plugIns;
+
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.utils.SMSSendUtil;
+
+@Service
+public class SMSService {
+	private String templeteid="SMS_88050013";
+	private String channel = "yuanxiao";
+	private String password = "c091922d2e8448a0";
+	private String requestUrl = "http://sms-center.boxuegu.com/smscenter/postsms";
+	/**
+	 * 合同验证码
+	 * @param mobile
+	 * @return
+	 */
+	public String sendContractSms(String mobile){
+		String msgNum = SMSSendUtil.getMsgNum();
+		boolean msgStatus=SMSSendUtil.sendMessage(mobile, templeteid, "{\"vcode\":"+msgNum+"}", SMSSendUtil.USAGE_LOGIN, SMSSendUtil.SMSTYPE_VERIFICATION_CODE, channel, password, requestUrl);
+		if(msgStatus){
+			return msgNum;
+		}
+		return "";
+	}
+}

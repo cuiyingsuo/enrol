@@ -1,0 +1,78 @@
+package com.cz.enrol.service.ems;
+
+import com.cz.enrol.common.EmsSubjectBody;
+import com.cz.enrol.dao.subject.SubjectMapper;
+import com.cz.enrol.entity.Subject;
+import com.cz.enrol.utils.HttpHelper;
+import com.cz.enrol.utils.HttpUtil;
+
+import com.cz.enrol.utils.JsonUtil;
+import com.cz.enrol.utils.MD5Util;
+import com.cz.enrol.vo.EmsSubject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+
+/**
+ * @liuzs Created by liuzhongshuai on 2017/12/19.
+ */
+@Service
+public class SynchBaseDataForEms {
+
+    @Autowired
+    private SubjectMapper subjectMapper;
+
+    @Value("${ems.api.appid}")
+    private String emsAppId;
+
+    @Value("${ems.api.key}")
+    private String emsKey;
+
+
+    /**
+     * 同步学科
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void SynchSubjectForEms() {
+        //获取学科地址
+        String url = "https://ems.itcast.cn/api/dictionary/data.do";
+
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put("cid", emsAppId);
+        map.put("method", "subjects");
+        map.put("model", "FACETOFACE");
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        String result = HttpUtil.httpPost(url, map);
+
+        EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+
+        if (emsSubjectBody == null) {
+            throw new RuntimeException("无法在ems获取学科信息!,无法同步学科信息!");
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            throw new RuntimeException(emsSubjectBody.getErrorMessage());
+        }
+        List<EmsSubject> emsSubjects = emsSubjectBody.getResultObject();
+        for (EmsSubject emsSubject : emsSubjects) {
+            Subject subject = new Subject();
+            subject.setCode(emsSubject.getId());
+            subject.setName(emsSubject.getName());
+            subject.setTeachModeCode(emsSubject.getModel());
+            subject.setCreator("system");
+            subject.setCreateTime(System.currentTimeMillis());
+            subject.setStatus((byte) 1);
+            subjectMapper.insertSelective(subject);
+        }
+    }
+
+
+}

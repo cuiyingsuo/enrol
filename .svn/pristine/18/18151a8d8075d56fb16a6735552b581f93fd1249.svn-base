@@ -1,0 +1,59 @@
+package com.cz.enrol.service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.cz.enrol.vo.ClassEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.organize.ClassMapper;
+import com.cz.enrol.entity.EnrolClass;
+
+/**
+ * 班级表 服务类
+ **/
+@Service
+public class ClassService extends BaseService<EnrolClass> {
+
+    @Autowired
+    private ClassMapper classDao;
+
+    public EnrolClass queryByPrimaryKey(Long id) {
+        return classDao.selectByPrimaryKey(id);
+    }
+
+    public List<EnrolClass> queryByClassIdList(List<Long> ids) {
+        return classDao.selectByClassIdList(ids);
+    }
+
+    public List<Map<String, Object>> queryByGoodsId(Long goodsId) {
+        // TODO Auto-generated method stub
+        return classDao.selectByGoodsId(goodsId);
+    }
+
+    public Map<String, Object> queryByClassId(Long classId) {
+        // TODO Auto-generated method stub
+        return classDao.selectByClassId(classId);
+    }
+
+    public List<Map<String, Object>> queryClassListOfGoodsSpec(Long goodsId, Long campusId) {
+        Map<String, Long> params = new HashMap<String, Long>();
+        params.put("goodsId", goodsId);
+        params.put("campusId", campusId);
+        List<Map<String, Object>> classList = classDao.selectClassListOfGoodsSpec(params);
+        return classList;
+    }
+
+    /**
+     * 查询班级选项 返回字段（id,name）
+     *
+     * @param enrolClass
+     * @return
+     */
+    public List<Map> queryClassByMulitField(ClassEx enrolClass) {
+        return classDao.queryClassByMulitField(enrolClass);
+    }
+}

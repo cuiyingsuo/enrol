@@ -1,0 +1,8 @@
+package com.cz.enrol.dao.student;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Seal;
+
+public interface SealMapper extends BaseDao<Seal> {
+
+}

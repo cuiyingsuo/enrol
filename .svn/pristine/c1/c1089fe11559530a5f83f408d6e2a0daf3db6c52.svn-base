@@ -1,0 +1,52 @@
+package com.cz.enrol.dao.invoice;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolInvoice;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+
+/**
+ * EnrolInvoiceMapper数据库操作接口类
+ **/
+
+public interface EnrolInvoiceMapper extends BaseDao<EnrolInvoice> {
+
+
+    /**
+     * 查询（根据主键ID查询）
+     **/
+    EnrolInvoice selectByPrimaryKey(@Param("id") Long id);
+
+    /**
+     * 删除（根据主键ID删除）
+     **/
+    int deleteByPrimaryKey(@Param("id") Long id);
+
+    /**
+     * 添加
+     **/
+    int insert(EnrolInvoice record);
+
+    /**
+     * 添加 （匹配有值的字段）
+     **/
+    int insertSelective(EnrolInvoice record);
+
+    /**
+     * 修改 （匹配有值的字段）
+     **/
+    int updateByPrimaryKeySelective(EnrolInvoice record);
+
+    /**
+     * 修改（根据主键ID修改）
+     **/
+    int updateByPrimaryKey(EnrolInvoice record);
+
+    /**
+     * 根据订单号查询发票
+     */
+    List<EnrolInvoice> queryInvoiceByOrderNo(Long orderNo);
+
+}

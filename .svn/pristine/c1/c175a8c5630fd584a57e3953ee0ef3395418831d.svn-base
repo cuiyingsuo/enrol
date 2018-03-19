@@ -1,0 +1,25 @@
+package com.cz.enrol.dao.subject;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolSubject;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+
+/**
+ * 
+ * EnrolSubjectMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolSubjectMapper extends BaseDao<EnrolSubject> {
+
+
+	
+	/**
+	 * 
+	 * 学科列表
+	 */
+	public List<EnrolSubject> querySubjectList();
+}

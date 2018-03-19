@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.student.StudentMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolStudentResultMapResultMap" type="com.cz.enrol.entity.Student">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--学员名称-->
+		<result property="name" column="name" />
+		<!--密码-->
+		<result property="password" column="password" />
+		<!--头像-->
+		<result property="image" column="image" />
+		<!--是否重读(0:否，1:是)-->
+		<result property="isAgain" column="is_again" />
+		<!--学员状态-->
+		<result property="status" column="status" />
+		<!--是否院校(0:否，1:是)-->
+		<result property="isAcademy" column="is_academy" />
+		<!--性别-->
+		<result property="gender" column="gender" />
+		<!--手机号-->
+		<result property="mobile" column="mobile" />
+		<!--QQ号-->
+		<result property="qq" column="qq" />
+		<!--邮箱-->
+		<result property="email" column="email" />
+		<!--是否住宿(0:否,1:是)-->
+		<result property="isQuarter" column="is_quarter" />
+		<!-- 预计到校时间 -->
+		<result property="preComeTime"	column="pre_come_time"/>
+		<!--毕业时间-->
+		<result property="graduationTime" column="graduation_time" />
+		<!--毕业学校-->
+		<result property="school" column="school" />
+		<!--学历-->
+		<result property="education" column="education" />
+		<!--专业-->
+		<result property="major" column="major" />
+		<!--证件号码-->
+		<result property="cardNo" column="card_no" />
+		<!--证件地址-->
+		<result property="cardAddr" column="card_addr" />
+		<!--居住地-->
+		<result property="liveAddr" column="live_addr" />
+		<!--详细地址-->
+		<result property="liveAddrDetail" column="live_addr_detail" />
+		<!--联系人-->
+		<result property="contacts" column="contacts" />
+		<!--联系人的联系方式-->
+		<result property="contactsMobile" column="contacts_mobile" />
+		<!--来源渠道Code-->
+		<result property="fromChannelCode" column="from_channel_code" />
+		<!--来源渠道-->
+		<result property="fromChannel" column="from_channel" />
+		<!--出生日期-->
+		<result property="birthday" column="birthday" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	password,	image,	is_again,	status,	is_academy,	gender,	mobile,	qq,	email,	is_quarter,	pre_come_time,graduation_time,	school,	education,	major,	card_no,	card_addr,	live_addr,	live_addr_detail,	contacts,	contacts_mobile,	from_channel_code,	from_channel,	birthday,	creator,	create_time,	editor,	edit_time
+	</sql>
+
+	<!-- 根据学员手机号查询密码 -->
+	<select id="queryStudentByMobile" resultMap="EnrolStudentResultMapResultMap" parameterType="java.lang.String">
+		select
+		<include refid="Base_Column_List" />
+		from enrol_student
+		where mobile = #{mobile} LIMIT 1
+	</select>
+	
+	<!-- 根据手机号修改 -->
+	<update id="updatePasswordByMobile" parameterType="java.util.Map">
+		UPDATE enrol_student
+		SET
+			password = #{password}
+		WHERE mobile = #{mobile}
+	</update>
+	
+	<update id="updateByMobileSelective" parameterType="com.apicloud.server.entity.enrol.EnrolStudent">
+		 UPDATE enrol_student
+ 		 <set> 
+			<if test="name != null">
+				 `name` = #{name},
+			</if>
+			<if test="password != null">
+				 password = #{password},
+			</if>
+			<if test="image != null">
+				 image = #{image},
+			</if>
+			<if test="isAgain != null">
+				 is_again = #{isAgain},
+			</if>
+			<if test="status != null">
+				 `status` = #{status},
+			</if>
+			<if test="isAcademy != null">
+				 is_academy = #{isAcademy},
+			</if>
+			<if test="gender != null">
+				 gender = #{gender},
+			</if>
+			<if test="qq != null">
+				 qq = #{qq},
+			</if>
+			<if test="email != null">
+				 email = #{email},
+			</if>
+			<if test="isQuarter != null">
+				 is_quarter = #{isQuarter},
+			</if>
+			<if test="preComeTime !=null">
+				pre_come_time=#{preComeTime},
+			</if>
+			<if test="graduationTime != null">
+				 graduation_time = #{graduationTime},
+			</if>
+			<if test="school != null">
+				 school = #{school},
+			</if>
+			<if test="education != null">
+				 education = #{education},
+			</if>
+			<if test="major != null">
+				 major = #{major},
+			</if>
+			<if test="cardNo != null">
+				 card_no = #{cardNo},
+			</if>
+			<if test="cardAddr != null">
+				 card_addr = #{cardAddr},
+			</if>
+			<if test="liveAddr != null">
+				 live_addr = #{liveAddr},
+			</if>
+			<if test="liveAddrDetail != null">
+				 live_addr_detail = #{liveAddrDetail},
+			</if>
+			<if test="contacts != null">
+				 contacts = #{contacts},
+			</if>
+			<if test="contactsMobile != null">
+				 contacts_mobile = #{contactsMobile},
+			</if>
+			<if test="fromChannelCode != null">
+				 from_channel_code = #{fromChannelCode},
+			</if>
+			<if test="fromChannel != null">
+				 from_channel = #{fromChannel},
+			</if>
+			<if test="birthday != null">
+				 birthday = #{birthday},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				 editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				 edit_time = #{editTime},
+			</if>
+
+ 		 </set>
+		 WHERE mobile = #{mobile}
+	</update>
+</mapper>

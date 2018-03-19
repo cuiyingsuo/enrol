@@ -1,0 +1,85 @@
+package com.cz.enrol.dao.organize;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolClass;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * EnrolClassMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolClassMapper extends BaseDao<EnrolClass>{
+
+
+	/**
+	 * 
+	 * 查询（根据主键ID查询）
+	 * 
+	 **/
+	EnrolClass selectByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 删除（根据主键ID删除）
+	 *
+	 **/
+	int deleteByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 添加
+	 *
+	 **/
+	int insert(EnrolClass record);
+
+	/**
+	 *
+	 * 添加 （匹配有值的字段）
+	 *
+	 **/
+	int insertSelective(EnrolClass record);
+
+	/**
+	 *
+	 * 修改 （匹配有值的字段）
+	 *
+	 **/
+	int updateByPrimaryKeySelective(EnrolClass record);
+
+	/**
+	 *
+	 * 修改（根据主键ID修改）
+	 *
+	 **/
+	int updateByPrimaryKey(EnrolClass record);
+	
+	/**
+	 * 
+	 * 根据课程id列表获取课程
+	 */
+	List<EnrolClass> selectByClassIdList(List<Long> ids);
+	
+	/**
+	 * 
+	 * 根据学科查课程列表
+	 * 
+	 */
+	List<EnrolClass> selectBySubjectId(Long subjectId);
+	
+	/**
+	 * 
+	 * 根据商品id查询班级列表
+	 */
+	List<Map<String,Object>> selectByGoodsId(Long goodsId);
+	
+	/**
+	 * 
+	 * 根据班级id查询班级信息（包含校区信息）
+	 */
+	Map<String,Object> selectByClassId(Long classId);
+}

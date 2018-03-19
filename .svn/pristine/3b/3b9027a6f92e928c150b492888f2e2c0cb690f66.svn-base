@@ -1,0 +1,52 @@
+package com.cz.enrol.bussiness.help;
+
+import com.cz.enrol.dao.marketing.MarketingDeductionMapper;
+import com.cz.enrol.dao.marketing.MarketingDeductionTargetMapper;
+import com.cz.enrol.entity.MarketingDeduction;
+import com.cz.enrol.entity.MarketingDeductionTarget;
+import com.cz.enrol.entity.OrderMain;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
+
+import java.util.List;
+
+/**
+ * @author liuzs
+ *         满减辅助类
+ *         Created by liuzhongshuai on 2017/11/2.
+ */
+@Component
+public class MarketDeductionHelp {
+
+    @Autowired
+    private MarketingDeductionTargetMapper marketingDeductionTargetMapper;
+
+    @Autowired
+    private MarketingDeductionMapper marketingDeductionMapper;
+
+    /**
+     * 商品维度扣减
+     * 通一种商品同一时刻只享受一种减免的
+     *
+     * @param orderMain
+     * @return
+     */
+    public OrderMain deductionForGoods(OrderMain orderMain) {
+
+        List<MarketingDeduction> marketingDeductionTargetList = marketingDeductionMapper.deductionForTarget(orderMain.getGoodsId());
+        if (CollectionUtils.isEmpty(marketingDeductionTargetList)) {
+            return orderMain;
+        }
+        MarketingDeduction marketingDeduction = marketingDeductionTargetList.get(0);
+
+        orderMain.setPrefAmount(marketingDeduction.getReductionMoney());
+        orderMain.setMarketingId(marketingDeduction.getId());
+        orderMain.setOrderPrice(orderMain.getCostPrice() - orderMain.getPrefAmount());
+        orderMain.setMarketingName(marketingDeduction.getTitle());
+
+        return orderMain;
+    }
+
+
+}

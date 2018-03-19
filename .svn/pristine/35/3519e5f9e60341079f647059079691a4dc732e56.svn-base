@@ -1,0 +1,53 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.order.EnrolOrderFlowMapper;
+import com.cz.enrol.entity.EnrolOrderFlow;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+
+/**
+ * 
+ * 订单支付流水表/资金流水表 服务类
+ * 
+ **/
+@Transactional
+@Service
+public class EnrolOrderFlowService{
+
+	 //统一记录日志类
+	 private Logger Log= LoggerFactory.getLogger("enrol");
+	 @Autowired
+	 private SqlSessionTemplate session;
+
+	 //当前业务数据操作接口dao
+	 private EnrolOrderFlowMapper dao;
+	 private EnrolOrderFlowMapper getDao(){
+		 if(dao==null)
+			 dao=session.getMapper(EnrolOrderFlowMapper.class);
+		 return dao;
+	 }
+	public EnrolOrderFlow selectByPrimaryKey(Long id) {
+		return getDao().selectByPrimaryKey(id);
+	}
+	public int deleteByPrimaryKey(Long id) {
+		return getDao().deleteByPrimaryKey(id);
+	}
+	public int insert(EnrolOrderFlow record) {
+		return getDao().insert(record);
+	}
+	public int insertSelective(EnrolOrderFlow record) {
+		return getDao().insertSelective(record);
+	}
+	public int updateByPrimaryKeySelective(EnrolOrderFlow record) {
+		return getDao().updateByPrimaryKeySelective(record);
+	}
+	public int updateByPrimaryKey(EnrolOrderFlow record) {
+		return getDao().updateByPrimaryKey(record);
+	}
+
+}

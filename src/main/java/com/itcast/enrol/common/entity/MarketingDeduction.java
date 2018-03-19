@@ -1,0 +1,308 @@
+package com.itcast.enrol.common.entity;
+
+import java.util.Date;
+import javax.persistence.*;
+
+@Table(name = "enrol_marketing_deduction")
+public class MarketingDeduction {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 营销 活动标题
+     */
+    private String title;
+
+    /**
+     * 优惠维度 1:商品 2:班级 3:学科 4:校区
+     */
+    private Integer dimension;
+
+    /**
+     * 优惠金额(分）
+     */
+    @Column(name = "reduction_money")
+    private Integer reductionMoney;
+
+    /**
+     * 期限
+     */
+    @Column(name = "start_time")
+    private Date startTime;
+
+    /**
+     * 是否启用，0未启用，1已启用；
+     */
+    @Column(name = "is_enable")
+    private Integer isEnable;
+
+    /**
+     * 是否删除，0未删除，1已删除；
+     */
+    @Column(name = "is_delete")
+    private Integer isDelete;
+
+    /**
+     * 备注；
+     */
+    private String remark;
+
+    /**
+     * 创建者
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    @Column(name = "end_time")
+    private Date endTime;
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取营销 活动标题
+     *
+     * @return title - 营销 活动标题
+     */
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * 设置营销 活动标题
+     *
+     * @param title 营销 活动标题
+     */
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    /**
+     * 获取优惠维度 1:商品 2:班级 3:学科 4:校区
+     *
+     * @return dimension - 优惠维度 1:商品 2:班级 3:学科 4:校区
+     */
+    public Integer getDimension() {
+        return dimension;
+    }
+
+    /**
+     * 设置优惠维度 1:商品 2:班级 3:学科 4:校区
+     *
+     * @param dimension 优惠维度 1:商品 2:班级 3:学科 4:校区
+     */
+    public void setDimension(Integer dimension) {
+        this.dimension = dimension;
+    }
+
+    /**
+     * 获取优惠金额(分）
+     *
+     * @return reduction_money - 优惠金额(分）
+     */
+    public Integer getReductionMoney() {
+        return reductionMoney;
+    }
+
+    /**
+     * 设置优惠金额(分）
+     *
+     * @param reductionMoney 优惠金额(分）
+     */
+    public void setReductionMoney(Integer reductionMoney) {
+        this.reductionMoney = reductionMoney;
+    }
+
+    /**
+     * 获取期限
+     *
+     * @return start_time - 期限
+     */
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    /**
+     * 设置期限
+     *
+     * @param startTime 期限
+     */
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    /**
+     * 获取是否启用，0未启用，1已启用；
+     *
+     * @return is_enable - 是否启用，0未启用，1已启用；
+     */
+    public Integer getIsEnable() {
+        return isEnable;
+    }
+
+    /**
+     * 设置是否启用，0未启用，1已启用；
+     *
+     * @param isEnable 是否启用，0未启用，1已启用；
+     */
+    public void setIsEnable(Integer isEnable) {
+        this.isEnable = isEnable;
+    }
+
+    /**
+     * 获取是否删除，0未删除，1已删除；
+     *
+     * @return is_delete - 是否删除，0未删除，1已删除；
+     */
+    public Integer getIsDelete() {
+        return isDelete;
+    }
+
+    /**
+     * 设置是否删除，0未删除，1已删除；
+     *
+     * @param isDelete 是否删除，0未删除，1已删除；
+     */
+    public void setIsDelete(Integer isDelete) {
+        this.isDelete = isDelete;
+    }
+
+    /**
+     * 获取备注；
+     *
+     * @return remark - 备注；
+     */
+    public String getRemark() {
+        return remark;
+    }
+
+    /**
+     * 设置备注；
+     *
+     * @param remark 备注；
+     */
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * @return end_time
+     */
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    /**
+     * @param endTime
+     */
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+}

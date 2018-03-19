@@ -1,0 +1,107 @@
+package com.cz.enrol.service;
+
+
+import com.cz.enrol.dao.student.StudentMapper;
+import com.cz.enrol.entity.Student;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 学员表 服务类
+ **/
+@Transactional
+@Service
+public class StudentService {
+
+    // 统一记录日志类
+    private Logger log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    private SqlSessionTemplate session;
+
+    @Autowired
+    private StudentMapper studentDao;
+
+    public Student selectByPrimaryKey(Long id) {
+        return studentDao.selectByPrimaryKey(id);
+    }
+
+    public int deleteByPrimaryKey(Long id) {
+        return studentDao.deleteByPrimaryKey(id);
+    }
+
+    public int insert(Student record) {
+        return studentDao.insert(record);
+    }
+
+    public int insertSelective(Student record) {
+        return studentDao.insertSelective(record);
+    }
+
+    public int updateByPrimaryKeySelective(Student record) {
+        return studentDao.updateByPrimaryKeySelective(record);
+    }
+
+    public int updateByPrimaryKey(Student record) {
+        return studentDao.updateByPrimaryKey(record);
+    }
+
+    public Student queryStudentByMobile(String mobile) {
+        return studentDao.queryStudentByMobile(mobile);
+    }
+
+    public int checkPassword(String mobile, String password) {
+        Student studentInfo = studentDao.queryStudentByMobile(mobile);
+        if (null == studentInfo) {
+            return 0;
+        } else if (!studentInfo.getPassword().equals(password)) {
+            return 1;
+        }
+        return 2;
+    }
+
+    public int modifyPassword(String mobile, String password) {
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("mobile", mobile);
+        params.put("password", password);
+        int rel = studentDao.updatePasswordByMobile(params);
+        return rel;
+    }
+
+    public int updateByMobileSelective(Student es) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        params.put("mobile", es.getMobile());
+        params.put("name", es.getName());
+        params.put("birthday", es.getBirthday());
+        params.put("cardAddr", es.getCardAddr());
+        params.put("cardNo", es.getCardNo());
+        params.put("contacts", es.getContacts());
+        params.put("contactsMobile", es.getContactsMobile());
+        params.put("editor", es.getEditor());
+        params.put("editTime", es.getEditTime());
+        params.put("education", es.getEducation());
+        params.put("email", es.getEmail());
+        params.put("fromChannel", es.getFromChannel());
+        params.put("fromChannelCode", es.getFromChannelCode());
+        params.put("gender", es.getGender());
+        params.put("graduationTime", es.getGraduationTime());
+        params.put("image", es.getImage());
+        params.put("isAcademy", es.getIsAcademy());
+        params.put("isAgain", es.getIsAgain());
+        params.put("isQuarter", es.getIsQuarter());
+        params.put("liveAddr", es.getLiveAddr());
+        params.put("liveAddrDetail", es.getLiveAddrDetail());
+        params.put("major", es.getMajor());
+        params.put("preComeTime", es.getPreComeTime());
+        params.put("qq", es.getQq());
+        params.put("school", es.getSchool());
+        params.put("status", es.getStatus());
+        return studentDao.updateByMobileSelective(params);
+    }
+}

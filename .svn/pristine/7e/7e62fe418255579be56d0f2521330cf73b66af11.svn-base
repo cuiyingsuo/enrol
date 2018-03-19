@@ -1,0 +1,70 @@
+package com.cz.enrol.controller;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.service.OrderSubService;
+
+/**
+ * 订单信息表（子表）； 访问控制器类
+ **/
+@RestController
+@RequestMapping("/orderSubController")
+public class OrderSubController {
+
+    // 统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    // 当前业务操作接口bo
+    private OrderSubService service;
+
+    /**
+     * 查询分订单信息
+     *
+     * @param request
+     * @param response
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping(value = "/getOrderSubInfo", method = RequestMethod.GET)
+    public Map getOrderSubInfo(@RequestBody Long id) {
+    	Map resultMap = new HashMap<String, Object>();
+        OrderSub orderSubInfo = service.selectByPrimaryKey(id);
+        if (null != orderSubInfo) {
+        	resultMap.put("success", "true");
+        	resultMap.put("code", 200);
+        	resultMap.put("message", "成功");
+        	resultMap.put("orderSubInfo", orderSubInfo);
+        }
+        return resultMap;
+    }
+
+    /**
+     * 查询分订单信息
+     *
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping(value = "/addOrderSub", method = RequestMethod.POST)
+    public String addOrderSub( ModelMap modelMap) {
+        OrderSub orderSub = new OrderSub();
+
+        int rel = service.insertSelective(orderSub);
+        if (rel != 0) {
+            modelMap.addAttribute("success", "true");
+            modelMap.addAttribute("code", 200);
+            modelMap.addAttribute("message", "成功");
+        }
+        return "result";
+    }
+}

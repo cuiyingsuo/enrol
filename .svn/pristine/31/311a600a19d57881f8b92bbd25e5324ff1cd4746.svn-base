@@ -1,0 +1,93 @@
+datasource:
+  type: com.alibaba.druid.pool.DruidDataSource
+  master:
+    url: jdbc:mysql://rm-bp1p8b1wksu13mu3v.mysql.rds.aliyuncs.com:3306/enrol?autoReconnect=true&amp;useUnicode=true&amp;characterEncoding=utf8&amp;zeroDateTimeBehavior=convertToNull
+    username: kaifa
+    password: kaifa@1csgwjhn5#
+    driver-class-name: com.mysql.jdbc.Driver
+    filters: stat
+    maxActive: 200
+    initialSize: 50
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 360000
+    minEvictableIdleTimeMillis: 300000
+    validationQueryTimeout: 900000
+    validationQuery: SELECT SYSDATE() from dual
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+
+#logback 日志输出设置
+spring:
+  redis:
+    database: 0
+    host: 192.168.0.192
+    port: 6379
+    timeout: 2000
+    password:
+    pool:
+      maxActive: 100
+      maxWait: 10000
+      maxIdle: 8
+      minIdle: 0
+
+server:
+  port: 8088
+  
+  
+#电子合同
+contract:
+  #合同模板路径
+  tempUrl: D:/tmp/
+  #生成的合同保存路径
+  savePath: /home/data/html/h5/
+  #天印签章服务器ip
+  serverIp: 116.62.194.137
+  #天印签章服务器端口
+  serverPor: 8080
+  #总公司天印系统编码
+  parentOrg: CZBK
+  #作废合同印章天印系统id
+  sealId: 
+
+#通联支付配置
+allin:
+  #h5支付
+  h5-pay:
+    #支付订单提交地址
+    pay-url: http://test.allinpay.com/mobilepayment/mobile/SaveMchtOrderServlet.action
+    #支付订单完成跳转地址
+    return-url: http://enrol.itcast.cn/h5/my-order.html
+    #支付完成回调地址
+    receiveUrl: http://enrol.itcast.cn/enrol/payResultController/payResult
+    #通联会员注册地址
+    reg-url: http://test.allinpay.com/usercenter/merchant/UserInfo/reg.do
+    #加密使用key
+    key: 1234567890
+    #版本号
+    version: v1.0
+    #商户号
+    merchant-id: "008340142150000"
+  #信用卡分期
+  card-install:
+    #通联提供
+    app_key: testhn
+    #通联接口方法名
+    method: allinpay.order.orderinstall.add
+    #通联系统版本号
+    v: 1.0
+    #通联签名版本号
+    sign_v: 1
+    #在通联注册的商户号
+    mer_id: "999290053990002"
+    #贷款申请后，通联跳转我们的页面地址
+    return_url: enrol.itcast.cn/h5/index1.html
+    #秘钥地址
+    keyPath: /usr/local/enrol/libs/private.pfx
+    #公钥地址
+    publicKeyPath: /usr/local/enrol/libs/public.cer
+    #申请分期提交通联地址
+    reqUrl: http://140.207.41.162:8005/asaop/rest/api/

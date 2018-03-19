@@ -1,0 +1,66 @@
+package com.cz.enrol.dao.order;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolOrderSub;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * EnrolOrderSubMapper数据库操作接口类
+ * 
+ **/
+
+public interface EnrolOrderSubMapper extends BaseDao<EnrolOrderSub>{
+
+
+	/**
+	 * 
+	 * 查询（根据主键ID查询）
+	 * 
+	 **/
+	EnrolOrderSub selectByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 删除（根据主键ID删除）
+	 *
+	 **/
+	int deleteByPrimaryKey(@Param("id") Long id);
+
+	/**
+	 *
+	 * 添加
+	 *
+	 **/
+	int insert(EnrolOrderSub record);
+
+	/**
+	 *
+	 * 添加 （匹配有值的字段）
+	 *
+	 **/
+	int insertSelective(EnrolOrderSub record);
+
+	/**
+	 *
+	 * 修改 （匹配有值的字段）
+	 *
+	 **/
+	int updateByPrimaryKeySelective(EnrolOrderSub record);
+
+	/**
+	 *
+	 * 修改（根据主键ID修改）
+	 *
+	 **/
+	int updateByPrimaryKey(EnrolOrderSub record);
+	
+	/**
+	 * 根据主订单号查询分订单
+	 */
+	List<Map<String,Object>> selectByMergeOrderNo(Long orderNo);
+
+}

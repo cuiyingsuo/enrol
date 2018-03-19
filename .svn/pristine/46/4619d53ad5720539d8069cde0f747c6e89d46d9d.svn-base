@@ -1,0 +1,29 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.goods.GoodsHotMapper;
+import com.cz.enrol.entity.GoodsHot;
+
+/**
+ * 商品班级关系表 服务类
+ **/
+@Service
+public class GoodsHotService {
+	// 热门课程dao
+	@Autowired
+	private GoodsHotMapper goodsHotDao;
+
+	/**
+	 * 查询全部热门课程
+	 * 
+	 * @return
+	 */
+	public List<GoodsHot> queryAll() {
+		return goodsHotDao.selectAll();
+	}
+
+}

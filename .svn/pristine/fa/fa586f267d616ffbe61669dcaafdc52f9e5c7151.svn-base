@@ -1,0 +1,77 @@
+package com.cz.enrol.common;
+
+import com.alibaba.fastjson.JSONObject;
+import com.allinpay.util.StringUtils;
+import com.cz.enrol.exception.UnLoginException;
+import com.cz.enrol.utils.RedisUtil;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class BaseController {
+	/**
+	 * 用token在redis查用户信息
+	 * 
+	 * @param token
+	 * @return
+	 */
+	protected Map<String, Object> getUserInfoByRedis(String token) {
+		Map<String, Object> userInfo = new HashMap<String, Object>();
+		if (StringUtils.isEmpty(token)) {
+            throw new UnLoginException("用户未登录!", ReturnStatus.LOGIN_ERROR);
+        }
+		if (RedisUtil.hasKey(token)) {
+			JSONObject jsonObj = JSONObject.parseObject(RedisUtil.get(token).toString());
+			userInfo.put("mobile", jsonObj.get("mobile").toString());
+			userInfo.put("name", jsonObj.get("name").toString());
+			userInfo.put("id", jsonObj.get("id").toString());
+
+		} else {
+			throw new UnLoginException("用户登录超时!", ReturnStatus.LOGIN_ERROR);
+		}
+		return userInfo;
+	}
+	/**
+	 * 成功返回
+	 * @param content
+	 * @return
+	 */
+	protected BaseBody success(Object content) {
+		BaseBody baseBody = new BaseBody();
+
+		baseBody.setSuccess(true);
+		baseBody.setCode(200);
+		baseBody.setContent(content);
+		baseBody.setMessage("成功");
+		return baseBody;
+	}
+	/**
+	 * 失败返回
+	 * @param code
+	 * @param msg
+	 * @return
+	 */
+	protected BaseBody fail(int code, String msg) {
+		BaseBody baseBody = new BaseBody();
+		
+		baseBody.setSuccess(false);
+		baseBody.setCode(code);
+		baseBody.setMessage(msg);
+		return baseBody;
+	}
+	
+	/**
+	 * 失败返回
+	 * @param code
+	 * @param msg
+	 * @return
+	 */
+	protected BaseBody fail() {
+		BaseBody baseBody = new BaseBody();
+		
+		baseBody.setSuccess(false);
+		baseBody.setCode(ReturnStatus.DATA_NULL);
+		baseBody.setMessage("查无数据");
+		return baseBody;
+	}
+}

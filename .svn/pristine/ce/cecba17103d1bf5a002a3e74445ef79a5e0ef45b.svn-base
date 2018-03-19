@@ -1,0 +1,22 @@
+package com.cz.enrol.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.permission.EnrolPermissionMapper;
+
+/**
+ * 资源表 服务类
+ **/
+@Service
+public class EnrolPermissionService {
+
+	// 统一记录日志类
+	private Logger Log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	// 当前业务数据操作接口dao
+	private EnrolPermissionMapper permissionDao;
+
+}

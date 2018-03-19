@@ -1,0 +1,129 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.User;
+import com.cz.enrol.service.UserService;
+import com.cz.enrol.utils.RedisUtil;
+import com.cz.enrol.utils.TokenUtil;
+import com.cz.enrol.vo.UserEx;
+import com.google.code.kaptcha.Producer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+
+import javax.imageio.ImageIO;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
+
+/**
+ * 后台用户登录，登出 ，修改密码，密码找回。。。
+ *
+ * @author liuzhongshuai
+ *         Created by liuzhongshuai on 2017/10/20.
+ */
+@RestController
+@RequestMapping("/managenment/user")
+public class ManagerUserLoginController {
+
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private Producer captchaProducer;
+
+
+    /**
+     * 用户登录
+     *
+     * @return
+     */
+    @PostMapping("/userLogin")
+    public BaseBody<String> userLogin(UserEx user, @RequestParam(defaultValue = "0") String validateCode) throws UnsupportedEncodingException {
+        BaseBody<String> baseBody = new BaseBody<String>();
+        if ("0".equals(validateCode)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("验证码不正确!");
+            return baseBody;
+        }
+        String mobile = user.getMobile();
+        String password = user.getPassword();
+        if (StringUtils.isEmpty(mobile) || StringUtils.isEmpty(password)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("用户名或密码为空!");
+            return baseBody;
+        }
+        //验证码验证
+        String vCpde = String.valueOf(RedisUtil.get(mobile + "_validateCode"));
+        if (!validateCode.equals(vCpde)) {
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(10001);
+            baseBody.setMessage("验证码不正确!");
+            return baseBody;
+        }
+        //验证登录
+        User userResult = userService.userLogin(mobile, password);
+        //登录成功将用户信息 存入redis
+        String token = TokenUtil.setUserEx(userResult, 3600);
+
+        baseBody.setContent(token);
+        baseBody.setMessage("登录成功!");
+        return baseBody;
+    }
+
+    /**
+     * 添加新后台用户
+     *
+     * @param userEx
+     * @return
+     */
+    @PostMapping("/addUser")
+    public BaseBody<User> addUser(UserEx userEx) {
+        BaseBody<User> baseBody = new BaseBody<User>();
+
+        //查询该用户是否已经注册
+        User userCon=new User();
+        userCon.setMobile(userEx.getMobile());
+        List<User> userResult=userService.select(userCon);
+
+        if(!CollectionUtils.isEmpty(userResult)){
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setMessage("该用户已被添加过!");
+            baseBody.setCode(1001);
+            return baseBody;
+        }
+        User user = userService.addUser(userEx);
+        baseBody.setContent(user);
+        baseBody.setMessage("添加用户成功!");
+        return baseBody;
+    }
+
+    /**
+     * 刷新登录验证码
+     */
+    @GetMapping("/validateCodeRef")
+    public void validateCodeRef(HttpServletResponse response, @RequestParam(defaultValue = "0") String phoneNum) throws IOException {
+
+        if ("0".equals(phoneNum)) {
+            return;
+        }
+        String codeStr = captchaProducer.createText();
+        RedisUtil.set(phoneNum + "_validateCode", codeStr.toString());
+        //验证码20分钟有效
+        RedisUtil.set(phoneNum + "_validateCode", 1200);
+        BufferedImage bi = captchaProducer.createImage(codeStr);
+        ServletOutputStream out = response.getOutputStream();
+        ImageIO.write(bi, "jpg", out);
+        out.flush();
+        out.close();
+    }
+
+}

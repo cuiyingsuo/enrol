@@ -1,0 +1,8 @@
+package com.cz.enrol.dao.marketing;
+
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.MarketingDeductionTarget;
+
+public interface MarketingDeductionTargetMapper extends BaseDao<MarketingDeductionTarget> {
+}

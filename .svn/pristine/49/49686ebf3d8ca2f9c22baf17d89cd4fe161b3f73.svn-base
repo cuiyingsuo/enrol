@@ -1,0 +1,189 @@
+package com.cz.enrol.vo;
+
+
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+/**
+ * 商品扩展类
+ *
+ * @author liuzs
+ * Created by liuzhongshuai on 2017/10/23.
+ */
+public class GoodsEx {
+
+    /**
+     * 商品名称
+     */
+    @NotEmpty(message = "请填写商品名称!")
+    private String name;
+
+    @Min(value = 0, message = "课程原价值不正确")
+    @NotNull(message = "课程价钱必填")
+    private Integer price;
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    @Min(value = 1, message = "学科必选!")
+    @NotNull(message = "学科必选")
+    private Long subjectId;
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
+    }
+
+    @NotEmpty(message ="商品详情必填!")
+    private String detail;
+
+    public String getSynopsis() {
+        return synopsis;
+    }
+
+    public void setSynopsis(String synopsis) {
+        this.synopsis = synopsis;
+    }
+
+    @NotEmpty(message = "商品简介必填!")
+    private String synopsis;
+
+
+    /**
+     * 班级id集合字符串id中间 用","链接
+     * 1001,1002,1008
+     */
+    private String classIdStrs;
+
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    private String creator;
+
+
+    public String getCoverImgTmp() {
+        return coverImgTmp;
+    }
+
+    public void setCoverImgTmp(String coverImgTmp) {
+        this.coverImgTmp = coverImgTmp;
+    }
+
+    public String getDetailImgTmp() {
+        return detailImgTmp;
+    }
+
+    public void setDetailImgTmp(String detailImgTmp) {
+        this.detailImgTmp = detailImgTmp;
+    }
+
+    private String coverImgTmp;
+
+
+    private String detailImgTmp;
+
+    /**
+     * 是否支持全款支付
+     */
+    private Byte isFull = 1;
+
+    public Byte getIsFull() {
+        return isFull;
+    }
+
+    public void setIsFull(Byte isFull) {
+        this.isFull = isFull;
+    }
+
+    public Byte getIsBatch() {
+        return isBatch;
+    }
+
+    public void setIsBatch(Byte isBatch) {
+        this.isBatch = isBatch;
+    }
+
+    public Byte getIsLoan() {
+        return isLoan;
+    }
+
+    public void setIsLoan(Byte isLoan) {
+        this.isLoan = isLoan;
+    }
+
+    /**
+     * 是否支持分次付款
+     */
+    private Byte isBatch = 1;
+
+    /**
+     * 是否支持借贷
+     */
+    private Byte isLoan = 1;
+
+    /**
+     * 商品简介
+     */
+    private String goodsSummary;
+
+    /**
+     * 商品详情
+     */
+    private String goodsDetail;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getClassIdStrs() {
+        return classIdStrs;
+    }
+
+    public void setClassIdStrs(String classIdStrs) {
+        this.classIdStrs = classIdStrs;
+    }
+
+    public String getGoodsSummary() {
+        return goodsSummary;
+    }
+
+    public void setGoodsSummary(String goodsSummary) {
+        this.goodsSummary = goodsSummary;
+    }
+
+    public String getGoodsDetail() {
+        return goodsDetail;
+    }
+
+    public void setGoodsDetail(String goodsDetail) {
+        this.goodsDetail = goodsDetail;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+}

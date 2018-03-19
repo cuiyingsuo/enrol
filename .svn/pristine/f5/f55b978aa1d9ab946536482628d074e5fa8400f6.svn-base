@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.order.OrderMainMapper">
+
+    <!--实体映射 -->
+    <resultMap id="EnrolOrderMainResultMapResultMap" type="com.cz.enrol.entity.OrderMain">
+        <!--主键 -->
+        <id property="id" column="主键"/>
+        <!--合单号； -->
+        <result property="mergeOrderNo" column="merge_order_no"/>
+        <!--订单金额 -->
+        <result property="orderPrice" column="order_price"/>
+        <!--商品原价格 -->
+        <result property="costPrice" column="cost_price"/>
+        <!--学员Id，对应enrol_student表的关键字Id -->
+        <result property="studentId" column="student_id"/>
+        <!--学员名称 -->
+        <result property="studentName" column="student_name"/>
+        <!--学员手机号 -->
+        <result property="studentMobile" column="student_mobile"/>
+        <!--学科Id，对应enrol_subject表关键字Id; -->
+        <result property="subjectId" column="subject_id"/>
+        <!--学科名字 -->
+        <result property="subjectName" column="subject_name"/>
+        <!--校区Id,对应表enrol_campus关键字； -->
+        <result property="campusId" column="campus_id"/>
+        <!--分校名称 -->
+        <result property="campusName" column="campus_name"/>
+        <!--班级id，对应表enrol_class关键字Id； -->
+        <result property="classId" column="class_id"/>
+        <!--班级名称 -->
+        <result property="className" column="class_name"/>
+        <!--支付类型，0、 全款支付，1、分次支付，2、 全额贷款 -->
+        <result property="payType" column="pay_type"/>
+        <!--营销策略Id，对应表enrol_marketing关键字； -->
+        <result property="marketingId" column="marketing_id"/>
+        <!--营销策略名称 -->
+        <result property="marketingName" column="marketing_name"/>
+        <!--支付渠道名称,如通联，百度； -->
+        <result property="payChannelName" column="pay_channel_name"/>
+        <!--优惠金额 -->
+        <result property="prefAmount" column="pref_amount"/>
+        <!--已支付 -->
+        <result property="paid" column="paid"/>
+        <!--支付时间 -->
+        <result property="payTime" column="pay_time"/>
+        <!--订单状态(0:未支付、1:支付中、2:支付完成、3:退费中、4:退费成功) -->
+        <result property="status" column="status"/>
+        <!--是否开具电子收据（0：否，1：是） -->
+        <result property="elecReceipt" column="elec_receipt"/>
+        <!--创建者 -->
+        <result property="creator" column="creator"/>
+        <!--创建时间 -->
+        <result property="createTime" column="create_time"/>
+        <!--编辑者 -->
+        <result property="editor" column="editor"/>
+        <!--编辑时间 -->
+        <result property="editTime" column="edit_time"/>
+        <!--商品Id，对应enrol_goods表主键； -->
+        <result property="goodsId" column="goods_id"/>
+        <!-- 商品名称 -->
+        <result property="goodsName" column="goods_name"/>
+        <!--贷款额度 -->
+        <result property="loanMoney" column="loan_money"/>
+        <!--退费费用 -->
+        <result property="returnMoney" column="return_money"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, merge_order_no, order_price,cost_price, student_id,
+		student_name,
+		student_mobile, subject_id, subject_name, campus_id,
+		campus_name,
+		class_id, class_name, pay_type, marketing_id,
+		marketing_name,
+		pay_channel_name, pref_amount, paid, pay_time, status,
+		elec_receipt,
+		receipt_url, receipt_no, creator, create_time, editor,
+		edit_time,
+		goods_id,goods_name, loan_money, return_money
+	</sql>
+
+    <!-- 查询主订单列表 -->
+    <select id="selectOrderMainList" resultType="java.util.Map"
+            parameterType="java.lang.String">
+		SELECT
+		om.id AS id,
+		om.merge_order_no AS orderMainNo,
+		om.goods_name AS goodsName,
+		om.cost_price AS costPrice,
+		om.order_price
+		AS orderPrice,
+		om.student_id AS studentId,
+		om.student_name AS
+		studentName,
+		om.student_mobile AS studentMobile,
+		cam.address AS
+		campusAddress,
+		om.class_name AS className,
+		cla.start_date AS startDate,
+		cla.class_time AS classTime,
+		cla.teach_mode_name AS teachModeName,
+		om.pay_type AS payType,
+		om.`status` AS orderStatus,
+		om.paid AS paid,
+		(om.order_price-om.paid) AS unpaid,
+		goods.cover_img_url AS goodsImg,
+		om.is_cancel AS isCancel,
+		om.create_time AS createTime,
+		om.is_free AS isFree,
+		om.is_other_expense AS isOtherExpense,
+		om.other_expense AS otherExpense,
+		om.other_expense_remark AS otherExpenseRemark
+		FROM
+		enrol_order_main om
+		LEFT JOIN enrol_class cla ON om.class_id=cla.id
+		LEFT JOIN enrol_campus cam ON om.campus_id=cam.id
+		LEFT JOIN enrol_goods goods ON om.goods_id=goods.id
+
+		where om.student_mobile=#{mobile}
+		order by
+		om.create_time desc
+	</select>
+
+    <!-- 查询订单详情 -->
+    <select id="selectOrderMainInfo" resultType="java.util.Map"
+            parameterType="java.lang.String">
+		SELECT
+		om.id AS id,
+		om.merge_order_no AS orderMainNo,
+		om.goods_name AS goodsName,
+		om.cost_price AS costPrice,
+		om.order_price
+		AS orderPrice,
+		om.student_id AS studentId,
+		om.student_name AS
+		studentName,
+		om.student_mobile AS studentMobile,
+		cam.address AS campusAddress,
+		cam.id AS campusId,
+		om.class_name AS className,
+		cla.id AS classId,
+		cla.start_date AS startDate,
+		cla.class_time AS classTime,
+		cla.teach_mode_name AS teachModeName,
+		om.pay_type AS payType,
+		om.`status` AS orderStatus,
+		om.paid AS paid,
+		(om.order_price-om.paid) AS unpaid,
+		goods.cover_img_url AS goodsImg,
+		om.create_time AS createTime,
+		cla.class_type_code AS classTypeCode,
+		cla.class_type_name AS classTypeName,
+		om.is_cancel AS isCancel,
+		om.elec_receipt AS receiptStatus,
+		om.is_free AS isFree,
+		om.is_other_expense AS isOtherExpense,
+		om.other_expense AS otherExpense,
+		om.other_expense_remark AS otherExpenseRemark
+		FROM enrol_order_main om
+		LEFT JOIN enrol_class cla ON om.class_id=cla.id
+		LEFT JOIN enrol_campus cam ON om.campus_id=cam.id
+		LEFT JOIN enrol_goods goods ON om.goods_id=goods.id
+
+		where
+		om.merge_order_no=#{orderMainNo} AND om.student_mobile=#{mobile}
+	</select>
+
+    <!--主订单多条件查询 -->
+    <select id="queryOrderMainsToPage" resultType="java.util.Map"
+            parameterType="com.cz.enrol.vo.OrderQueryEx">
+        SELECT
+        eom.merge_order_no AS orderNo,
+        concat(
+        ec.`name`,
+        '(',
+        ec.start_date,
+        ec.teach_mode_name,
+        ')'
+        ) AS orderContent,
+        eom.student_name as studentName,
+        eom.student_mobile as studentMobile,
+        eom.pay_type as payType,
+        eom.create_time as createTime,
+        eom.order_price orderPrice,
+        eom.pay_time as lastPayTime,
+        eom.pay_channel_name as payChannelName,
+        eom.paid,
+        (eom.order_price-eom.paid) as surplusPrice,
+        eom.`status` as `status`,
+        eom.elec_receipt as elecReceipt,
+        eom.is_free as isFree,
+        eom.other_expense as otherExpense,
+        eom.other_expense_remark as otherExpenseRemark
+        FROM
+        enrol_order_main eom,
+        enrol_class ec
+        WHERE
+        eom.class_id = ec.id
+        AND ec.is_del = 0
+
+        AND eom.is_aft=${isAft}
+
+        <if test="subjectId!=null and subjectId!=''">
+            AND eom.subject_id=#{subjectId}
+        </if>
+
+        <if test="classTypeCode!=null and classTypeCode !=''">
+            AND ec.class_type_code=#{classTypeCode}
+        </if>
+
+        <if test="teachTypeCode!=null and teachTypeCode!='' ">
+            AND ec.teach_mode_code=#{teachTypeCode}
+        </if>
+
+        <if test="campusId!=null and campusId!='' ">
+            AND eom.campus_id=#{campusId}
+        </if>
+
+        <if test="classId!=null and classId !=''">
+            AND eom.class_id=#{classId}
+        </if>
+
+        <if test="payType!=null and payType!=''">
+            AND eom.pay_type=#{payType}
+        </if>
+
+        <if test="marketId!=null and marketId!=''">
+            AND eom.marketing_id=#{marketId}
+        </if>
+
+        <if test="orderStatus!=null and orderStatus!=''">
+            AND eom.status=#{orderStatus}
+        </if>
+
+        <if test="likeName!=null and likeName!=''">
+            AND (eom.student_name like CONCAT(CONCAT('%', #{likeName}), '%') or
+            eom.student_mobile=#{likeName} or
+            eom.merge_order_no=#{likeName})
+        </if>
+
+        <if test="startDate!=null and startDate!='' ">
+            AND eom.create_time <![CDATA[ >= ]]>
+            UNIX_TIMESTAMP(#{startDate})*1000
+        </if>
+
+        <if test="endDate!=null and endDate!=''">
+            AND eom.create_time <![CDATA[ <= ]]>
+            UNIX_TIMESTAMP(#{endDate})*1000
+        </if>
+
+        ORDER BY eom.create_time DESC
+    </select>
+    <!-- 查询超时订单 -->
+    <select id="selectOrderCancle" resultType="java.util.Map" parameterType="java.lang.Long">
+		SELECT id,class_id AS classId,student_id AS studentId FROM enrol_order_main
+		WHERE (#{currentTime}-create_time)/1000/60>60 AND `status`=0 AND is_cancel=0;
+	</select>
+    <!-- 根据主订单号查询订单 -->
+    <select id="selectOrderMainByNo" resultType="com.cz.enrol.entity.OrderMain" parameterType="java.lang.String">
+		SELECT 
+		<include refid="Base_Column_List"/>
+ 		FROM enrol_order_main WHERE merge_order_no=#{mergeOrderNo}
+    </select>
+</mapper>

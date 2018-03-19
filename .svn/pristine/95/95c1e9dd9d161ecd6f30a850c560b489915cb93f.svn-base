@@ -1,0 +1,139 @@
+package com.cz.enrol.common;
+
+import com.cz.enrol.entity.Banner;
+import com.cz.enrol.exception.BeanNullException;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+/**
+ * Created by liuzhongshuai on 2017/10/22.
+ */
+public class BaseService<T> {
+
+
+    @Autowired
+    private BaseDao<T> baseDao;
+
+
+    /**
+     * 根据主键删除一条数据
+     *
+     * @param id
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int delByPrimaryKey(int id) {
+        return baseDao.deleteByPrimaryKey(id);
+    }
+
+    /**
+     * 根据主键查询一条数据
+     *
+     * @param id
+     * @return
+     */
+    public T selectByPrimaryKey(int id) {
+        return baseDao.selectByPrimaryKey(id);
+    }
+
+
+    /**
+     * 条件查询
+     *
+     * @param t
+     * @return
+     */
+    public List<T> select(T t) {
+        return baseDao.select(t);
+    }
+
+
+    /**
+     * 查询所有
+     *
+     * @return
+     */
+    public List<T> selectAll() {
+        return baseDao.selectAll();
+    }
+
+    /**
+     * 条件删除
+     *
+     * @param t
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int delete(T t) {
+        return baseDao.delete(t);
+    }
+
+    /**
+     * 修改 通过 主键
+     * @param t
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public int updateByPk(T t){
+        return baseDao.updateByPrimaryKey(t);
+    }
+
+    /**
+     * 通用分页查询方法
+     *
+     * @param t
+     * @param startNum
+     * @param pageSize
+     * @return
+     */
+    public BasePage<T> queryListByPage(T t, int startNum, int pageSize) {
+
+        if (null == t) {
+            throw new BeanNullException("查询实体不能为null!");
+        }
+
+        PageHelper.startPage(startNum, pageSize);
+        List<T> list = baseDao.select(t);
+        PageInfo<T> pageInfo = new PageInfo<T>(list);
+
+        BasePage<T> basePage = new BasePage<T>();
+        basePage.setPageData(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startNum);
+        basePage.setTotalPage(pageInfo.getPages());
+
+        return basePage;
+    }
+
+    /**
+     * 通用分页查询方法,支持排序
+     *
+     * @param t
+     * @param startNum
+     * @param pageSize
+     * @return
+     */
+    public BasePage<T> queryListByPage(T t, int startNum, int pageSize, String orderBy) {
+
+        if (null == t) {
+            throw new BeanNullException("查询实体不能为null!");
+        }
+
+        PageHelper.startPage(startNum, pageSize, orderBy);
+        List<T> list = baseDao.select(t);
+        PageInfo<T> pageInfo = new PageInfo<T>(list);
+
+        BasePage<T> basePage = new BasePage<T>();
+        basePage.setPageData(pageInfo.getList());
+        basePage.setPageSize(pageSize);
+        basePage.setCurrentPage(startNum);
+        basePage.setTotalPage(pageInfo.getPages());
+
+        return basePage;
+    }
+
+
+}

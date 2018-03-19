@@ -1,0 +1,95 @@
+package com.cz.enrol.service;
+
+import java.io.UnsupportedEncodingException;
+
+import com.cz.enrol.exception.LoginException;
+import com.cz.enrol.utils.BusLogUtil;
+import com.cz.enrol.vo.UserEx;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.dao.user.UserMapper;
+import com.cz.enrol.entity.User;
+import com.cz.enrol.utils.AesUtil;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * 用户表 服务类
+ **/
+@Service
+public class UserService extends BaseService<User> {
+
+    private static BusLogUtil busLogUtil = new BusLogUtil(UserService.class);
+
+    @Value("${enrol.user.login.key}")
+    private String key;
+    @Value("${enrol.user.defaut-password}")
+    private String defautPassword;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    /**
+     * 用户登录
+     *
+     * @param mobile
+     * @param password
+     * @return
+     */
+    public User userLogin(String mobile, String password) throws UnsupportedEncodingException {
+
+        User userCondition = new User();
+        userCondition.setMobile(mobile);
+        User user = userMapper.selectOne(userCondition);
+        //用户未注册
+        if (user == null) {
+            throw new LoginException("用户未注册!", 2002);
+        }
+        //用户状态已被禁用
+        if ("0".equals(user.getStatus())) {
+            throw new LoginException("该用户已经被禁用!", 2002);
+        }
+        byte[] bytes1 = AesUtil.decrypt(AesUtil.parseHexStr2Byte(user.getPassword()), key);
+        String hexStr = new String(bytes1, "UTF-8");
+        //密码验证未通过
+        if (!(mobile + password).equals(hexStr)) {
+            throw new LoginException("密码错误!", 2002);
+        }
+        return user;
+    }
+
+    /**
+     * 后台添加新用户
+     *
+     * @param userEx
+     * @return
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public User addUser(UserEx userEx) {
+
+        String mobile = userEx.getMobile();
+        String password = defautPassword;
+        //aes加密
+        byte[] aesBytes = AesUtil.encrypt(mobile + password, key);
+        //保存用户
+        User user = new User();
+        BeanUtils.copyProperties(userEx, user);
+        try {
+            String Str16 = AesUtil.parseByte2HexStr(aesBytes);
+            user.setPassword(Str16);
+        } catch (Exception e) {
+            busLogUtil.error("后台添加用户编码异常:{}", e.getMessage());
+            throw new RuntimeException("编码异常!");
+        }
+        user.setCreator("admin");
+        user.setCreateTime(System.currentTimeMillis());
+        user.setStatus((byte) 1);
+        user.setIsDel((byte) 0);
+        userMapper.insertSelective(user);
+        return user;
+    }
+
+}

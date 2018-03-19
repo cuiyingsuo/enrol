@@ -1,0 +1,429 @@
+package com.cz.enrol.controller;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.alibaba.fastjson.JSONObject;
+import com.allinpay.ets.client.RequestOrder;
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.service.OrderMainService;
+import com.cz.enrol.service.PayService;
+import com.cz.enrol.utils.RedisUtil;
+
+/**
+ * 
+ * 支付访问接口
+ * 
+ * @author My
+ *
+ */
+@RestController
+@RequestMapping("/payController")
+public class PayController {
+	@Value("${allin.pay-url}")
+	private String serverUrl;
+
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private OrderMainService orderMainService;
+
+	@Autowired
+	private PayService payService;
+
+	@Value("${server.token-key}")
+	private String loginToken;
+
+	/**
+	 * 全款支付
+	 * 
+	 * @param orderMainNo
+	 *            主订单编码
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/payFull", method = RequestMethod.POST)
+	public BaseBody payFull(String orderMainNo, HttpServletRequest request,
+			HttpServletResponse response) {
+		BaseBody<Map<String, Object>> baseBody = new BaseBody<Map<String, Object>>();
+
+		Map<String, Object> requestOrderMap = new HashMap<String, Object>();
+		requestOrderMap.put("serverUrl", serverUrl);
+
+		String token = request.getHeader(loginToken);
+		if (null == token || !RedisUtil.hasKey(token)) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(1002);
+			baseBody.setMessage("用户未登录或登录超时");
+			return baseBody;
+		}
+		Map<String, Object> orderMainMap = orderMainService
+				.queryOrderMainInfoByNo(orderMainNo);
+
+		if (null != orderMainMap && orderMainMap.size() > 0) {
+			Map<String, Object> orderMainInfo = (Map<String, Object>) orderMainMap.get("orderMainInfo");
+
+			int status = Integer.parseInt(orderMainInfo.get("status")
+					.toString());
+
+			if (status == 2) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("订单已支付完成，不可支付");
+				return baseBody;
+			}
+			if (status == 3) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("订单退费中，不可支付");
+				return baseBody;
+			}
+			if (status == 4) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("订单已退费，不可支付");
+				return baseBody;
+			}
+		}
+
+		JSONObject jsonObj = JSONObject.parseObject(RedisUtil.get(token)
+				.toString());
+
+		RequestOrder requestOrder = payService.payFullRequestOrder(
+				jsonObj.getString("id"), jsonObj.getString("mobile"),
+				orderMainNo);
+
+		if (null != requestOrder) {
+			requestOrderMap.put("payOrderInfo", requestOrder);
+
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(requestOrderMap);
+			baseBody.setMessage("订单信息请求成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setMessage("订单信息生成失败");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 分次支付
+	 * 
+	 * @param orderMainNo
+	 *            主订单号
+	 * @param payPrice
+	 *            支付金额
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/payPart", method = RequestMethod.POST)
+	public BaseBody payPart(String orderMainNo, String payPrice,
+			HttpServletRequest request, HttpServletResponse response) {
+		logger.info("请求分次支付：支付金额={}",payPrice);
+		BaseBody<Map<String, Object>> baseBody = new BaseBody<Map<String, Object>>();
+		
+		BigDecimal myformat=new BigDecimal(payPrice);
+		int price = myformat.movePointRight(2).intValue();
+		
+		Map<String, Object> requestOrderMap = new HashMap<String, Object>();
+		requestOrderMap.put("serverUrl", serverUrl);
+		RequestOrder requestOrder = null;
+
+		String token = request.getHeader(loginToken);
+		if (null == token || !RedisUtil.hasKey(token)) {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(1002);
+			baseBody.setMessage("用户未登录或登录超时");
+			return baseBody;
+		}
+
+		Map<String, Object> orderMainMap = orderMainService.queryOrderMainInfoByNo(orderMainNo);
+
+		if (null != orderMainMap && orderMainMap.size() > 0) {
+			Map<String, Object> orderMainInfo = (Map<String, Object>) orderMainMap.get("orderMainInfo");
+
+			int status = Integer.parseInt(orderMainInfo.get("status")
+					.toString());
+			int orderMainPrice = Integer.parseInt(orderMainInfo.get(
+					"orderPrice").toString());
+			int orderMainPaid = Integer.parseInt(orderMainInfo.get("paid")
+					.toString());
+			int payType = Integer.parseInt(orderMainInfo.get("payType")
+					.toString());
+
+			if (status == 2) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("订单已支付完成，不可支付");
+				return baseBody;
+			}
+			if (status == 3) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("订单退费中，不可支付");
+				return baseBody;
+			}
+			if (status == 4) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("订单已退费，不可支付");
+				return baseBody;
+			}
+			if ((orderMainPrice - orderMainPaid - price) < 0) {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(2001);
+				baseBody.setMessage("支付金额不得超过订单未支付金额");
+				return baseBody;
+			}
+
+			String classTypeCode = orderMainInfo.get("classTypeCode")
+					.toString();
+			String classTypeName = orderMainInfo.get("classTypeName")
+					.toString();
+
+			if (payType == 1||payType==2) {
+				List<Map<String, Object>> payOrderList = (List<Map<String, Object>>) orderMainMap
+						.get("payOrderList");
+				if (null == payOrderList || payOrderList.size() == 0) {
+					// 首次支付
+					if (classTypeCode.equals("class_detail_base")) {
+						if (price < 20000) {
+							baseBody.setSuccess(ReturnStatus.FAILD);
+							baseBody.setCode(2001);
+							baseBody.setMessage(classTypeName + ":首次支付金额最少200元");
+							return baseBody;
+						}
+					}
+					if (classTypeCode.equals("class_detail_ employment")) {
+						if (price < 50000) {
+							baseBody.setSuccess(ReturnStatus.FAILD);
+							baseBody.setCode(2001);
+							baseBody.setMessage(classTypeName + ":首次支付金额最少500元");
+							return baseBody;
+						}
+					}
+
+				} else if (payOrderList.size() == 1 && payType!=2) {
+					// 二次支付
+					if (classTypeCode.equals("class_detail_base")) {
+						if ((orderMainPrice - orderMainPaid - price) > 0) {
+							baseBody.setSuccess(ReturnStatus.FAILD);
+							baseBody.setCode(2001);
+							baseBody.setMessage(classTypeName
+									+ ":二次支付需支付订单剩余全部未支付金额："
+									+ (orderMainPrice - orderMainPaid));
+							return baseBody;
+						}
+					}
+					if (classTypeCode.equals("class_detail_ employment")) {
+						if (price < 300000) {
+							baseBody.setSuccess(ReturnStatus.FAILD);
+							baseBody.setCode(2001);
+							baseBody.setMessage(classTypeName
+									+ ":二次支付金额最少3000元");
+							return baseBody;
+						}
+					}
+				} else {
+					// 三次支付
+					if ((orderMainPrice - orderMainPaid - price) > 0) {
+						baseBody.setSuccess(ReturnStatus.FAILD);
+						baseBody.setCode(2001);
+						baseBody.setMessage(classTypeName
+								+ ":三次支付需支付订单剩余全部未支付金额："
+								+ (orderMainPrice - orderMainPaid));
+						return baseBody;
+					}
+				}
+
+				JSONObject jsonObj = JSONObject.parseObject(RedisUtil
+						.get(token).toString());
+				requestOrder = payService.payPartRequestOrder(jsonObj
+						.getString("id"), jsonObj.get("mobile").toString(),
+						price, orderMainNo);
+
+			} else {
+				baseBody.setSuccess(ReturnStatus.FAILD);
+				baseBody.setCode(500);
+				baseBody.setMessage("订单为全额支付订单，不支持分次支付");
+				return baseBody;
+			}
+		} else {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("获取订单信息失败");
+			return baseBody;
+		}
+
+		if (null != requestOrder) {
+			requestOrderMap.put("requestOrder", requestOrder);
+
+			baseBody.setSuccess(ReturnStatus.SUCCESS);
+			baseBody.setCode(200);
+			baseBody.setContent(requestOrderMap);
+			baseBody.setMessage("支付信息请求成功");
+		} else {
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("支付信息生成失败");
+		}
+		return baseBody;
+	}
+
+	/**
+	 * 支付结果回执
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(value = "/payResult", method = RequestMethod.POST)
+	public void payResult(HttpServletRequest request,
+			HttpServletResponse response) {
+		logger.info("--------------------------------------订单结果回执---------------------------------------------------");
+		// 接收Server返回的支付结果
+		String merchantId = request.getParameter("merchantId");
+		String version = request.getParameter("version");
+		String language = request.getParameter("language");
+		String signType = request.getParameter("signType");
+		String payType = request.getParameter("payType");
+		String issuerId = request.getParameter("issuerId");
+		String paymentOrderId = request.getParameter("paymentOrderId");
+		String orderNo = request.getParameter("orderNo");
+		String orderDatetime = request.getParameter("orderDatetime");
+		String orderAmount = request.getParameter("orderAmount");
+		String payDatetime = request.getParameter("payDatetime");
+		String payAmount = request.getParameter("payAmount");
+		String ext1 = request.getParameter("ext1");
+		String ext2 = request.getParameter("ext2");
+		String payResult = request.getParameter("payResult");
+		String errorCode = request.getParameter("errorCode");
+		String returnDatetime = request.getParameter("returnDatetime");
+		String signMsg = request.getParameter("signMsg");
+
+		logger.info(
+				"merchantId：{}  version：{}  language：{}  signType：{}  payType：{}  issuerId：{}  "
+						+ "paymentOrderId：{}  orderNo：{}  orderDatetime:{}  orderAmount:{}  payDatetime:{}"
+						+ "  payAmount:{}  ext1:{}  ext2:{}  payResult:{}  errorCode:{}  returnDatetime:{}  signMsg:{}",
+				merchantId, version, language, signType, payType, issuerId,
+				paymentOrderId, orderNo, orderDatetime, orderAmount,
+				payDatetime, payAmount, ext1, ext2, payResult, errorCode,
+				returnDatetime, signMsg);
+
+		// 验签是商户为了验证接收到的报文数据确实是支付网关发送的。
+		// 构造订单结果对象，验证签名。
+		com.allinpay.ets.client.PaymentResult paymentResult = new com.allinpay.ets.client.PaymentResult();
+		paymentResult.setMerchantId(merchantId);
+		paymentResult.setVersion(version);
+		paymentResult.setLanguage(language);
+		paymentResult.setSignType(signType);
+		paymentResult.setPayType(payType);
+		paymentResult.setIssuerId(issuerId);
+		paymentResult.setPaymentOrderId(paymentOrderId);
+		paymentResult.setOrderNo(orderNo);
+		paymentResult.setOrderDatetime(orderDatetime);
+		paymentResult.setOrderAmount(orderAmount);
+		paymentResult.setPayDatetime(payDatetime);
+		paymentResult.setPayAmount(payAmount);
+		paymentResult.setExt1(ext1);
+		paymentResult.setExt2(ext2);
+		paymentResult.setPayResult(payResult);
+		paymentResult.setErrorCode(errorCode);
+		paymentResult.setReturnDatetime(returnDatetime);
+		paymentResult.setKey("1234567890");
+		// signMsg为服务器端返回的签名值。
+		paymentResult.setSignMsg(signMsg);
+		// signType为"1"时，必须设置证书路径。
+		//paymentResult.setCertPath("/opt/conf/TLCert-test.cer");
+
+		// 验证签名：返回true代表验签成功；否则验签失败。
+		boolean verifyResult = paymentResult.verify();
+
+		// 验签成功，还需要判断订单状态，为"1"表示支付成功。
+		boolean paySuccess = verifyResult && payResult.equals("1");
+
+		// 记录通联回执信息
+		payService.recordPaymentResult(paymentResult,verifyResult);
+		logger.info("回执验证：{}",paySuccess);
+		if (paySuccess) {
+			// 记录订单信息
+			payService.recordOrderInfo(paymentResult);
+		}
+		try {
+			response.sendRedirect("http://172.17.0.91:8080/h5/my-order.html");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 申请信用卡分期
+	 * @param orderMainNo
+	 * @return
+	 */
+	@RequestMapping(value = "/applyInstallment", method = RequestMethod.POST)
+	public BaseBody applyInstallment(String orderMainNo,
+			HttpServletRequest request, HttpServletResponse response){
+		BaseBody<String> baseBody = new BaseBody<String>();
+		Map<String, Object> orderMainMap = orderMainService.queryOrderMainInfoByNo(orderMainNo);
+		Map<String, Object> orderMainInfo = (Map<String, Object>) orderMainMap.get("orderMainInfo");
+		
+		int orderStatus = Integer.valueOf(orderMainInfo.get("status").toString());
+		if(orderStatus!=1){
+			baseBody.setSuccess(ReturnStatus.FAILD);
+			baseBody.setCode(500);
+			baseBody.setMessage("当前订单状态不能贷款");
+			return baseBody;
+		}
+		
+		String cardInstallmentInfo = payService.makeCardInstallmentInfo(orderMainNo);
+		try {
+			response.getWriter().write(cardInstallmentInfo);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return baseBody;
+	}
+	/**
+	 * 信用卡分期回调通知
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/installmentNotify", method = RequestMethod.POST)
+	public String installmentNotify(HttpServletRequest request, HttpServletResponse response){
+		logger.info("------------------------------------------分期支付，异步通知-----------------------------------------");
+		Map<String,String[]> requestMap = request.getParameterMap();
+		HashMap<String,String> notifyMap = new HashMap<String,String>();
+		for(String key:requestMap.keySet()){
+			String value = requestMap.get(key)[0];
+			notifyMap.put(key, value);
+		}
+		boolean verifyRel=payService.installmentNotify(notifyMap);
+		if(verifyRel){
+			logger.info("------------------------------------------分期支付，异步通知.返回{}-------------------------------","success");
+			return "success";
+		}
+		logger.info("------------------------------------------分期支付，异步通知.返回{}-------------------------------","error");
+		return "error";
+	}
+}

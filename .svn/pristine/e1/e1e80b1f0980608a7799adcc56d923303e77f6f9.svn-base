@@ -1,0 +1,61 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.subject.SubjectMapper;
+import com.cz.enrol.entity.Subject;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+
+/**
+ * 
+ * 学科表 服务类
+ * 
+ **/
+@Transactional
+@Service
+public class SubjectService {
+
+	 //统一记录日志类
+	 private Logger Log= LoggerFactory.getLogger("enrol");
+	 @Autowired
+	 private SqlSessionTemplate session;
+
+	 //当前业务数据操作接口dao
+	 private SubjectMapper dao;
+	 private SubjectMapper getDao(){
+		 if(dao==null) {
+			 dao = session.getMapper(SubjectMapper.class);
+		 }
+		 return dao;
+	 }
+	public Subject selectByPrimaryKey(Long id) {
+		return getDao().selectByPrimaryKey(id);
+	}
+	public int deleteByPrimaryKey(Long id) {
+		return getDao().deleteByPrimaryKey(id);
+	}
+	public int insert(Subject record) {
+		return getDao().insert(record);
+	}
+	public int insertSelective(Subject record) {
+		return getDao().insertSelective(record);
+	}
+	public int updateByPrimaryKeySelective(Subject record) {
+		return getDao().updateByPrimaryKeySelective(record);
+	}
+	public int updateByPrimaryKey(Subject record) {
+		return getDao().updateByPrimaryKey(record);
+	}
+	
+	
+	public List<Subject> querySubjectList() {
+		return getDao().querySubjectList();
+	}
+
+}

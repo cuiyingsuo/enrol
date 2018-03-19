@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itcast.enrol.common.dao.dict.DictMapper">
+
+    <!--实体映射-->
+    <resultMap id="EnrolDictResultMapResultMap" type="com.itcast.enrol.common.entity.Dict">
+        <!--主键-->
+        <id property="id" column="主键"/>
+        <!--名称-->
+        <result property="name" column="name"/>
+        <!--字典类型-->
+        <result property="type" column="type"/>
+        <!--字典code-->
+        <result property="code" column="code"/>
+        <!--顺序，可选；-->
+        <result property="order" column="order"/>
+        <!--父级Id，若有；-->
+        <result property="parentId" column="parent_id"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列-->
+    <sql id="Base_Column_List">
+		 id,	name,	type,	code,	order,	parent_id
+	</sql>
+
+    <select id="selectInfoByType" resultType="java.util.Map" parameterType="java.lang.String">
+		SELECT 
+			`code`,
+			`name`,
+			`order`,
+			parent_id AS parentId
+		FROM enrol_dict
+		WHERE type=#{type}
+	</select>
+
+    <select id="getDetailType" resultType="java.util.Map" parameterType="java.lang.String">
+				SELECT
+			ed1.`code`,
+			ed1.`name`
+		FROM
+			enrol_dict ed1
+		WHERE
+			ed1.parent_id = (
+				SELECT
+					id
+				FROM
+					enrol_dict ed
+				WHERE
+					ed.`code` =#{type}
+			)
+		ORDER BY
+			ed1.`order` DESC
+	</select>
+</mapper>

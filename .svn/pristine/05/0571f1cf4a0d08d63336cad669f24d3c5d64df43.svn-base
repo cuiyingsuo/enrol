@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.banner.BannerMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolBannerResultMapResultMap" type="com.cz.enrol.entity.Banner">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--名称-->
+		<result property="name" column="name" />
+		<!--图片base64存储内容-->
+		<result property="image" column="image" />
+		<!--内容-->
+		<result property="content" column="content" />
+		<!--状态（0：待发布，1：已发布）-->
+		<result property="status" column="status" />
+		<!--是否是封面(0:否,1:是)-->
+		<result property="isCover" column="is_cover" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+		<!--跳转链接（若有）；-->
+		<result property="redirectUrl" column="redirect_url" />
+		<!--显示位置，0对应首页顶部banner；-->
+		<result property="showPos" column="show_pos" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	image,	content,	status,	is_cover,	creator,	create_time,	editor,	edit_time,	redirect_url,	show_pos
+	</sql>
+
+	<!-- 查询列表 -->
+	<select id="queryBannerList" resultMap="EnrolBannerResultMapResultMap">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_banner
+		 WHERE status = 1 ORDER BY show_pos ASC
+	</select>
+</mapper>

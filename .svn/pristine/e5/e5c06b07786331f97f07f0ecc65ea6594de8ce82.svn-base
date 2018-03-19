@@ -1,0 +1,9 @@
+package com.cz.enrol.dao.organize;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolPost;
+import org.apache.ibatis.annotations.Param;
+
+public interface EnrolPostMapper extends BaseDao<EnrolPost> {
+
+}

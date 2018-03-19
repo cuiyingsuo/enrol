@@ -1,0 +1,108 @@
+package com.cz.enrol.vo;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+/**
+ * Created by liuzhongshuai on 2017/11/6.
+ */
+public class StudentQueryEx {
+
+    @NotNull(message = "当前页不能为null")
+    @Min(value = 1,message = "当前页必须大于等于 1")
+    private Integer page;
+
+    @NotNull(message = "每页大小不能为null")
+    @Min(value = 1,message = "每页长度必须大于等于 1")
+    private Integer limit;
+
+    private Long campusId;
+
+    private Long subjectId;
+
+    private Long classId;
+
+    private String classTypeCode;
+
+    private String teachModeCode;
+
+    private Integer status;
+
+    private String likeStr;
+
+    public String getLikeStr() {
+        return likeStr;
+    }
+
+    public void setLikeStr(String likeStr) {
+        this.likeStr = likeStr;
+    }
+
+
+
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    public Long getClassId() {
+        return classId;
+    }
+
+    public void setClassId(Long classId) {
+        this.classId = classId;
+    }
+
+    public String getClassTypeCode() {
+        return classTypeCode;
+    }
+
+    public void setClassTypeCode(String classTypeCode) {
+        this.classTypeCode = classTypeCode;
+    }
+
+    public String getTeachModeCode() {
+        return teachModeCode;
+    }
+
+    public void setTeachModeCode(String teachModeCode) {
+        this.teachModeCode = teachModeCode;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        this.page = page;
+    }
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+
+}

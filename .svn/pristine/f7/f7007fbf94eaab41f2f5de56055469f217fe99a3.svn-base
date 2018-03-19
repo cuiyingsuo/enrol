@@ -1,0 +1,29 @@
+package com.cz.enrol.dao.goods;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Goods;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * EnrolGoodsMapper数据库操作接口类
+ * 
+ **/
+
+public interface GoodsMapper extends BaseDao<Goods> {
+	
+	/**
+	 * 根据学科查询商品及课程列表
+	 * @param subjectId
+	 * @return
+	 */
+	List<Goods> selectBySubjectId(Long subjectId);
+	
+	/**
+	 * 
+	 * 查询商品（课程）规格
+	 */
+	List<Map<String,Object>> selectGoodsSpec(Long goodsId);
+}

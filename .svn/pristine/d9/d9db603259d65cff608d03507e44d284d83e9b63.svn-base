@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.invoice.EnrolInvoiceMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolInvoiceResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolInvoice">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--订单号-->
+		<result property="orderNo" column="order_no" />
+		<!--发票类型(0:纸质发票，1:电子发票)-->
+		<result property="type" column="type" />
+		<!--类别(0:普票，1:专票)-->
+		<result property="category" column="category" />
+		<!--发票号码-->
+		<result property="invoiceNo" column="invoice_no" />
+		<!--抬头类型(0:个人，1:单位)-->
+		<result property="titleType" column="title_type" />
+		<!--抬头-->
+		<result property="title" column="title" />
+		<!--纳税人识别号-->
+		<result property="number" column="number" />
+		<!--发票内容-->
+		<result property="content" column="content" />
+		<!--电子发票地址-->
+		<result property="url" column="url" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	order_no,	type,	category,	invoice_no,	title_type,	title,	number,	content,	url,	creator,	create_time,	editor,	edit_time
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolInvoice" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_invoice
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_invoice
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolInvoice">
+		 INSERT INTO enrol_invoice
+ 		(id,order_no,type,category,invoice_no,title_type,title,number,content,url,creator,create_time,editor,edit_time) 
+		 VALUES 
+ 		(#{id},#{orderNo},#{type},#{category},#{invoiceNo},#{titleType},#{title},#{number},#{content},#{url},#{creator},#{createTime},#{editor},#{editTime}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolInvoice">
+		 INSERT INTO enrol_invoice
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="orderNo != null">
+				 order_no,
+			</if>
+			<if test="type != null">
+				 type,
+			</if>
+			<if test="category != null">
+				 category,
+			</if>
+			<if test="invoiceNo != null">
+				 invoice_no,
+			</if>
+			<if test="titleType != null">
+				 title_type,
+			</if>
+			<if test="title != null">
+				 title,
+			</if>
+			<if test="number != null">
+				 number,
+			</if>
+			<if test="content != null">
+				 content,
+			</if>
+			<if test="url != null">
+				 url,
+			</if>
+			<if test="creator != null">
+				 creator,
+			</if>
+			<if test="createTime != null">
+				 create_time,
+			</if>
+			<if test="editor != null">
+				 editor,
+			</if>
+			<if test="editTime != null">
+				 edit_time,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="orderNo!=null">
+				 #{orderNo},
+			</if>
+			<if test="type!=null">
+				 #{type},
+			</if>
+			<if test="category!=null">
+				 #{category},
+			</if>
+			<if test="invoiceNo!=null">
+				 #{invoiceNo},
+			</if>
+			<if test="titleType!=null">
+				 #{titleType},
+			</if>
+			<if test="title!=null">
+				 #{title},
+			</if>
+			<if test="number!=null">
+				 #{number},
+			</if>
+			<if test="content!=null">
+				 #{content},
+			</if>
+			<if test="url!=null">
+				 #{url},
+			</if>
+			<if test="creator!=null">
+				 #{creator},
+			</if>
+			<if test="createTime!=null">
+				 #{createTime},
+			</if>
+			<if test="editor!=null">
+				 #{editor},
+			</if>
+			<if test="editTime!=null">
+				 #{editTime},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolInvoice">
+		 UPDATE enrol_invoice
+ 		 <set> 
+			<if test="orderNo != null">
+				 order_no = #{orderNo},
+			</if>
+			<if test="type != null">
+				 type = #{type},
+			</if>
+			<if test="category != null">
+				 category = #{category},
+			</if>
+			<if test="invoiceNo != null">
+				 invoice_no = #{invoiceNo},
+			</if>
+			<if test="titleType != null">
+				 title_type = #{titleType},
+			</if>
+			<if test="title != null">
+				 title = #{title},
+			</if>
+			<if test="number != null">
+				 number = #{number},
+			</if>
+			<if test="content != null">
+				 content = #{content},
+			</if>
+			<if test="url != null">
+				 url = #{url},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				 editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				 edit_time = #{editTime},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolInvoice">
+		 UPDATE enrol_invoice
+		 SET 
+			 order_no = #{orderNo},
+			 type = #{type},
+			 category = #{category},
+			 invoice_no = #{invoiceNo},
+			 title_type = #{titleType},
+			 title = #{title},
+			 number = #{number},
+			 content = #{content},
+			 url = #{url},
+			 creator = #{creator},
+			 create_time = #{createTime},
+			 editor = #{editor},
+			 edit_time = #{editTime}
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 根据订单号查询发票 -->
+	<select id="queryInvoiceByOrderNo" resultMap="EnrolInvoiceResultMapResultMap" parameterType="java.lang.Long">
+		select
+		<include refid="Base_Column_List" />
+		from enrol_invoice i
+		where i.order_no in (
+			select os.order_no from enrol_order_sub os where merge_order_no = #{orderNo}
+		)
+	</select>
+</mapper>

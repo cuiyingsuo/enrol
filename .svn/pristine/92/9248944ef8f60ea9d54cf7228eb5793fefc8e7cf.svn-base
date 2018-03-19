@@ -1,0 +1,425 @@
+package com.cz.enrol.service.plugIns;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
+
+//http://blog.csdn.net/justinytsoft/article/details/53320225
+//http://www.cnblogs.com/h--d/p/6150320.html
+//http://www.cnblogs.com/shuilangyizu/p/5760928.html
+
+class TextInfo {
+	private String text = "";
+	private int disp = 0; //0:正常显示；1:下划线；
+	public String getText() {
+		return text;
+	}
+	public void setText(String text) {
+		this.text = text;
+	}
+	public int getDisp() {
+		return disp;
+	}
+	public void setDisp(int disp) {
+		this.disp = disp;
+	}
+}
+
+public class PDFUtil {
+
+    //设置纸张；
+    private Rectangle rect = null;
+   
+    //创建文档实例；
+    private Document doc =null;
+        
+    //添加中文支持；
+    private BaseFont bfChinese=null;
+
+    
+    //生成多少个空格字符；
+    private String CreateSP(int spaceCount) {
+    	String retStr="";
+    	for(int i=0;i<spaceCount;i++) retStr += " ";
+    	return retStr;
+    }
+    
+    //生成多少个回车换行符；
+    private String CreateBR(int spaceCount) {
+    	String retStr="";
+    	for(int i=0;i<spaceCount;i++) retStr += "\r\n";
+    	return retStr;
+    }
+    
+    //设置PDF文件基本信息；
+    private void InitPDFVar() {
+    	try{
+    	    rect = new Rectangle(PageSize.A4);
+    	    doc=new Document(rect);    	        
+    	    bfChinese = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+    	} catch(Exception e){
+    		;
+    	}	
+    }
+    
+    //设置PDF顶部文件内容；
+    //String pdfSerial: 	pdf文档序列号；
+    //String subSchool: 	分校名称；
+    //String studentName: 	学员名称；
+    //String nextContent:	后续内容；
+    private void SetPDFTop(String pdfSerial,String subSchool,String studentName,String nextContent) throws Exception {
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,13,Font.BOLD); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_RIGHT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk1 = new Chunk("协议编号：", font) ;
+            Chunk chunk2 = new Chunk(pdfSerial, font) ;
+            phrase.add(chunk1);
+            phrase.add(chunk2);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,21,Font.BOLD); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_CENTER);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateBR(2) +"黑马程序员培训协议" + CreateBR(4) , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,15,Font.BOLD); 
+    		Font font2 = new Font(bfChinese,15,Font.UNDERLINE); 
+    		
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		if(true) {
+	    		Phrase phrase = new Phrase();  
+	            Chunk chunk1 = new Chunk(CreateSP(33) + "甲方：", font) ;
+	            phrase.add(chunk1);
+	            Chunk chunk2 = new Chunk("江苏传智播客教育科技股份有限公司", font2) ;
+	            phrase.add(chunk2);
+	            paragraph.add(phrase);
+	    	}
+            doc.add(paragraph);
+            
+            paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_CENTER);
+    		if(true) {
+	    		Phrase phrase = new Phrase();  
+	            Chunk chunk3 = new Chunk(subSchool, font2) ;
+	            phrase.add(chunk3);
+	            paragraph.add(phrase);
+	    	}
+    		doc.add(paragraph);
+    		
+            paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		if(true) {
+	    		Phrase phrase = new Phrase();  
+	            Chunk chunk1 = new Chunk(CreateSP(33) + "乙方(学员)：", font) ;
+	            phrase.add(chunk1);
+	            Chunk chunk2 = new Chunk(studentName, font2) ;
+	            phrase.add(chunk2);
+	            paragraph.add(phrase);
+	    	}
+    		doc.add(paragraph);
+    	}
+
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk1 = new Chunk(CreateBR(1) + CreateSP(16) + nextContent, font) ;
+            phrase.add(chunk1);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    }
+    
+    //设置PDF段落内容；
+    //String ParagraphTitle: 	段落标题；
+    //String ParagraphContent:	段落内容；
+    private void SetPDFParagraph(String ParagraphTitle,String ParagraphContent) throws Exception {
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,14,Font.BOLD); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(ParagraphTitle , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(ParagraphContent, font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    }
+
+    //设置PDF段落内容；
+    //String ParagraphTitle: 	段落标题；
+    //List<TextInfo> listTextInfo:	段落内容；
+    private void SetPDFParagraph(String ParagraphTitle,List<TextInfo> listTextInfo) throws Exception {
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,14,Font.BOLD); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(ParagraphTitle , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Font font2 = new Font(bfChinese,12,Font.UNDERLINE); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+    		for(int i=0;i<listTextInfo.size();++i) {
+    			if(listTextInfo.get(i).getDisp() == 0){
+		            Chunk chunk = new Chunk(listTextInfo.get(i).getText(), font) ;
+		            phrase.add(chunk);
+    			}
+    			else {
+		            Chunk chunk = new Chunk(listTextInfo.get(i).getText(), font2) ;
+		            phrase.add(chunk);    				
+    			}
+    		}
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    }
+
+    //设置PDF段落内容；
+    //String signLocation: 合同签订地点;
+	//String studentName: 乙方（签字）;
+    //String studentTel:电  话;
+    //String studentIdentify: 身份证号码;
+	//String studentAddress: 家庭地址;
+    //String nowAddress:现居住地址;
+    private void SetPDFBottom(String signLocation,
+    		String studentName,String studentTel,String studentIdentify,
+    		String studentAddress,String nowAddress,String signDate) throws Exception {
+    	
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateBR(2) + CreateSP(4) + "本合同签订地为： " + signLocation , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "甲方（盖章）：" , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "乙方（签字）：" + studentName , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "电  话：  " + studentTel, font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "身份证号码：" + studentIdentify, font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "家庭地址：" + studentAddress, font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_LEFT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "现居住地址："+nowAddress , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}	
+    	if(true) {
+    		Font font = new Font(bfChinese,12,Font.NORMAL); 
+    		Paragraph paragraph = new Paragraph();  
+    		paragraph.setAlignment(Element.ALIGN_RIGHT);
+    		Phrase phrase = new Phrase();  
+            Chunk chunk = new Chunk(CreateSP(4) + "签署日期：" + signDate , font) ;
+            phrase.add(chunk);
+            paragraph.add(phrase);
+            doc.add(paragraph);
+    	}	
+    }
+    
+    /**
+    * 创建PDF文档
+    * @return
+    * @throws Exception
+    * @throws docException
+    */
+    public void createPDF(String pdfFileName) throws Exception {
+    	
+        PdfWriter.getInstance(doc, new FileOutputStream(new File(pdfFileName)));         
+        doc.open();
+        doc.newPage();
+
+        if(true) {
+	        String pdfSerial="CZ20171108XXXX";
+	        String subSchool="江苏传智播客教育科技股份有限公司北京分公司";
+	        String studentName="张三丰";
+	        String nextContent="乙方自愿报名参加江苏传智播客教育科技股份有限公司（以下简称“传智播客公司”）运营、江苏传智播客教育科技股份有限公司XX分公司（以下简称“传智播客XX分公司”）辅助教学的传智播客.黑马程序员培训班，为明确双方的权利与义务，经双方友好协商，就培训相关事宜达成如下协议：";
+	        SetPDFTop(pdfSerial,subSchool,studentName,nextContent);
+        }
+
+        if(true) {
+        	if(true) {
+        		String ParagraphTitle = CreateBR(2) + "第一条" + CreateSP(4) +  "培训条款";
+        		String ParagraphContent = "";
+        		ParagraphContent += CreateSP(4) + "1.1" + CreateSP(4) + "乙方参加学习        课程 ，培训时间为：      年      月     日至      年      月      日（具体培训时间以实际上课时间为准） 。";
+        		ParagraphContent += CreateBR(1);
+        		ParagraphContent += CreateSP(4) + "1.2" + CreateSP(4) + "本培训课程标准费用为                  元整(￥             )，根据甲方现有的学费优惠政策（具体优惠政策以甲方相关规定为准），乙方实际应交纳的培训费用为                  元整(￥          )。上述费用由传智播客公司全部代为收取，收取后代乙方向传智播客XX分公司支付全部费用的30%作为其辅助教学的费用。如发生退费，由传智播客公司统一向乙方支付（乙方使用贷款方式缴纳学费的，退费方式按照甲乙双方与相关方的约定处理），传智播客公司及传智播客XX分公司内部协商代退费事宜，与乙方无关。";
+        		ParagraphContent += CreateBR(1);
+        		ParagraphContent += CreateSP(4) + "1.3" + CreateSP(4) + "参加培训期间，食宿均由乙方自理，甲方不予负责。";
+        		ParagraphContent += CreateBR(1);
+        		ParagraphContent += CreateSP(4) + "1.4" + CreateSP(4) + " 培训地点：传智播客XX分公司所在地。";
+        		ParagraphContent += CreateBR(1);	
+        		SetPDFParagraph(ParagraphTitle,ParagraphContent);
+        	}
+        	if(true) {
+        		String ParagraphTitle = CreateBR(2) + "第二条" + CreateSP(4) +  "培训费支付条款";
+        		String ParagraphContent = "";
+        		ParagraphContent += CreateSP(4) + "2.1" + CreateSP(4) + "乙方必须在开课前向甲方一次性交清培训费。";
+        		ParagraphContent += CreateBR(1);
+        		ParagraphContent += CreateSP(4) + "2.2" + CreateSP(4) + "培训费支付方式：现金、刷卡、转账。上述培训费用必须支付到甲方公司账户，如乙方将上述费用支付给个人（包括甲方员工）的，视为乙方未缴费。";
+        		ParagraphContent += CreateBR(1);
+        		ParagraphContent += CreateSP(4) + "2.3" + CreateSP(4) + "培训课程结束后对乙方已经支付的学费不予退还。";
+        		ParagraphContent += CreateBR(1);
+        		SetPDFParagraph(ParagraphTitle,ParagraphContent);
+        	}
+
+        	if(true) {
+        		String ParagraphTitle = CreateBR(2) + "第三条" + CreateSP(4) +  "培训条款";
+        		String TextContent = "";
+        		List<TextInfo> listTextInfo = new LinkedList<TextInfo>();
+        		if(true){
+        			TextInfo ti = new TextInfo();
+        			TextContent = CreateBR(1) + CreateSP(4) + "1.1" + CreateSP(4) + "乙方参加学习        课程 ，培训时间为：      年      月     日至      年      月      日（具体培训时间以实际上课时间为准） 。";
+            		ti.setDisp(1);
+            		ti.setText(TextContent);
+            		listTextInfo.add(ti);
+        		}
+        		if(true){
+        			TextInfo ti = new TextInfo();
+        			TextContent = CreateBR(1) +  CreateSP(4) + "1.2" + CreateSP(4) + "本培训课程标准费用为                  元整(￥             )，根据甲方现有的学费优惠政策（具体优惠政策以甲方相关规定为准），乙方实际应交纳的培训费用为                  元整(￥          )。上述费用由传智播客公司全部代为收取，收取后代乙方向传智播客XX分公司支付全部费用的30%作为其辅助教学的费用。如发生退费，由传智播客公司统一向乙方支付（乙方使用贷款方式缴纳学费的，退费方式按照甲乙双方与相关方的约定处理），传智播客公司及传智播客XX分公司内部协商代退费事宜，与乙方无关。";
+        	        ti.setDisp(1);
+            		ti.setText(TextContent);
+            		listTextInfo.add(ti);
+        		}
+        		if(true){
+        			TextInfo ti = new TextInfo();
+        			TextContent =  CreateBR(1) + CreateSP(4) + "1.3" + CreateSP(4) + "参加培训期间，食宿均由乙方自理，甲方不予负责。";            		ti.setDisp(1);
+        			ti.setDisp(0);
+        			ti.setText(TextContent);
+            		listTextInfo.add(ti);
+        		}
+        		if(true){
+        			TextInfo ti = new TextInfo();
+        			TextContent =  CreateBR(1) + CreateSP(4) + "1.4" + CreateSP(4) + " 培训地点：传智播客XX分公司所在地。";
+        			TextContent += CreateBR(1);
+        			ti.setDisp(0);
+            		ti.setText(TextContent);
+            		listTextInfo.add(ti);
+        		}
+        	   		
+        		SetPDFParagraph(ParagraphTitle,listTextInfo);
+        	  }
+        }
+        
+        if(true) {
+        	String signLocation = "金燕龙办公大楼一层一个角落";
+    		String studentName = "张三丰";
+        	String studentTel = "13141319378";
+        	String studentIdentify = "4323297307158479";
+    		String studentAddress = "上次信息产业中心另一个角落";
+    		String nowAddress = "又是另外一个角落";
+    		String signDate = "2017年11月11日";
+            SetPDFBottom(signLocation,studentName,studentTel,studentIdentify,studentAddress,nowAddress,signDate) ;
+        }
+        
+        doc.close();
+    }
+    
+    //构造函数；
+    public PDFUtil() {
+    	InitPDFVar();
+	}
+	
+    //执行入口
+	public static void main(String[] args) throws Exception {
+		PDFUtil pdfUtil = new PDFUtil();
+		pdfUtil.createPDF("D://test.pdf");
+	}
+
+} 

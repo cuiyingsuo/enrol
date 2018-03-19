@@ -1,0 +1,29 @@
+package com.cz.enrol.dao.order;
+
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.OrderSub;
+
+/**
+ * 
+ * EnrolOrderSubMapper数据库操作接口类
+ * 
+ **/
+
+public interface OrderSubMapper extends BaseDao<OrderSub>{
+
+
+	/**
+     * 查询（根据主键ID查询）
+     **/
+	OrderSub selectByPrimaryKey(@Param("id") Long id);
+	/**
+	 * 根据主订单号查询分订单
+	 */
+	List<Map<String,Object>> selectByMergeOrderNo(Long orderNo);
+
+}

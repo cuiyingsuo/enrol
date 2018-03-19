@@ -1,0 +1,120 @@
+package com.cz.enrol.service;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.springframework.stereotype.Service;
+
+import com.allinpay.ets.client.RequestOrder;
+import com.allinpay.ets.client.SecurityUtil;
+import com.cz.enrol.entity.OrderSub;
+
+@Service
+public class PayService {
+	String serverUrl = "";
+	String key = "";
+	String version = "";
+	String language = "";
+	String inputCharset = "";
+	String merchantId = "";
+	String pickupUrl = "";
+	String receiveUrl = "";
+	String payType = "";
+	String signType = "";
+	String orderNo = "";
+	String orderAmount = "";
+	String orderDatetime = "";
+	String orderCurrency = "";
+	String orderExpireDatetime = "";
+	String payerTelephone = "";
+	String payerEmail = "";
+	String payerName = "";
+	String payerIDCard = "";
+	String pid = "";
+	String productName = "";
+	String productId = "";
+	String productNum = "";
+	String productPrice = "";
+	String productDesc = "";
+	String ext1 = "";
+	String ext2 = "";
+	String extTL = "";
+	String issuerId = "";
+	String pan = "";
+	String tradeNature = "";
+	String sign = "";
+
+	public Map<String, Object> pay(OrderSub orderSub) {
+		Map<String,Object> payResult = new HashMap<String,Object>();
+
+		// 若直连telpshx渠道，payerTelephone、payerName、payerIDCard、pan四个字段不可为空
+		// 其中payerIDCard、pan需使用公钥加密（PKCS1格式）后进行Base64编码
+		if (null != payerIDCard && !"".equals(payerIDCard)) {
+			try {
+				// payerIDCard =
+				// SecurityUtil.encryptByPublicKey("C:\\TLCert.cer",
+				// payerIDCard);
+				payerIDCard = SecurityUtil.encryptByPublicKey(
+						"/src/main/resources/cert/TLCert.cer", payerIDCard);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		if (null != pan && !"".equals(pan)) {
+			try {
+				pan = SecurityUtil.encryptByPublicKey("/opt/conf/TLCert.cer",
+						pan);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
+		// 构造订单请求对象，生成signMsg。
+		RequestOrder requestOrder = new RequestOrder();
+		if (null != inputCharset && !"".equals(inputCharset)) {
+			requestOrder.setInputCharset(Integer.parseInt(inputCharset));
+		}
+		requestOrder.setPickupUrl(pickupUrl);
+		requestOrder.setReceiveUrl(receiveUrl);
+		requestOrder.setVersion(version);
+		if (null != language && !"".equals(language)) {
+			requestOrder.setLanguage(Integer.parseInt(language));
+		}
+		requestOrder.setSignType(Integer.parseInt(signType));
+		requestOrder.setPayType(Integer.parseInt(payType));
+		requestOrder.setIssuerId(issuerId);
+		requestOrder.setMerchantId(merchantId);
+		requestOrder.setPayerName(payerName);
+		requestOrder.setPayerEmail(payerEmail);
+		requestOrder.setPayerTelephone(payerTelephone);
+		requestOrder.setPayerIDCard(payerIDCard);
+		requestOrder.setPid(pid);
+		requestOrder.setOrderNo(orderNo);
+		requestOrder.setOrderAmount(Long.parseLong(orderAmount));
+		requestOrder.setOrderCurrency(orderCurrency);
+		requestOrder.setOrderDatetime(orderDatetime);
+		requestOrder.setOrderExpireDatetime(orderExpireDatetime);
+		requestOrder.setProductName(productName);
+		if (null != productPrice && !"".equals(productPrice)) {
+			requestOrder.setProductPrice(Long.parseLong(productPrice));
+		}
+		if (null != productNum && !"".equals(productNum)) {
+			requestOrder.setProductNum(Integer.parseInt(productNum));
+		}
+		requestOrder.setProductId(productId);
+		requestOrder.setProductDesc(productDesc);
+		requestOrder.setExt1(ext1);
+		requestOrder.setExt2(ext2);
+		requestOrder.setExtTL(extTL);// 通联商户拓展业务字段，在v2.2.0版本之后才使用到的，用于开通分账等业务
+		requestOrder.setPan(pan);
+		requestOrder.setTradeNature(tradeNature);
+		requestOrder.setKey(key); // key为MD5密钥，密钥是在通联支付网关会员服务网站上设置。
+
+		String strSrcMsg = requestOrder.getSrc(); // 此方法用于debug，测试通过后可注释。
+		String strSignMsg = requestOrder.doSign(); // 签名，设为signMsg字段值。
+		System.out.println(serverUrl);
+		
+		return payResult;
+	}
+
+}

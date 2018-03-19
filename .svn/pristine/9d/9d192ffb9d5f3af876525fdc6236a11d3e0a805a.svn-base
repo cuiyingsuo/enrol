@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.marketing.EnrolMarketingClassMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolMarketingClassResultMapResultMap" type="com.cz.enrol.entity.EnrolMarketingClass">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--策略Id-->
+		<result property="marketingId" column="marketing_id" />
+		<!--班级Id-->
+		<result property="classId" column="class_id" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	marketing_id,	class_id,	creator,	create_time
+	</sql>
+
+
+</mapper>

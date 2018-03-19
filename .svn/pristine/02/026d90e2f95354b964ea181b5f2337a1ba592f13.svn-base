@@ -1,0 +1,64 @@
+package com.cz.enrol.configure;
+
+import com.cz.enrol.service.GoodsHotService;
+import com.cz.enrol.service.OrderMainService;
+import com.cz.enrol.service.ems.SynchBaseDataForEms;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.text.ParseException;
+
+/**
+ * Created by liuzhongshuai on 2017/11/1.
+ */
+@Component
+public class SchedulingConfigure {
+    private Logger logger = LoggerFactory.getLogger("enrol");
+    @Autowired
+    private OrderMainService orderMainService;
+
+    @Autowired
+    private GoodsHotService goodsHotService;
+
+    @Autowired
+    private SynchBaseDataForEms synchBaseDataForEms;
+
+    /**
+     * 订单状态扫描 任务执行时间大于 配置 时间 时候 会 顺延
+     */
+    @Scheduled(fixedDelay = 1000 * 60 * 5)
+    public void orderScheduler() {
+        int num = orderMainService.updateOrderCancle();
+        if (num > 0) {
+            logger.info("订单监控定时器，检测到{}条订单超时未支付，取消订单。", num);
+        }
+    }
+
+    /**
+     * 每天凌晨1点更新
+     */
+    @Scheduled(cron = "0 00 01 * * ?")
+    public void goodsHotScheduler() {
+        logger.info("开始更新热门课程.");
+        goodsHotService.updateGoodshot();
+    }
+
+
+    /**
+     * 每天凌晨两点同步一次
+     */
+    @Scheduled(cron = "0 0 02 * * ?")
+    public void synClass() {
+        logger.info("开始同步班级.");
+        try {
+            synchBaseDataForEms.synchClassForEms();
+        } catch (ParseException e) {
+            logger.error("同步ems班级异常，{}", e);
+        }
+    }
+
+
+}

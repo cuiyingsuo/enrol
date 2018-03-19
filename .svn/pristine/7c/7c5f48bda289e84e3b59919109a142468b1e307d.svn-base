@@ -1,0 +1,29 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.banner.BannerMapper;
+import com.cz.enrol.entity.Banner;
+
+
+/**
+ * banner表 服务类
+ **/
+@Service
+public class BannerService {
+
+    @Autowired
+    private BannerMapper bannerDao;
+
+    public Banner queryByPrimaryKey(Long id) {
+        return bannerDao.selectByPrimaryKey(id);
+    }
+
+    public List<Banner> queryBannerList() {
+        return bannerDao.selectAll();
+    }
+
+}

@@ -1,0 +1,283 @@
+package com.itcast.enrol.common.ems;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.itcast.enrol.common.base.BaseBody;
+import com.itcast.enrol.common.dao.organize.CampusMapper;
+import com.itcast.enrol.common.dao.organize.ClassMapper;
+import com.itcast.enrol.common.dao.organize.ClassTypeMapper;
+import com.itcast.enrol.common.dao.subject.SubjectMapper;
+import com.itcast.enrol.common.dao.task.TaskMapper;
+import com.itcast.enrol.common.entity.Campus;
+import com.itcast.enrol.common.entity.ClassType;
+import com.itcast.enrol.common.entity.EnrolClass;
+import com.itcast.enrol.common.entity.Subject;
+import com.itcast.enrol.common.utils.BeanUtils;
+import com.itcast.enrol.common.utils.HttpHelper;
+import com.itcast.enrol.management.service.ManagerBankAccountService;
+import com.itcast.enrol.management.service.ManagerCampusService;
+import com.itcast.enrol.management.service.ManagerOrderMainService;
+import com.itcast.enrol.management.service.ManagerOrderSubService;
+
+/**
+ *
+ * Created by liuzhongshuai on 2017/12/19.
+ */
+@RestController
+@RequestMapping("/emsapi")
+public class EmsSynchBaseDataApi {
+	
+	// 统一记录日志类
+	private static Logger logger = LoggerFactory.getLogger("enrol");
+	
+	 @Autowired
+	    private SubjectMapper subjectMapper;
+
+	    @Autowired
+	    private CampusMapper campusMapper;
+
+	    @Autowired
+	    private ClassTypeMapper classTypeMapper;
+
+	    @Autowired
+	    private ClassMapper classMapper;
+
+	    @Autowired
+	    private TaskMapper taskMapper;
+	    
+	    @Autowired
+	    private ManagerOrderSubService orderSubService;
+	    
+	    @Autowired
+	    private ManagerOrderMainService orderMainService;
+	    
+	    @Autowired
+	    private ManagerCampusService campusService;
+	    
+	    @Autowired
+	    private ManagerBankAccountService bankAccountService;
+	    
+	private String emsApiId ="enrol_ems";
+	
+	private String emsApiKey = "c7cf4ba3ffd02c6dbae4ce36f20718f3";
+    /**
+     * 给ems提供的修改校区接口
+     * @param optType ：1 insert 2 update 3 delete
+     * @return
+     */
+    @PostMapping("/modifyCampus")
+    public BaseBody modifyCampus(String optType){
+        BaseBody baseBody=new BaseBody();
+
+        return baseBody;
+    }
+
+
+    /**
+     * 给ems提供的修改学科接口
+     * @param optType ：1 insert 2 update 3 delete
+     * @return
+     */
+    @PostMapping("/modifySubject")
+    public BaseBody modifySubject(String optType){
+        BaseBody baseBody=new BaseBody();
+
+        return baseBody;
+    }
+
+
+    /**
+     * 给ems提供的修改班级类型接口
+     * @param optType ：1 insert 2 update 3 delete
+     * @return
+     */
+    @PostMapping("/modifyClassType")
+    public BaseBody modifyClassType(String optType){
+        BaseBody baseBody=new BaseBody();
+
+        return baseBody;
+    }
+
+    /**
+     * 给ems提供的修改班级接口
+     * @param optType ：0 insert 1 update 2 delete
+     * @return
+     */
+    @RequestMapping(value = "/modifyClass", method = RequestMethod.POST)
+    public Map<String,Object> modifyClass(@RequestParam Map<String,String> paramsMap){
+    	logger.info("ems增加或修改班级信息：{}",paramsMap);
+    	
+    	Map<String,Object> returnMap = new HashMap<String,Object>();
+    	
+    	Map<String, String> map = new TreeMap<>();
+    	map.put("brand", paramsMap.get("brand"));
+    	map.put("classteacher", paramsMap.get("classteacher"));
+    	map.put("classTypeId", paramsMap.get("classTypeId"));
+    	map.put("creatorName", paramsMap.get("creatorName"));
+    	map.put("enrolId", paramsMap.get("enrolId"));
+    	map.put("graduationDate",paramsMap.get("graduationDate"));
+    	map.put("id", paramsMap.get("id"));
+    	map.put("isDelete", paramsMap.get("isDelete"));
+    	map.put("jobNumber", paramsMap.get("jobNumber"));
+        map.put("lessonModel", paramsMap.get("lessonModel"));
+        map.put("name", paramsMap.get("name"));
+        map.put("optType", paramsMap.get("optType"));
+    	map.put("phase", paramsMap.get("phase"));
+    	map.put("predictionGraduationDate", paramsMap.get("predictionGraduationDate"));
+    	map.put("schedule", paramsMap.get("schedule"));
+    	map.put("schoolCode", paramsMap.get("schoolCode"));
+    	map.put("startDate", paramsMap.get("startDate"));
+    	map.put("status", paramsMap.get("status"));
+    	map.put("subjectId", paramsMap.get("subjectId"));
+        map.put("teachingModel", paramsMap.get("teachingModel"));
+        
+        String paramsApiId = paramsMap.get("enrolId");
+        if(!emsApiId.equals(paramsApiId)){
+        	returnMap.put("success", false);
+        	returnMap.put("msg", "未授权");
+        	logger.info("ems增加或修改班级信息,未授权");
+        	return returnMap;
+        }
+        
+        HttpHelper.handlerSigUrlByMd5(map, emsApiKey);
+    	String sign=map.get("sig");
+    	String paramSign=paramsMap.get("sign");
+    	if(!sign.equals(paramSign)){
+    		returnMap.put("success", false);
+        	returnMap.put("msg", "签名验证不正确");
+        	logger.info("ems增加或修改班级信息,签名错误");
+        	return returnMap;
+    	}
+    	try {
+    		boolean result = updateClass(paramsMap);
+    		logger.info("ems更新班级信息，{}",result);
+			
+		} catch (ParseException e) {
+			logger.error("ems更新班级信息异常，{}",e);
+		}
+    	returnMap.put("success", true);
+    	returnMap.put("msg", "成功");
+        return returnMap;
+    }
+    
+    private boolean updateClass(Map<String,String> paramsMap) throws ParseException{
+    	 //获取系统所有运营的校区
+        List<Campus> campusList = campusMapper.selectAll();
+        //获取系统运营的学科
+        List<Subject> subjectList = subjectMapper.selectAll();
+        //班级类型
+        List<ClassType> classTypeList = classTypeMapper.selectAll();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        
+    	EnrolClass enrolClass = new EnrolClass();
+        enrolClass.setId(Long.parseLong(paramsMap.get("id")));
+        enrolClass.setCampusCode(paramsMap.get("schoolCode"));
+        enrolClass.setCampusId(getCampusByCode(campusList, paramsMap.get("schoolCode")).getId());
+        enrolClass.setBrandCode(paramsMap.get("brand"));
+        enrolClass.setSubjectId(getSubjectByCode(subjectList, paramsMap.get("subjectId")).getId());
+        enrolClass.setCreateTime(System.currentTimeMillis());
+        enrolClass.setStartDate(format.parse(paramsMap.get("startDate")));
+        enrolClass.setName(paramsMap.get("name"));
+        enrolClass.setTeachModeCode(paramsMap.get("teachingModel"));
+        enrolClass.setTeachModeName("UNITDOUBLET".equals(paramsMap.get("teachingModel")) ? "双元" : "面授");
+        enrolClass.setLessonModel(paramsMap.get("lessonModel"));
+        enrolClass.setClassTypeCode(paramsMap.get("classTypeId"));
+        ClassType classType = getClassTypeById(classTypeList, paramsMap.get("classTypeId"));
+        
+        Calendar calendar = Calendar.getInstance();
+        if (null != classType && classType.getId() != null) {
+            enrolClass.setClassTypeName(classType.getName());
+            //计算闭班时间
+            calendar.setTime(format.parse(paramsMap.get("startDate")));
+            calendar.add(Calendar.DATE, classType.getDays());
+            enrolClass.setEndDate(calendar.getTime());
+            enrolClass.setClassTime("约" + classType.getDays() + "天");
+        } else {
+            enrolClass.setEndDate(new Date());
+        }
+        enrolClass.setPeriods(paramsMap.get("phase"));
+        enrolClass.setPlan(100);
+        enrolClass.setCurrent(50);
+        enrolClass.setUserId(5);
+        enrolClass.setUserNo(paramsMap.get("jobNumber"));
+        enrolClass.setUserName("admin");
+        enrolClass.setCreator(paramsMap.get("creatorName"));
+        if(paramsMap.get("optType").equals("2")){
+        	enrolClass.setStatus(Byte.valueOf("0"));
+        }else{
+        	enrolClass.setStatus(Byte.valueOf(paramsMap.get("status")));
+        }
+        enrolClass.setIsDel((byte) 0);
+        //先查询，如果能查到id相同的数据，执行update操作，否则 insert
+        EnrolClass enrolClassQuery = new EnrolClass();
+        enrolClassQuery.setId(Long.valueOf(paramsMap.get("id")));
+        EnrolClass newClass = classMapper.selectOne(enrolClassQuery);
+        if (null != newClass && newClass.getId() != null) {
+            BeanUtils.copyProperties(enrolClass, newClass);
+            classMapper.updateByPrimaryKey(newClass);
+            logger.info("ems更新班级信息，修改班级成功");
+        } else {
+        	String status = paramsMap.get("status");
+    		if(null!=status && status.equals("1")){
+    			classMapper.insertSelective(enrolClass);
+    			logger.info("ems更新班级信息，新增班级成功");
+    		}else{
+    			logger.info("ems更新班级信息，新增班级为未启用班级，不做同步");
+    		}
+        }
+        
+        return true;
+    }
+    
+    private Campus getCampusByCode(List<Campus> campuses, String code) {
+        if (CollectionUtils.isEmpty(campuses)) {
+            return new Campus();
+        }
+        for (Campus campus : campuses) {
+            if (campus.getSerialCode().equals(code)) {
+                return campus;
+            }
+        }
+        return new Campus();
+    }
+    private Subject getSubjectByCode(List<Subject> subjectList, String code) {
+        if (CollectionUtils.isEmpty(subjectList)) {
+            return new Subject();
+        }
+        for (Subject subject : subjectList) {
+            if (code.equals(subject.getCode())) {
+                return subject;
+            }
+        }
+        return new Subject();
+    }
+
+    private ClassType getClassTypeById(List<ClassType> classTypeList, String id) {
+        if (CollectionUtils.isEmpty(classTypeList)) {
+            return new ClassType();
+        }
+        for (ClassType classType : classTypeList) {
+            if (id.equals(classType.getId())) {
+                return classType;
+            }
+        }
+        return new ClassType();
+    }
+}

@@ -1,0 +1,42 @@
+package com.cz.enrol.common;
+
+import com.cz.enrol.service.OrderFlowService;
+import com.cz.enrol.vo.PayFlowQueryEx;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/11/1.
+ */
+public class ImportXlsJob implements Runnable {
+
+    private PayFlowQueryEx payFlowQueryEx;
+
+    private XSSFSheet xssfSheet;
+
+    private String[] heads;
+
+    private OrderFlowService orderFlowService;
+
+    private CountDownLatch countDownLatch;
+
+    public ImportXlsJob(OrderFlowService orderFlowService, XSSFSheet xssfSheet, PayFlowQueryEx payFlowQueryEx, CountDownLatch latch, String... heads) {
+        this.payFlowQueryEx = payFlowQueryEx;
+        this.orderFlowService = orderFlowService;
+        this.countDownLatch = latch;
+        this.xssfSheet = xssfSheet;
+        this.heads=heads;
+    }
+
+    @Override
+    public void run() {
+
+        BasePage<Map> basePage = orderFlowService.queryFlowToPage(payFlowQueryEx);
+
+
+        countDownLatch.countDown();
+    }
+}

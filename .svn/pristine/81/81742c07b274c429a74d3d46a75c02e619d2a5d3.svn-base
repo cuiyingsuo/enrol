@@ -1,0 +1,84 @@
+package com.cz.enrol.common;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by liuzhongshuai on 2017/11/12.
+ */
+//原子权限定义：导航菜单权限（type=1,2）；页面操作权限（type=3）；业务数据权限（由业务功能来实现）；
+public class BaseMenu implements Serializable {
+
+	//权限编码；
+	private String code;
+	//权限名称；
+	private String name;
+	//父级权限；
+	private BaseMenu parent;
+	//子级权限；
+	private List<BaseMenu> childs = new ArrayList<>();
+	//访问链接；
+	private String url;
+	//权限类型；
+	private String type;
+	//生序order;
+	private Integer order;
+	
+	public BaseMenu getParent() {
+		return parent;
+	}
+
+	public void setParent(BaseMenu parent) {
+		this.parent = parent;
+	}
+
+	public List<BaseMenu> getChilds() {
+		return childs;
+	}
+
+	public void setChilds(List<BaseMenu> childs) {
+		this.childs = childs;
+	}
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public Integer getOrder() {
+		return order;
+	}
+
+	public void setOrder(Integer order) {
+		this.order = order;
+	}
+
+}

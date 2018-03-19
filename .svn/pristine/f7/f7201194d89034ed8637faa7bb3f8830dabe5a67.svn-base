@@ -1,0 +1,647 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+import java.util.Date;
+
+@Table(name = "enrol_class")
+public class EnrolClass {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 班级名称
+     */
+    private String name;
+
+    /**
+     * 校区Id，对应表enrol_campus关键字Id
+     */
+    @Column(name = "campus_id")
+    private Long campusId;
+
+    /**
+     * 品牌code
+     */
+    @Column(name = "brand_code")
+    private String brandCode;
+
+    /**
+     * 期数
+     */
+    private String periods;
+
+    /**
+     * 授课模式code
+     */
+    @Column(name = "teach_mode_code")
+    private String teachModeCode;
+
+    /**
+     * 授课模式名称
+     */
+    @Column(name = "teach_mode_name")
+    private String teachModeName;
+
+
+    @Column(name = "lesson_model")
+    private String lessonModel;
+
+
+    @Column(name = "campus_code")
+    private String campusCode;
+
+    /**
+     * 学科Id
+     */
+    @Column(name = "subject_id")
+    private Long subjectId;
+
+    /**
+     * 课程类型Id
+     */
+    @Column(name = "class_type_code")
+    private String classTypeCode;
+
+    /**
+     * 班级类型名称
+     */
+    @Column(name = "class_type_name")
+    private String classTypeName;
+
+    /**
+     * 价格
+     */
+    @Column(name = "discount_price")
+    private Long discountPrice;
+
+    /**
+     * 开班时间
+     */
+    @Column(name = "start_date")
+    private Date startDate;
+
+    @Column(name = "end_date")
+    private Date endDate;
+
+    /**
+     * 课时
+     */
+    @Column(name = "class_time")
+    private String classTime;
+
+    /**
+     * 计划招生数量
+     */
+    private Integer plan;
+
+    /**
+     * 实际招生数量
+     */
+    private Integer current;
+
+    /**
+     * 班主任Id，对应enrol_user表关键字Id；
+     */
+    @Column(name = "user_id")
+    private Integer userId;
+
+    /**
+     * 班主任名称
+     */
+    @Column(name = "user_name")
+    private String userName;
+
+
+    /**
+     * 班主任对应的工号
+     */
+    @Column(name = "user_no")
+    private String userNo;
+
+    /**
+     * 备注
+     */
+    private String memo;
+
+    /**
+     * 创建者
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    /**
+     * 编辑者
+     */
+    private String editor;
+
+    /**
+     * 编辑时间
+     */
+    @Column(name = "edit_time")
+    private Long editTime;
+
+    /**
+     * 班级介绍；
+     */
+    private String introduce;
+
+    /**
+     * 状态(0:停用,1:启用)
+     */
+    private Byte status;
+
+
+    /**
+     * 是否被删除
+     * 0：否 1：是
+     */
+    private Byte isDel;
+
+
+    public String getCampusCode() {
+        return campusCode;
+    }
+
+    public void setCampusCode(String campusCode) {
+        this.campusCode = campusCode;
+    }
+
+    /**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取班级名称
+     *
+     * @return name - 班级名称
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * 设置班级名称
+     *
+     * @param name 班级名称
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 获取校区Id，对应表enrol_campus关键字Id
+     *
+     * @return campus_id - 校区Id，对应表enrol_campus关键字Id
+     */
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    /**
+     * 设置校区Id，对应表enrol_campus关键字Id
+     *
+     * @param campusId 校区Id，对应表enrol_campus关键字Id
+     */
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    /**
+     * 获取品牌code
+     *
+     * @return brand_code - 品牌code
+     */
+    public String getBrandCode() {
+        return brandCode;
+    }
+
+    /**
+     * 设置品牌code
+     *
+     * @param brandCode 品牌code
+     */
+    public void setBrandCode(String brandCode) {
+        this.brandCode = brandCode;
+    }
+
+    /**
+     * 获取期数
+     *
+     * @return periods - 期数
+     */
+    public String getPeriods() {
+        return periods;
+    }
+
+    /**
+     * 设置期数
+     *
+     * @param periods 期数
+     */
+    public void setPeriods(String periods) {
+        this.periods = periods;
+    }
+
+    /**
+     * 获取授课模式code
+     *
+     * @return teach_mode_code - 授课模式code
+     */
+    public String getTeachModeCode() {
+        return teachModeCode;
+    }
+
+    /**
+     * 设置授课模式code
+     *
+     * @param teachModeCode 授课模式code
+     */
+    public void setTeachModeCode(String teachModeCode) {
+        this.teachModeCode = teachModeCode;
+    }
+
+    /**
+     * 获取授课模式名称
+     *
+     * @return teach_mode_name - 授课模式名称
+     */
+    public String getTeachModeName() {
+        return teachModeName;
+    }
+
+    /**
+     * 设置授课模式名称
+     *
+     * @param teachModeName 授课模式名称
+     */
+    public void setTeachModeName(String teachModeName) {
+        this.teachModeName = teachModeName;
+    }
+
+    /**
+     * 获取学科Id
+     *
+     * @return subject_id - 学科Id
+     */
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    /**
+     * 设置学科Id
+     *
+     * @param subjectId 学科Id
+     */
+    public void setSubjectId(Long subjectId) {
+        this.subjectId = subjectId;
+    }
+
+    /**
+     * 获取课程类型Id
+     *
+     * @return class_type_code - 课程类型Id
+     */
+    public String getClassTypeCode() {
+        return classTypeCode;
+    }
+
+    /**
+     * 设置课程类型Id
+     *
+     * @param classTypeCode 课程类型Id
+     */
+    public void setClassTypeCode(String classTypeCode) {
+        this.classTypeCode = classTypeCode;
+    }
+
+    /**
+     * 获取班级类型名称
+     *
+     * @return class_type_name - 班级类型名称
+     */
+    public String getClassTypeName() {
+        return classTypeName;
+    }
+
+    /**
+     * 设置班级类型名称
+     *
+     * @param classTypeName 班级类型名称
+     */
+    public void setClassTypeName(String classTypeName) {
+        this.classTypeName = classTypeName;
+    }
+
+    /**
+     * 获取价格
+     *
+     * @return discount_price - 价格
+     */
+    public Long getDiscountPrice() {
+        return discountPrice;
+    }
+
+    /**
+     * 设置价格
+     *
+     * @param discountPrice 价格
+     */
+    public void setDiscountPrice(Long discountPrice) {
+        this.discountPrice = discountPrice;
+    }
+
+    /**
+     * 获取开班时间
+     *
+     * @return start_date - 开班时间
+     */
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    /**
+     * 设置开班时间
+     *
+     * @param startDate 开班时间
+     */
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * @return end_date
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * @param endDate
+     */
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    /**
+     * 获取课时
+     *
+     * @return class_time - 课时
+     */
+    public String getClassTime() {
+        return classTime;
+    }
+
+    /**
+     * 设置课时
+     *
+     * @param classTime 课时
+     */
+    public void setClassTime(String classTime) {
+        this.classTime = classTime;
+    }
+
+    /**
+     * 获取计划招生数量
+     *
+     * @return plan - 计划招生数量
+     */
+    public Integer getPlan() {
+        return plan;
+    }
+
+    /**
+     * 设置计划招生数量
+     *
+     * @param plan 计划招生数量
+     */
+    public void setPlan(Integer plan) {
+        this.plan = plan;
+    }
+
+    /**
+     * 获取实际招生数量
+     *
+     * @return current - 实际招生数量
+     */
+    public Integer getCurrent() {
+        return current;
+    }
+
+    /**
+     * 设置实际招生数量
+     *
+     * @param current 实际招生数量
+     */
+    public void setCurrent(Integer current) {
+        this.current = current;
+    }
+
+    /**
+     * 获取班主任Id，对应enrol_user表关键字Id；
+     *
+     * @return user_id - 班主任Id，对应enrol_user表关键字Id；
+     */
+    public Integer getUserId() {
+        return userId;
+    }
+
+    /**
+     * 设置班主任Id，对应enrol_user表关键字Id；
+     *
+     * @param userId 班主任Id，对应enrol_user表关键字Id；
+     */
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * 获取班主任名称
+     *
+     * @return user_name - 班主任名称
+     */
+    public String getUserName() {
+        return userName;
+    }
+
+    /**
+     * 设置班主任名称
+     *
+     * @param userName 班主任名称
+     */
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    /**
+     * 获取备注
+     *
+     * @return memo - 备注
+     */
+    public String getMemo() {
+        return memo;
+    }
+
+    /**
+     * 设置备注
+     *
+     * @param memo 备注
+     */
+    public void setMemo(String memo) {
+        this.memo = memo;
+    }
+
+    /**
+     * 获取创建者
+     *
+     * @return creator - 创建者
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建者
+     *
+     * @param creator 创建者
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+    /**
+     * 获取编辑者
+     *
+     * @return editor - 编辑者
+     */
+    public String getEditor() {
+        return editor;
+    }
+
+    /**
+     * 设置编辑者
+     *
+     * @param editor 编辑者
+     */
+    public void setEditor(String editor) {
+        this.editor = editor;
+    }
+
+    /**
+     * 获取编辑时间
+     *
+     * @return edit_time - 编辑时间
+     */
+    public Long getEditTime() {
+        return editTime;
+    }
+
+    /**
+     * 设置编辑时间
+     *
+     * @param editTime 编辑时间
+     */
+    public void setEditTime(Long editTime) {
+        this.editTime = editTime;
+    }
+
+    /**
+     * 获取班级介绍；
+     *
+     * @return introduce - 班级介绍；
+     */
+    public String getIntroduce() {
+        return introduce;
+    }
+
+    /**
+     * 设置班级介绍；
+     *
+     * @param introduce 班级介绍；
+     */
+    public void setIntroduce(String introduce) {
+        this.introduce = introduce;
+    }
+
+    public String getUserNo() {
+        return userNo;
+    }
+
+    public void setUserNo(String userNo) {
+        this.userNo = userNo;
+    }
+
+    /**
+     * 获取状态(0:停用,1:启用)
+     *
+     * @return status - 状态(0:停用,1:启用)
+     */
+    public Byte getStatus() {
+        return status;
+    }
+
+    /**
+     * 设置状态(0:停用,1:启用)
+     *
+     * @param status 状态(0:停用,1:启用)
+     */
+    public void setStatus(Byte status) {
+        this.status = status;
+    }
+
+    public Byte getIsDel() {
+        return isDel;
+    }
+
+    public void setIsDel(Byte isDel) {
+        this.isDel = isDel;
+    }
+
+    public String getLessonModel() {
+        return lessonModel;
+    }
+
+    public void setLessonModel(String lessonModel) {
+        this.lessonModel = lessonModel;
+    }
+}

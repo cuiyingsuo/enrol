@@ -1,0 +1,56 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.annotation.CheckIntValues;
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.Subject;
+import com.cz.enrol.service.SubjectService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/24.
+ */
+@RestController
+@RequestMapping("/managenment")
+@Validated
+public class ManagerSubjectController {
+
+    @Autowired
+    private SubjectService managerSubjectService;
+
+
+    /**
+     * 学科查询
+     *
+     * @param status
+     * @return
+     *
+     */
+    @GetMapping("/subject/queryList")
+    public BaseBody<List<Subject>> querySubjectList(@CheckIntValues(values = {0, 1}, ableNull = false, message = "不支持的参数值") Integer status) {
+
+        BaseBody<List<Subject>> baseBody = new BaseBody<List<Subject>>();
+
+        List<Subject> subjects = null;
+        //查询所有
+        if (null == status) {
+            subjects = managerSubjectService.selectAll();
+        } else {
+            //查询相应状态的学科列表
+            Subject subject = new Subject();
+            subject.setStatus(status.byteValue());
+            subjects = managerSubjectService.select(subject);
+        }
+        baseBody.setMessage("查询成功!");
+        baseBody.setContent(subjects);
+        return baseBody;
+    }
+}

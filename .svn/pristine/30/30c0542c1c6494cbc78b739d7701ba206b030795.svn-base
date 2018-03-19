@@ -1,0 +1,17 @@
+package com.cz.enrol.dao.permission;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.RolePermission;
+
+/**
+ * 
+ * EnrolRolePermissionMapper数据库操作接口类
+ * 
+ **/
+
+public interface RolePermissionMapper extends BaseDao<RolePermission>{
+
+
+	
+
+}

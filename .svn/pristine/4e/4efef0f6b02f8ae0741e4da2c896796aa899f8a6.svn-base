@@ -1,0 +1,97 @@
+package com.cz.enrol.controller.enrol.management;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.poi.ss.formula.functions.T;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BaseController;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.enrol.Org;
+import com.cz.enrol.service.enrol.OrgService;
+
+/**
+ * 
+ * @author cuiys  20171212
+ *
+ */
+@RestController
+@RequestMapping("/managenment/org")
+@Validated
+public class ManagerOrgController extends BaseController{
+	
+	@Autowired
+	private OrgService orgService;
+    /**
+     * 条件查询org
+     *
+     * @param org
+     * @return
+     */
+    @GetMapping("/queryOrgs")
+    public BaseBody<T> queryOrgs(Org org, @RequestParam(defaultValue = "1", name = "page") int startNum, @RequestParam(defaultValue = "10", name = "limit") int pageSize) {
+    	
+    	List<Org> orgList = orgService.select(org);
+    	
+    	if(null==orgList){
+    		return fail();
+    	}
+        
+        return success(orgList);
+    }
+    
+    /**
+     * 增加机构
+     * @param org
+     * @return
+     */
+    @PostMapping("/addOrg")
+    public BaseBody<T> addOrg(Org org){
+    	
+    	int num = orgService.insertSelective(org);
+    	
+    	if(num==0){
+    		return fail();
+    	}
+    	
+    	return success("增加机构成功");
+    }
+    
+    /**
+     * 编辑机构
+     * @param org
+     * @return
+     * @throws InvocationTargetException 
+     * @throws IllegalAccessException 
+     */
+    @PostMapping("/editOrg")
+    public BaseBody<T> editOrg(Org org) throws IllegalAccessException, InvocationTargetException{
+    	
+    	Long id = org.getId();
+    	if(null==id||0L==id){
+    		return fail(ReturnStatus.PARAM_ERROR,"机构id不能为空");
+    	}
+    	
+    	Org dbOrg = orgService.selectByPrimaryKey(org.getId());
+    	Map orgMap = new BeanMap(org);
+    	BeanUtils.populate(dbOrg, orgMap);
+    	
+    	int num = orgService.updateByPk(dbOrg);
+    	if(num==0){
+    		return fail(ReturnStatus.DATA_NULL,"无机构信息更改");
+    	}
+    	return success("机构信息修改成功");
+    }
+
+}

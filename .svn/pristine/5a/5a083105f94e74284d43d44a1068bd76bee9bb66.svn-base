@@ -1,0 +1,96 @@
+package com.cz.enrol.service;
+
+import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.cz.enrol.dao.student.StudentMapper;
+import com.cz.enrol.entity.Student;
+import com.cz.enrol.utils.JavaBeanUtil;
+import com.cz.enrol.vo.StudentVo;
+
+/**
+ * 学员表 服务类
+ **/
+@Service
+public class StudentService {
+
+	// 统一记录日志类
+	private Logger log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private StudentMapper studentDao;
+
+	public Map<String,Object> queryStudentByMobile(String mobile) {
+		Student student = new Student();
+		student.setMobile(mobile);
+		student = studentDao.selectOne(student);
+		
+		
+		Map<String,Object> studentMap = JavaBeanUtil.convertBeanToMap(student);
+
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		studentMap.put("preComeTime", sdf.format(student.getPreComeTime()));
+		studentMap.put("birthday", sdf.format(student.getBirthday()));
+		
+		sdf=new SimpleDateFormat("yyyy-MM");
+		studentMap.put("graduationTime", sdf.format(student.getGraduationTime()));
+		return studentMap;
+	}
+
+	public Student checkPassword(String mobile, String password) {
+		Student student = new Student();
+		student.setMobile(mobile);
+		Student studentInfo = studentDao.selectOne(student);
+		if (null == studentInfo||!studentInfo.getPassword().equals(password)) {
+			return null;
+		}
+		return studentInfo;
+	}
+
+	@Transactional
+	public int modifyPassword(String mobile, String password) {
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("mobile", mobile);
+		params.put("password", password);
+		int rel = studentDao.updatePasswordByMobile(params);
+		return rel;
+	}
+
+	@Transactional
+	public int updateByMobile(StudentVo sv) {
+		Student student = new Student();
+		student.setMobile(sv.getMobile());
+		student=studentDao.selectOne(student);
+		
+		student.setImage(sv.getImage());
+		student.setStatus(sv.getStatus());
+		student.setGender(sv.getGender());
+		student.setQq(sv.getQq());
+		student.setEmail(sv.getEmail());
+		student .setPreComeTime(sv.getPreComeTime());
+		student.setIsQuarter(sv.getIsQuarter());
+		student.setLiveAddr(sv.getLiveAddr());
+		student.setLiveAddrDetail(sv.getLiveAddrDetail());
+		student.setCardNo(sv.getCardNo());
+		student.setCardAddr(sv.getCardAddr());
+		student.setEducation(sv.getEducation());
+		student.setGraduationTime(sv.getGraduationTime());
+		student.setSchool(sv.getSchool());
+		student.setMajor(sv.getMajor());
+		student.setContacts(sv.getContacts());
+		student.setContactsMobile(sv.getContactsMobile());
+		student.setFromChannel(sv.getFromChannel());
+		//student.setBirthday(sv.getBirthday());
+		
+		return studentDao.updateByPrimaryKeySelective(student);
+	}
+
+
+
+}

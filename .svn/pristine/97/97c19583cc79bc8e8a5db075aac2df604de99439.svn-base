@@ -1,0 +1,25 @@
+package com.cz.enrol.dao.goods;
+
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.GoodsClass;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * EnrolGoodsClassMapper数据库操作接口类
+ **/
+
+public interface GoodsClassMapper extends BaseDao<GoodsClass> {
+
+
+    /**
+     * 商品管理条件查询接口
+     *
+     * @param conditions
+     * @return
+     */
+    List<Map<String, Object>> queryGoodsForClass(Map<String, String> conditions);
+
+}

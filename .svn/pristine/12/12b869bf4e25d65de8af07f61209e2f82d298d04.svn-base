@@ -1,0 +1,19 @@
+package com.cz.enrol.dao.banner;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Banner;
+
+/**
+ * EnrolBannerMapper数据库操作接口类
+ **/
+
+public interface BannerMapper extends BaseDao<Banner> {
+
+
+
+    /**
+     * 查询可以状态banner的数量
+     * @return
+     */
+    int getCountForEnable();
+}

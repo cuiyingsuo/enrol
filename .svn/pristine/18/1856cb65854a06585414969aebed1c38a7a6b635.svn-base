@@ -1,0 +1,78 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.service.OrderMainService;
+import com.cz.enrol.vo.OrderQueryEx;
+import com.cz.enrol.vo.StuGoodsEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/26.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerOrderController {
+
+    @Autowired
+    private OrderMainService orderMainService;
+
+
+    /**
+     * 商品 生成订单
+     *
+     * @param stuGoodsEx
+     * @return
+     */
+    @PostMapping("/orderMan/genOrderMain")
+    public BaseBody<OrderMain> genOrderMain(StuGoodsEx stuGoodsEx) {
+        BaseBody<OrderMain> baseBody = new BaseBody<OrderMain>();
+        if (null == stuGoodsEx) {
+            baseBody.setCode(1005);
+            baseBody.setMessage("参数值为null");
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            return baseBody;
+        }
+        OrderMain result = orderMainService.generateOrder(stuGoodsEx);
+        if (null == result) {
+            baseBody.setCode(1005);
+            baseBody.setMessage("订单生成失败");
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            return baseBody;
+        }
+        baseBody.setMessage("订单生成成功!");
+        return baseBody;
+    }
+
+    /**
+     * 订单管理 分页查询列表
+     *
+     * @param queryEx
+     * @return
+     */
+    @GetMapping("/orderMan/queryOrderMains")
+    public BaseBody<BasePage<List<OrderMain>>> queryOrderMains(OrderQueryEx queryEx) {
+
+        BaseBody<BasePage<List<OrderMain>>> baseBody = new BaseBody<BasePage<List<OrderMain>>>();
+        if(null==queryEx){
+            baseBody.setCode(1005);
+            baseBody.setMessage("参数值为null");
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            return baseBody;
+        }
+        BasePage basePage=orderMainService.queryOrderMainsToPage(queryEx);
+        baseBody.setContent(basePage);
+        return baseBody;
+    }
+
+
+}

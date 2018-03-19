@@ -1,0 +1,78 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.service.ClassService;
+import com.cz.enrol.vo.ClassEx;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/24.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerClassController {
+
+    @Autowired
+    private ClassService managerClassService;
+
+
+    /**
+     * 条件查询班级列表
+     *
+     * @param enrolClass
+     * @return
+     */
+    @GetMapping("/class/queryClassList")
+    public BaseBody<List<EnrolClass>> queryClassList(EnrolClass enrolClass) {
+        BaseBody<List<EnrolClass>> baseBody = new BaseBody<List<EnrolClass>>();
+        if (null == enrolClass) {
+            enrolClass = new EnrolClass();
+        }
+        List<EnrolClass> enrolClasses = managerClassService.select(enrolClass);
+        baseBody.setContent(enrolClasses);
+        baseBody.setMessage("查询成功!");
+        return baseBody;
+    }
+
+    /**
+     * 查询班级选项 返回字段（id，name）
+     *
+     * @param campusIds
+     * @param subjectId
+     * @param teachModeCode
+     * @param classTypeCode
+     * @return
+     */
+    @GetMapping("/class/queryClassByMulitField")
+    public BaseBody<List<Map>> queryClassByMulitField(@RequestParam(defaultValue = "0") String campusIds, @RequestParam(defaultValue = "0") String subjectId, @RequestParam(defaultValue = "0") String teachModeCode, @RequestParam(defaultValue = "0") String classTypeCode) {
+        BaseBody<List<Map>> baseBody = new BaseBody<List<Map>>();
+        //验证参数
+        if ("0".equals(campusIds) || "0".equals(subjectId) || "0".equals(teachModeCode) || "0".equals(classTypeCode)) {
+            baseBody.setMessage("参数不匹配!");
+            baseBody.setSuccess(ReturnStatus.FAILD);
+            baseBody.setCode(1006);
+            return baseBody;
+        }
+        ClassEx enrolClass = new ClassEx();
+        enrolClass.setCampusIds(campusIds);
+        enrolClass.setSubjectId(Long.parseLong(subjectId));
+        enrolClass.setTeachModeCode(teachModeCode);
+        enrolClass.setClassTypeCode(classTypeCode);
+        List<Map> enrolClassList = managerClassService.queryClassByMulitField(enrolClass);
+        baseBody.setContent(enrolClassList);
+        return baseBody;
+    }
+
+
+}

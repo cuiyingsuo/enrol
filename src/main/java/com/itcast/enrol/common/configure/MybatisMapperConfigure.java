@@ -1,0 +1,50 @@
+package com.itcast.enrol.common.configure;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+import tk.mybatis.spring.mapper.MapperScannerConfigurer;
+
+import java.util.Properties;
+
+/**
+ * @Author liuzhongshuai
+ * Created by liuzhongshuai on 2017/3/24.
+ * 配置通用mapper
+ */
+@Configuration
+@AutoConfigureAfter(BaseConfigure.class)
+public class MybatisMapperConfigure implements EnvironmentAware {
+
+    private final static Logger logger = LoggerFactory.getLogger(MybatisMapperConfigure.class);
+
+    private Environment env;
+
+    @Bean
+    @ConditionalOnBean(name = {"sqlSessionFactory"})
+    public MapperScannerConfigurer mappeScannerConfigurer() {
+
+        MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
+        mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
+        mapperScannerConfigurer.setBasePackage(env.getProperty("mybatis.mapper.basePackage"));
+
+        Properties properties = new Properties();
+        //这里要特别注意，不要把MyMapper放到 basePackage 中，也就是不能同其他Mapper一样被扫描到。
+        properties.setProperty("mappers", env.getProperty("mybatis.mapper.mappers"));
+        properties.setProperty("notEmpty", "false");
+        properties.setProperty("IDENTITY", "MYSQL");
+        mapperScannerConfigurer.setProperties(properties);
+        logger.info("{}:mapper", "初始化 通用 mapper");
+        return mapperScannerConfigurer;
+    }
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.env = environment;
+    }
+}

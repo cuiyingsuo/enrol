@@ -1,0 +1,54 @@
+package com.cz.enrol.controller;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.service.OrderSubService;
+
+/**
+ * 订单信息表（子表）； 访问控制器类
+ **/
+@RestController
+@RequestMapping("/orderSubController")
+public class OrderSubController {
+
+    // 统一记录日志类
+    private Logger Log = LoggerFactory.getLogger("enrol");
+    @Autowired
+    // 当前业务操作接口bo
+    private OrderSubService service;
+
+    /**
+     * 查询分订单信息
+     *
+     * @param request
+     * @param response
+     * @param modelMap
+     * @return
+     */
+    @RequestMapping(value = "/getOrderSubInfo", method = RequestMethod.GET)
+    public BaseBody<OrderSub> getOrderSubInfo(@RequestParam Long id) {
+    	BaseBody<OrderSub> baseBody = new BaseBody<OrderSub>();
+    	
+        OrderSub orderSubInfo = service.queryByPrimaryKey(id);
+        if (null != orderSubInfo) {
+        	baseBody.setReturnResult(ReturnStatus.SUCCESS);
+			baseBody.setReturnCode(200);
+			baseBody.setData(orderSubInfo);
+			baseBody.setReturnMsg("查询成功");
+        } else {
+			baseBody.setReturnResult(ReturnStatus.FAILD);
+			baseBody.setReturnCode(500);
+			baseBody.setReturnMsg("查询无记录");
+		}
+        return baseBody;
+    }
+}

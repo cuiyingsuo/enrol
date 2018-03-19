@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.permission.EnrolRolePermissionMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolRolePermissionResultMapResultMap"
+		type="com.cz.enrol.entity.EnrolRolePermission">
+		<!---->
+		<id property="id" column="" />
+		<!--角色Id -->
+		<result property="roleId" column="role_id" />
+		<!--资源Id -->
+		<result property="permissionId" column="permission_id" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!-- 编码 -->
+		<result property="code" column="code" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, role_id, permission_id, creator, create_time,code
+	</sql>
+
+</mapper>

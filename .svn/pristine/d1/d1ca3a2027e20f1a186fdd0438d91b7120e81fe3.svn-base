@@ -1,0 +1,30 @@
+package com.cz.enrol.common;
+
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * @Author liuzhongshuai
+ * Created by liuzhongshuai on 2017/10/20.
+ */
+@ControllerAdvice
+public class ExceptionInteceptor {
+
+    private final static BusLogUtil LOGGER = new BusLogUtil(ExceptionInteceptor.class);
+
+    @ExceptionHandler(value = Exception.class)
+    @ResponseBody
+    public BaseBody<Object> defaultErrorHandler(HttpServletRequest req, Exception e) throws Exception {
+
+        BaseBody<Object> baseBody = new BaseBody<Object>();
+        baseBody.setCode(500);
+        baseBody.setSuccess(ReturnStatus.FAILD);
+        baseBody.setMessage(e.getMessage());
+
+        LOGGER.error("enrol系统异常:", e);
+        return baseBody;
+    }
+}

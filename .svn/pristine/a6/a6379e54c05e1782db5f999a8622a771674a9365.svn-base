@@ -1,0 +1,120 @@
+package com.cz.enrol.vo;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/26.
+ */
+public class UserEx {
+
+    private Long id;
+
+    private String mobile;
+
+    private String name;
+
+    private String password;
+
+    private Byte sex;
+
+    private Integer jobNo;
+
+    private Long campusId;
+
+    private Long departmentId;
+
+    private Long postId;
+
+    private Long roleId;
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    private String creator;
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Byte getSex() {
+        return sex;
+    }
+
+    public void setSex(Byte sex) {
+        this.sex = sex;
+    }
+
+    public Integer getJobNo() {
+        return jobNo;
+    }
+
+    public void setJobNo(Integer jobNo) {
+        this.jobNo = jobNo;
+    }
+
+    public Long getCampusId() {
+        return campusId;
+    }
+
+    public void setCampusId(Long campusId) {
+        this.campusId = campusId;
+    }
+
+    public Long getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Long postId) {
+        this.postId = postId;
+    }
+
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Long getDepartmentId() {
+        return departmentId;
+    }
+
+    public void setDepartmentId(Long departmentId) {
+        this.departmentId = departmentId;
+    }
+
+
+}

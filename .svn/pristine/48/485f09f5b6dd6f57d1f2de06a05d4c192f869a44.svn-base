@@ -1,0 +1,147 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.dao.goods.EnrolGoodsMapper;
+import com.cz.enrol.dao.marketing.EnrolMarketingMapper;
+import com.cz.enrol.dao.order.EnrolOrderMainMapper;
+import com.cz.enrol.dao.order.EnrolOrderSubMapper;
+import com.cz.enrol.dao.organize.EnrolClassMapper;
+import com.cz.enrol.entity.EnrolGoods;
+import com.cz.enrol.entity.EnrolOrderMain;
+import com.cz.enrol.utils.GenerateSequenceUtil;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * 订单信息表（主表）； 服务类
+ * 
+ **/
+@Transactional
+@Service
+public class EnrolOrderMainService {
+
+	// 统一记录日志类
+	private Logger Log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private SqlSessionTemplate session;
+
+	@Autowired
+	private EnrolOrderMainMapper orderMainDao;
+	
+	@Autowired
+	private EnrolOrderSubMapper orderSubDao;
+	
+	@Autowired
+	private EnrolGoodsMapper goodsDao;
+	
+	@Autowired
+	private EnrolClassMapper classDao;
+	
+	@Autowired
+	private EnrolMarketingMapper marketingDao;
+	
+
+	public EnrolOrderMain selectByPrimaryKey(Long id) {
+		return orderMainDao.selectByPrimaryKey(id);
+	}
+
+
+	public int insert(EnrolOrderMain record) {
+		return orderMainDao.insert(record);
+	}
+
+	public int insertSelective(EnrolOrderMain record) {
+		return orderMainDao.insertSelective(record);
+	}
+
+	public List<Map<String,Object>> queryOrderByStudentId(Long studentId) {
+		return orderMainDao.queryOrderByStudentId(studentId);
+	}
+	
+	public List<Map<String,Object>> querySubOrderByMergeOrderNo(Long orderNo){
+		List<Map<String,Object>> subOrderList = orderSubDao.selectByMergeOrderNo(orderNo);
+		return subOrderList;
+	}
+
+	public Map<String, Object> confirmMainOrder(Long classId, Long goodsId) {
+		
+
+		EnrolGoods goods = goodsDao.selectByPrimaryKey(goodsId);
+		// 查询班级信息包含校区信息
+		Map<String, Object> enrolClass = classDao.selectByClassId(classId);
+		Map<String, Object> marketing = marketingDao.selectByClassId(classId);
+
+		Map<String, Object> relMap = new HashMap<String, Object>();
+		relMap.put("goodsName", goods.getName());
+		relMap.put("goodsPrice", goods.getPrice());
+
+		if (null != enrolClass) {
+			relMap.put("discountPrice", enrolClass.get("discountPrice"));
+			relMap.put("address", enrolClass.get("address"));
+			relMap.put("className", enrolClass.get("className"));
+			relMap.put("periods", enrolClass.get("periods"));
+			relMap.put("teachModeName", enrolClass.get("teachModeName"));
+			relMap.put("startDate", enrolClass.get("startDate"));
+			relMap.put("classTime", enrolClass.get("classTime"));
+			if (null != marketing) {
+				relMap.put("strategy", marketing.get("strategy"));
+			}
+		}
+		return relMap;
+	}
+
+	public boolean submitMainOrder(Long goodsId, Long classId, int payType,
+			int isReceipt) {
+
+		EnrolGoods goods = goodsDao.selectByPrimaryKey(goodsId);
+		//查询班级信息包含校区信息
+		Map<String, Object> enrolClass = classDao.selectByClassId(classId);
+		Map<String, Object> marketing = marketingDao.selectByClassId(classId);
+		
+		String mergeOrderNo = String.valueOf(GenerateSequenceUtil.generateSequenceNo());
+		
+		EnrolOrderMain orderMain = new EnrolOrderMain();
+		
+		orderMain.setMergeOrderNo(mergeOrderNo);
+		orderMain.setOrderPrice(Integer.parseInt(enrolClass.get("discountPrice").toString()));
+		orderMain.setCostPrice(goods.getPrice());
+		
+		orderMain.setStudentId(0L);
+		orderMain.setStudentName("");
+		orderMain.setStudentMobile("");
+		orderMain.setSubjectId(Long.parseLong(enrolClass.get("subjectId").toString()));
+		orderMain.setSubjectName(enrolClass.get("subjectName").toString());
+		orderMain.setCampusId(Long.parseLong(enrolClass.get("campusId").toString()));
+		orderMain.setCampusName(enrolClass.get("campusName").toString());
+		orderMain.setClassId(classId);
+		orderMain.setGoodsName(enrolClass.get("className").toString());
+		orderMain.setClassName(enrolClass.get("className").toString());
+		orderMain.setPayType(payType);
+		orderMain.setMarketingId(Long.parseLong(marketing.get("marketingId").toString()));
+		orderMain.setMarketingName(marketing.get("strategy").toString());
+		orderMain.setPayChannelName("");
+		orderMain.setPrefAmount(goods.getPrice()-(Integer.parseInt(enrolClass.get("discountPrice").toString())));
+		orderMain.setPaid(0);
+		orderMain.setStatus(0);
+		orderMain.setElecReceipt(isReceipt);
+		orderMain.setReceiptUrl("");
+		orderMain.setReceiptNo("");
+		orderMain.setCreator("学员");
+		orderMain.setCreateTime(System.currentTimeMillis());
+		orderMain.setGoodsId(goodsId);
+		int result = orderMainDao.insertSelective(orderMain);
+		if(result!=0){
+			return true;
+		}
+		return false;
+	}
+
+}

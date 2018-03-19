@@ -1,0 +1,189 @@
+package com.cz.enrol.service;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.allinpay.ets.client.PaymentResult;
+import com.allinpay.ets.client.RequestOrder;
+import com.cz.enrol.dao.order.OrderMainMapper;
+import com.cz.enrol.dao.order.OrderSubMapper;
+import com.cz.enrol.dao.order.PaymentResultMapper;
+import com.cz.enrol.dao.student.StudentMapper;
+import com.cz.enrol.entity.OrderFlow;
+import com.cz.enrol.entity.OrderMain;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.entity.Student;
+import com.cz.enrol.utils.GenerateSequenceUtil;
+
+@Service
+public class PayService {
+
+	// 统一记录日志类
+	private Logger logger = LoggerFactory.getLogger("enrol");
+
+	@Autowired
+	private OrderMainMapper orderMainDao;
+
+	@Autowired
+	private OrderSubMapper orderSubDao;
+	
+	@Autowired
+	private StudentMapper studentDao;
+	
+	@Autowired
+	private AllinpayService allinpayService;
+	
+	@Autowired
+	private PaymentResultMapper paymentResultDao;
+
+	/**
+	 * 全款支付拼接支付订单信息
+	 * 
+	 * @param mobile
+	 *            手机号码
+	 * @param mergeOrderNo
+	 *            主订单号
+	 * @return
+	 */
+	@Transactional
+	public RequestOrder payFullRequestOrder(String userId,String mobile, String mergeOrderNo) {
+		OrderMain orderMain = new OrderMain();
+		orderMain.setMergeOrderNo(mergeOrderNo);
+		orderMain = orderMainDao.selectOne(orderMain);
+
+		OrderSub orderSub = new OrderSub();
+		String orderNo = String.valueOf(GenerateSequenceUtil.generateSequenceNo());
+		orderSub.setOrderNo(orderNo);
+		orderSub.setOrderPrice(orderMain.getOrderPrice());
+		orderSub.setStatus(0);
+		orderSub.setMergeOrderNo(mergeOrderNo);
+		orderSub.setCreateTime(System.currentTimeMillis());
+		orderSub.setCreator(mobile);
+		orderSubDao.insertSelective(orderSub);
+		logger.info("用户{}创建支付订单:{}", mobile,orderNo);
+		RequestOrder requestOrder = allinpayService.getRequestOrder(userId,orderSub, orderMain);
+		return requestOrder;
+	}
+	/**
+	 * 分次支付拼接支付订单
+	 * @param mobile		手机号
+	 * @param payPrice		支付金额
+	 * @param mergeOrderNo	主订单号
+	 * @return
+	 */
+	@Transactional
+	public RequestOrder payPartRequestOrder(String userId,String mobile,int payPrice,String mergeOrderNo){
+		OrderMain orderMain = new OrderMain();
+		orderMain.setMergeOrderNo(mergeOrderNo);
+		orderMain = orderMainDao.selectOne(orderMain);
+
+		OrderSub orderSub = new OrderSub();
+		String orderNo = String.valueOf(GenerateSequenceUtil.generateSequenceNo());
+		orderSub.setOrderNo(orderNo);
+		orderSub.setOrderPrice(payPrice);
+		orderSub.setStatus(0);
+		orderSub.setMergeOrderNo(mergeOrderNo);
+		orderSub.setCreateTime(System.currentTimeMillis());
+		orderSub.setCreator(mobile);
+		
+		orderSubDao.insertSelective(orderSub);
+		logger.info("用户{}创建支付订单:{}", mobile,orderNo);
+		RequestOrder requestOrder = allinpayService.getRequestOrder(userId,orderSub, orderMain);
+		return requestOrder;
+	}
+	/**
+	 * 修改订单
+	 * 
+	 * @param payResult
+	 *            支付回执验证结果实体类
+	 */
+	@Transactional
+	public void recordOrderInfo(PaymentResult payResult) {
+		String orderNo = payResult.getMchtRefundOrderNo();
+		
+		OrderSub orderSub = new OrderSub();
+		orderSub.setOrderNo(orderNo);
+		orderSub = orderSubDao.selectOne(orderSub);
+		
+		OrderFlow orderFlow = new OrderFlow();
+		
+		if (null!=orderSub) {
+			orderSub.setEditor("SYSTEM");
+			orderSub.setEditTime(System.currentTimeMillis());
+			orderSub.setPayTime(System.currentTimeMillis());
+			orderSub.setStatus(2);
+			//修改分订单信息
+			orderSubDao.updateByPrimaryKeySelective(orderSub);
+
+			//主订单状态修改
+			OrderMain orderMain = new OrderMain();
+			orderMain.setMergeOrderNo(orderSub.getMergeOrderNo());
+			orderMain = orderMainDao.selectOne(orderMain);
+			orderMain.setPaid(orderMain.getPaid() + orderSub.getOrderPrice());
+			if (orderMain.getPayType() == 0) {
+				//全款支付订单状态改为支付完成
+				if(orderMain.getPaid()==orderMain.getOrderPrice()){
+					logger.info("{}：主订单-{}，支付订单-{}，全款支付，成功",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo);
+					orderMain.setStatus(2);
+				}else{
+					//已付款金额不等于订单金额情况（全款支付不应该出现）
+					logger.info("{}：主订单-{}，支付订单-{}，全款支付，出错，未支付：{}",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo,orderMain.getOrderPrice()-orderMain.getPaid());
+					orderMain.setStatus(1);
+				}
+			} else {
+				if(orderMain.getPaid()==orderMain.getOrderPrice()){
+					logger.info("{}：主订单-{}，支付订单-{}，分次支付，成功.订单金额已全部支付",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo);
+					orderMain.setStatus(2);
+				}else{
+					logger.info("{}：主订单-{}，支付订单-{}，分次支付，成功.订单剩余未支付金额：{}",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo,(orderMain.getPaid()-orderMain.getOrderPrice()));
+					orderMain.setStatus(1);
+				}
+			}
+			//修改主订单信息
+			orderMainDao.updateByPrimaryKeySelective(orderMain);
+			
+			//记录流水
+			orderFlow.setAmount(Integer.parseInt(payResult.getOrderAmount()));
+			orderFlow.setCreateDatetime(new Date());
+			orderFlow.setMargeOrderNo(orderSub.getMergeOrderNo());
+			orderFlow.setOrderNo(payResult.getOrderNo());
+			orderFlow.setPayChannelId(31L);
+			orderFlow.setPayChannelName("通联支付");
+			orderFlow.setPayDescription("支付成功");
+			orderFlow.setPayId(orderSub.getId());
+			if(orderMain.getPayType()==0){
+				orderFlow.setPaymentType("全款支付");
+			}else if(orderMain.getPayType()==1){
+				orderFlow.setPaymentType("分次支付");
+			}else if(orderMain.getPayType()==2){
+				orderFlow.setPaymentType("贷款支付");
+			}
+			orderFlow.setPayUserId(orderMain.getStudentId());
+			orderFlow.setStatus(1);
+			
+		}else{
+			//记录流水
+			orderFlow.setAmount(Integer.parseInt(payResult.getOrderAmount()));
+			orderFlow.setCreateDatetime(new Date());
+			orderFlow.setOrderNo(payResult.getOrderNo());
+			orderFlow.setPayChannelId(31L);
+			orderFlow.setPayChannelName("通联支付");
+			orderFlow.setPayDescription("支付失败");
+
+			orderFlow.setStatus(0);
+			logger.info("{}：主订单-{}，查询不到支付订单-{}，",payResult.getUserName(),orderSub.getMergeOrderNo(),orderNo);
+		}
+		
+	}
+	@Transactional
+	public void recordPaymentResult(PaymentResult paymentResult){
+		paymentResultDao.insertSelective(paymentResult);
+	}
+}

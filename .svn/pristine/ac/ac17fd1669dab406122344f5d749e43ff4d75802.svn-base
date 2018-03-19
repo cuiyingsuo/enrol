@@ -1,0 +1,168 @@
+package com.cz.enrol.controller.management;
+
+import com.cz.enrol.common.BaseBody;
+import com.cz.enrol.common.BasePage;
+import com.cz.enrol.common.ReturnStatus;
+import com.cz.enrol.entity.Banner;
+import com.cz.enrol.service.management.ManagerBannerService;
+import org.apache.tomcat.util.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+
+/**
+ * @author liuzs
+ * Created by liuzhongshuai on 2017/10/21.
+ */
+@RestController
+@RequestMapping("/managenment")
+public class ManagerBannerController {
+
+    @Autowired
+    private ManagerBannerService managerBannerService;
+
+
+    /**
+     * 新增banner
+     *
+     * @param banner
+     * @param file
+     * @return
+     * @throws IOException
+     */
+    @PostMapping("/mergeBanner")
+    public BaseBody<Banner> mergeBanner(Banner banner, @RequestParam("file") MultipartFile file) throws IOException {
+
+        BaseBody<Banner> bannerBaseBody = new BaseBody<Banner>();
+
+        if (null == banner) {
+            bannerBaseBody.setSuccess(ReturnStatus.FAILD);
+            bannerBaseBody.setMessage("参数为null");
+            bannerBaseBody.setCode(500);
+            return bannerBaseBody;
+        }
+        String fileName = file.getOriginalFilename();
+        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
+        String img64Str = new String(Base64.encodeBase64(file.getBytes()));
+        banner.setImage("data:image/" + suffix + ";base64," + img64Str);
+        byte status = 0;
+        banner.setStatus(status);
+        byte isCover = 0;
+        banner.setIsCover(isCover);
+
+        managerBannerService.mergeBanner(banner);
+        bannerBaseBody.setCode(200);
+        bannerBaseBody.setSuccess(ReturnStatus.SUCCESS);
+        bannerBaseBody.setMessage("保存成功！");
+        return bannerBaseBody;
+    }
+
+    /**
+     * 发布或取消发布 banner
+     *
+     * @param id
+     * @param status
+     * @return
+     */
+    @PutMapping("/banner/{id}/{status}")
+    public BaseBody<Banner> upOrDownBanner(@PathVariable @RequestParam("0") int id, @PathVariable @RequestParam("100") int status) {
+
+        BaseBody<Banner> bannerBaseBody = new BaseBody<Banner>();
+
+        if (id == 0 || status == 100) {
+            bannerBaseBody.setSuccess(ReturnStatus.FAILD);
+            bannerBaseBody.setMessage("参数为值不正确!");
+            bannerBaseBody.setCode(500);
+            return bannerBaseBody;
+        }
+        int effRow = managerBannerService.upOrDownBanner(id, status);
+        if (effRow != 1) {
+            bannerBaseBody.setSuccess(ReturnStatus.FAILD);
+            bannerBaseBody.setMessage("修改失败!");
+            bannerBaseBody.setCode(500);
+            return bannerBaseBody;
+        }
+        bannerBaseBody.setMessage("修改成功!");
+        return bannerBaseBody;
+    }
+
+
+    /**
+     * 删除banner
+     *
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/banner/{id}")
+    public BaseBody<Banner> delBanner(@PathVariable @RequestParam(defaultValue = "0") int id) {
+
+        BaseBody<Banner> bannerBaseBody = new BaseBody<Banner>();
+
+        if (id == 0) {
+            bannerBaseBody.setSuccess(ReturnStatus.FAILD);
+            bannerBaseBody.setCode(500);
+            bannerBaseBody.setMessage("参数值不正确!");
+            return bannerBaseBody;
+        }
+        managerBannerService.delByPrimaryKey(id);
+
+        bannerBaseBody.setMessage("删除成功!");
+        return bannerBaseBody;
+    }
+
+    /**
+     * banner info 预览
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/banner/{id}")
+    public BaseBody<Banner> getBanner(@PathVariable @RequestParam(defaultValue = "0") int id) {
+
+        BaseBody<Banner> bannerBaseBody = new BaseBody<Banner>();
+        if (id == 0) {
+            bannerBaseBody.setSuccess(ReturnStatus.FAILD);
+            bannerBaseBody.setCode(500);
+            bannerBaseBody.setMessage("参数值不正确!");
+            return bannerBaseBody;
+        }
+        Banner banner = managerBannerService.selectByPrimaryKey(id);
+        if (null == banner) {
+            bannerBaseBody.setSuccess(ReturnStatus.FAILD);
+            bannerBaseBody.setCode(500);
+            bannerBaseBody.setMessage("查询失败!");
+            return bannerBaseBody;
+        }
+        bannerBaseBody.setContent(banner);
+        bannerBaseBody.setMessage("查询成功!");
+
+        return bannerBaseBody;
+    }
+
+    /**
+     * 条件查询banner
+     *
+     * @param banner
+     * @return
+     */
+    @GetMapping("/queryBanners")
+    public BaseBody<BasePage<Banner>> queryBanners(Banner banner, @RequestParam(defaultValue = "1") int startNum, @RequestParam(defaultValue = "10") int pageSize) {
+
+        BaseBody<BasePage<Banner>> baseBody = new BaseBody<BasePage<Banner>>();
+        if (null == banner) {
+            banner = new Banner();
+        }
+
+        BasePage<Banner> bannerBasePage = managerBannerService.queryBannersToPage(banner, startNum, pageSize);
+        baseBody.setSuccess(ReturnStatus.SUCCESS);
+        baseBody.setMessage("查询成功!");
+        baseBody.setCode(200);
+        baseBody.setContent(bannerBasePage);
+        return baseBody;
+    }
+
+
+}

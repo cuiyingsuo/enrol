@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.invoice.InvoiceMapper">
+
+    <!--实体映射 -->
+    <resultMap id="EnrolInvoiceResultMapResultMap" type="com.cz.enrol.entity.Invoice">
+        <!--主键 -->
+        <id property="id" column="主键"/>
+        <!--订单号 -->
+        <result property="orderNo" column="order_no"/>
+        <!--发票类型(0:纸质发票，1:电子发票) -->
+        <result property="type" column="type"/>
+        <!--类别(0:普票，1:专票) -->
+        <result property="category" column="category"/>
+        <!--发票号码 -->
+        <result property="invoiceNo" column="invoice_no"/>
+        <!--抬头类型(0:个人，1:单位) -->
+        <result property="titleType" column="title_type"/>
+        <!--抬头 -->
+        <result property="title" column="title"/>
+        <!--纳税人识别号 -->
+        <result property="number" column="number"/>
+        <!--发票内容 -->
+        <result property="content" column="content"/>
+        <!--电子发票地址 -->
+        <result property="url" column="url"/>
+        <!--创建者 -->
+        <result property="creator" column="creator"/>
+        <!--创建时间 -->
+        <result property="createTime" column="create_time"/>
+        <!--编辑者 -->
+        <result property="editor" column="editor"/>
+        <!--编辑时间 -->
+        <result property="editTime" column="edit_time"/>
+    </resultMap>
+
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, order_no, type, category, invoice_no, title_type,
+		title, number,
+		content, url, creator, create_time, editor, edit_time
+	</sql>
+    <select id="selectOneByOrderMainNo" parameterType="java.lang.String" resultType="java.util.Map">
+		SELECT
+		ei.id,
+		ei.order_no AS orderNo,
+		ei.type,
+		ei.invoice_no AS invoiceNo,
+		ei.title_type AS titleType,
+		ei.title,
+		ei.number,
+		ei.content,
+		ei.remark,
+		ei.add_tel AS addTel,
+		ei.account,
+		ei.price,
+		ei.is_apply AS isApply,
+		cam.e_invoice AS eInvoice,
+		es.email
+		FROM enrol_invoice ei,enrol_order_main om,enrol_campus cam,enrol_student es
+
+		WHERE ei.order_no=#{orderMainNo} AND ei.order_no=om.merge_order_no AND om.campus_id=cam.id AND om.student_id=es.id
+	</select>
+
+    <!--申请开剧 发票列表-->
+    <select id="queryInvoice" parameterType="java.util.Map" resultType="java.util.LinkedHashMap">
+		SELECT
+
+			eom.student_id  as studentId,
+			eom.campus_name as campusName,
+			eom.student_name as studentName,
+			eom.class_name as className,
+			eom.order_price as orderPrice,
+			eom.paid,
+			ec.user_name as classMaster,
+			ei.type as invoiceType,
+			ei.title_type as titleType,
+			ei.title ,
+			ei.number,
+			ei.content,
+			ei.price,
+			ei.add_tel as addTel,
+			ei.account,
+			ei.email,
+			eom.student_mobile as studentMobile,
+			ei.remark,
+			ei.is_apply as isApply,
+			ei.id
+		FROM
+			enrol_invoice ei,
+			enrol_order_main eom,
+			enrol_class ec
+		WHERE
+			ei.order_no = eom.merge_order_no
+		AND eom.class_id=ec.id
+		AND ei.is_apply = 1
+	</select>
+</mapper>

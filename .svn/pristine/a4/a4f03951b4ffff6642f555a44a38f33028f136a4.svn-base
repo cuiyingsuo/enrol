@@ -1,0 +1,15 @@
+package com.cz.enrol.service;
+
+import com.cz.enrol.common.BaseService;
+import com.cz.enrol.entity.Department;
+import org.springframework.stereotype.Service;
+
+/**
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/11/27.
+ */
+@Service
+public class DepartmentService extends BaseService<Department> {
+
+
+}

@@ -1,0 +1,8 @@
+package com.cz.enrol.dao.bill;
+
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Bill;
+
+public interface BillMapper extends BaseDao<Bill> {
+}

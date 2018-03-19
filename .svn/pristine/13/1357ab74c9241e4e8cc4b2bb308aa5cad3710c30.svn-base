@@ -1,0 +1,22 @@
+package com.cz.enrol.dao.marketing;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.Marketing;
+
+import java.util.Map;
+
+/**
+ * 
+ * EnrolMarketingMapper数据库操作接口类
+ * 
+ **/
+
+public interface MarketingMapper extends BaseDao<Marketing>{
+
+	
+	/**
+	 * 
+	 * 根据班级id查询
+	 */
+	Map<String,Object> selectByClassId(Long classId);
+}

@@ -1,0 +1,33 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+import java.util.Map;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.dict.DictMapper;
+
+/**
+ * 
+ * 字典表 服务类
+ * 
+ **/
+@Service
+public class DictService {
+
+	@Autowired
+	private SqlSessionTemplate session;
+
+	@Autowired
+	private DictMapper dictDao;
+
+	public List<Map<String, String>> queryInfoByType(String type) {
+
+		return dictDao.selectInfoByType(type);
+	}
+
+}

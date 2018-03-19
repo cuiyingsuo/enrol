@@ -1,0 +1,18 @@
+package com.cz.enrol.dao.marketing;
+
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.MarketingDeduction;
+
+import java.util.List;
+
+public interface MarketingDeductionMapper extends BaseDao<MarketingDeduction> {
+
+    /**
+     * 查询优惠策略 通过 维度产品
+     *
+     * @param targetId
+     * @return
+     */
+    List<MarketingDeduction> deductionForTarget(Long targetId);
+}

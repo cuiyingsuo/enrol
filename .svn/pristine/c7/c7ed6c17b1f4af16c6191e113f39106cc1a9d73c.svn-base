@@ -1,0 +1,642 @@
+package com.cz.enrol.service.ems;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import com.allinpay.util.HttpUtils;
+import com.cz.enrol.common.EmsClass;
+import com.cz.enrol.common.EmsClassBody;
+import com.cz.enrol.common.EmsClassTypeBody;
+import com.cz.enrol.common.EmsSubjectBody;
+import com.cz.enrol.dao.organize.CampusMapper;
+import com.cz.enrol.dao.organize.ClassMapper;
+import com.cz.enrol.dao.organize.ClassTypeMapper;
+import com.cz.enrol.dao.subject.SubjectMapper;
+import com.cz.enrol.dao.task.TaskMapper;
+import com.cz.enrol.entity.BankAccount;
+import com.cz.enrol.entity.Bill;
+import com.cz.enrol.entity.Campus;
+import com.cz.enrol.entity.ClassType;
+import com.cz.enrol.entity.EnrolClass;
+import com.cz.enrol.entity.OrderFlow;
+import com.cz.enrol.entity.OrderSub;
+import com.cz.enrol.entity.Subject;
+import com.cz.enrol.entity.Task;
+import com.cz.enrol.service.BankAccountService;
+import com.cz.enrol.service.CampusService;
+import com.cz.enrol.service.OrderFlowService;
+import com.cz.enrol.service.OrderMainService;
+import com.cz.enrol.service.OrderSubService;
+import com.cz.enrol.utils.BeanUtils;
+import com.cz.enrol.utils.BusLogUtil;
+import com.cz.enrol.utils.HttpHelper;
+import com.cz.enrol.utils.HttpUtil;
+import com.cz.enrol.utils.JsonUtil;
+import com.cz.enrol.vo.EmsSubject;
+
+
+/**
+ * @liuzs Created by liuzhongshuai on 2017/12/19.
+ */
+@Service
+public class SynchBaseDataForEms {
+
+    private static final BusLogUtil BUS_LOG = new BusLogUtil(SynchBaseDataForEms.class);
+ // 统一记录日志类
+ 	private Logger logger = LoggerFactory.getLogger("enrol");
+
+    @Autowired
+    private SubjectMapper subjectMapper;
+
+    @Autowired
+    private CampusMapper campusMapper;
+
+    @Autowired
+    private ClassTypeMapper classTypeMapper;
+
+    @Autowired
+    private ClassMapper classMapper;
+
+    @Autowired
+    private TaskMapper taskMapper;
+    
+    @Autowired
+    private OrderSubService orderSubService;
+    
+    @Autowired
+    private OrderMainService orderMainService;
+    
+    @Autowired
+    private CampusService campusService;
+    
+    @Autowired
+    private BankAccountService bankAccountService;
+    
+    @Autowired
+    private OrderFlowService orderFlowService;
+
+    @Value("${ems.subject-url}")
+    private String subjectUrl;
+
+    @Value("${ems.class-type-url}")
+    private String classTypeUrl;
+
+    @Value("${ems.class-url}")
+    private String classUrl;
+    
+    @Value("${ems.pay-rel-url}")
+    private String payRelUrl;
+    
+    @Value("${ems.pay-rel-url}")
+    private String billRelUrl;
+    
+    @Value("${ems.pay-rel-url}")
+    private String invoiceUrl;
+
+    @Value("${ems.api.appid}")
+    private String emsAppId="student_pay";
+
+    @Value("${ems.api.key}")
+    private String emsKey;
+
+
+    /**
+     * 同步学科
+     * UNITDOUBLET FACETOFACE
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void synchSubjectForEms() {
+        synSubByModel("UNITDOUBLET");
+        synSubByModel("FACETOFACE");
+    }
+
+
+    /**
+     * 同步班级类型
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void synchClassTypeForEms() {
+        //获取班级类型
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put("cid", emsAppId);
+        map.put("method", "classTypes");
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        String result = HttpUtil.httpPost(classTypeUrl, map);
+        
+        EmsClassTypeBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsClassTypeBody.class);
+
+        if (emsSubjectBody == null) {
+            BUS_LOG.error("无法在ems获取班级类型信息!,无法同步班级类型信息!", "");
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            BUS_LOG.error("同步班级类型异常!", emsSubjectBody.getErrorMessage());
+            throw new RuntimeException(emsSubjectBody.getErrorMessage());
+        }
+        List<ClassType> emsClassTypes = emsSubjectBody.getResultObject();
+        //获取系统运营的学科
+        List<Subject> subjectList = subjectMapper.selectAll();
+        for (ClassType classType : emsClassTypes) {
+
+            if (getSubjectByCode(subjectList, classType.getSubjectId()).getCode() != null) {
+                //先查询学科，能查到，update，查不到 insert
+                ClassType classTypeQuery = new ClassType();
+                classTypeQuery.setId(classType.getId());
+
+                ClassType classTypeResult = classTypeMapper.selectOne(classTypeQuery);
+                if (null == classTypeResult || classTypeResult.getId() == null) {
+                    classTypeMapper.insertSelective(classType);
+                } else {
+                    BeanUtils.copyProperties(classType, classTypeResult);
+                    classTypeMapper.updateByPrimaryKey(classTypeResult);
+                }
+            }
+        }
+    }
+
+    /**
+     * 同步班级
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void synchClassForEms() throws ParseException {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //查询最后任务的记录时间，如果没有记录 证明是第一次同步班级，需要取出3个月的，如果有记录则需要取出 当前记录下一天的
+        String startTime = "";
+        String endTime = "";
+        Calendar calendar = Calendar.getInstance();
+        Task taskQuery = new Task();
+        //任务编码
+        taskQuery.setTaskCode("syn_class");
+        Task currentTask = taskMapper.selectOne(taskQuery);
+        if (null == currentTask) {
+            //得到当前时间
+            Date currentDate = new Date();
+            startTime = dateFormat.format(currentDate);
+            //向后推三个月
+            calendar.setTime(currentDate);
+            calendar.add(Calendar.DATE, 180);
+            //计算得出三个月后的时间
+            endTime = dateFormat.format(calendar.getTime());
+            Task task = new Task();
+            task.setTaskCode("syn_class");
+            task.setTaskExeDate(calendar.getTime());
+            task.setTaskExeDateTime(calendar.getTime());
+            task.setRemark("同步开班时间在" + startTime + "到" + endTime + "的班级!");
+            taskMapper.insert(task);
+        } else {
+            calendar.setTime(currentTask.getTaskExeDateTime());
+            calendar.add(Calendar.DATE, 1);
+            endTime = dateFormat.format(calendar.getTime());
+            startTime = endTime;
+            currentTask.setTaskExeDate(calendar.getTime());
+            currentTask.setTaskExeDateTime(calendar.getTime());
+            currentTask.setRemark("同步开班时间在" + startTime + "到" + endTime + "的班级!");
+            taskMapper.updateByPrimaryKey(currentTask);
+        }
+        int pageNo = 1;
+        while (true) {
+            EmsClassBody emsClassBody = requestClass(String.valueOf(pageNo), startTime, endTime);
+            if (emsClassBody == null || emsClassBody.getResultObject().getClasses().size() == 0) {
+                break;
+            }
+            //取出班级信息
+            if (!CollectionUtils.isEmpty(emsClassBody.getResultObject().getClasses())) {
+                List<EmsClass> emsClassList = emsClassBody.getResultObject().getClasses();
+                //获取系统所有运营的校区
+                List<Campus> campusList = campusMapper.selectAll();
+                //获取系统运营的学科
+                List<Subject> subjectList = subjectMapper.selectAll();
+                //班级类型
+                List<ClassType> classTypeList = classTypeMapper.selectAll();
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                for (EmsClass emsClass : emsClassList) {
+                    if (!("UNITDOUBLET".equals(emsClass.getTeachingModel()) || "FACETOFACE".equals(emsClass.getTeachingModel()))) {
+                        continue;
+                    }
+
+                    if(emsClass.getStatus().byteValue()==0){
+                        logger.info("#########################################################################################");
+                        logger.info("#################同步班级 ，班级状态为0，班级id:{}##################",emsClass.getId());
+                        logger.info("#########################################################################################");
+                        continue;
+                    }
+
+                    if(getSubjectByCode(subjectList, emsClass.getSubjectId()).getId()==null){
+                        logger.info("#########################################################################################");
+                        logger.info("#################同步班级 ，在本地库找不到相应学科，学科id:{}##################", emsClass.getSubjectId());
+                        logger.info("#########################################################################################");
+                        continue;
+                    }
+
+                    EnrolClass enrolClass = new EnrolClass();
+                    enrolClass.setId(emsClass.getId());
+                    enrolClass.setCampusCode(emsClass.getSchoolCode());
+                    enrolClass.setCampusId(getCampusByCode(campusList, emsClass.getSchoolCode()).getId());
+                    enrolClass.setBrandCode(emsClass.getBrand());
+                    enrolClass.setSubjectId(getSubjectByCode(subjectList, emsClass.getSubjectId()).getId());
+                    enrolClass.setCreateTime(System.currentTimeMillis());
+                    enrolClass.setStartDate(format.parse(emsClass.getStartDate()));
+                    enrolClass.setName(emsClass.getName());
+                    enrolClass.setTeachModeCode(emsClass.getTeachingModel());
+                    enrolClass.setTeachModeName("UNITDOUBLET".equals(emsClass.getTeachingModel()) ? "双元" : "面授");
+                    enrolClass.setLessonModel(emsClass.getLessonModel());
+                    enrolClass.setClassTypeCode(emsClass.getClassTypeId());
+                    ClassType classType = getClassTypeById(classTypeList, emsClass.getClassTypeId());
+                    if (null != classType && classType.getId() != null) {
+                        enrolClass.setClassTypeName(classType.getName());
+                        //计算闭班时间
+                        calendar.setTime(format.parse(emsClass.getStartDate()));
+                        calendar.add(Calendar.DATE, classType.getDays());
+                        enrolClass.setEndDate(calendar.getTime());
+                        enrolClass.setClassTime("约" + classType.getDays() + "天");
+                    } else {
+                        enrolClass.setEndDate(new Date());
+                    }
+                    enrolClass.setPeriods(emsClass.getPhase());
+                    enrolClass.setPlan(100);
+                    enrolClass.setCurrent(50);
+                    enrolClass.setUserId(5);
+                    enrolClass.setUserNo(emsClass.getJobNumber());
+                    enrolClass.setUserName("admin");
+                    enrolClass.setCreator(emsClass.getCreatorName());
+                    enrolClass.setStatus(emsClass.getStatus().byteValue());
+                    enrolClass.setIsDel((byte) 0);
+                    //先查询，如果能查到id相同的数据，执行update操作，否则 insert
+                    EnrolClass enrolClassQuery = new EnrolClass();
+                    enrolClassQuery.setId(emsClass.getId());
+                    EnrolClass newClass = classMapper.selectOne(enrolClassQuery);
+                    if (null != newClass && newClass.getId() != null) {
+                        BeanUtils.copyProperties(enrolClass, newClass);
+                        classMapper.updateByPrimaryKey(newClass);
+                    } else {
+                        classMapper.insertSelective(enrolClass);
+                    }
+                }
+            }
+            ++pageNo;
+        }
+    }
+
+    /**
+     * 同步学科
+     *
+     * @param model
+     */
+    private void synSubByModel(String model) {
+        //获取学科地址
+        Map<String, String> map = new LinkedHashMap<>(5);
+        map.put("cid", emsAppId);
+        map.put("method", "subjects");
+        map.put("model", model);
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        String result = HttpUtil.httpPost(subjectUrl, map);
+
+        EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+
+        if (emsSubjectBody == null) {
+            throw new RuntimeException("无法在ems获取学科信息!,无法同步学科信息!");
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            throw new RuntimeException(emsSubjectBody.getErrorMessage());
+        }
+        List<EmsSubject> emsSubjects = emsSubjectBody.getResultObject();
+        for (EmsSubject emsSubject : emsSubjects) {
+
+            Subject subjectQuery = new Subject();
+            subjectQuery.setCode(emsSubject.getId());
+            Subject subjectResult = subjectMapper.selectOne(subjectQuery);
+            //修改
+            if (subjectResult != null) {
+                subjectResult.setCode(emsSubject.getId());
+                subjectResult.setName(emsSubject.getName());
+                subjectResult.setTeachModeCode(emsSubject.getModel());
+                subjectResult.setCreator("system");
+                subjectResult.setMemo(model);
+                subjectResult.setCreateTime(System.currentTimeMillis());
+                subjectResult.setStatus((byte) 1);
+                subjectMapper.updateByPrimaryKeySelective(subjectResult);
+            } else {
+                Subject subject = new Subject();
+                subject.setCode(emsSubject.getId());
+                subject.setName(emsSubject.getName());
+                subject.setTeachModeCode(emsSubject.getModel());
+                subject.setCreator("system");
+                subject.setMemo(model);
+                subject.setCreateTime(System.currentTimeMillis());
+                subject.setStatus((byte) 1);
+                subjectMapper.insertSelective(subject);
+            }
+        }
+    }
+
+    /**
+     * 向ems推送支付结果
+     */
+    public void pushPayRelToEms(Map<String,String> payRel){
+    	Map<String, String> map = new LinkedHashMap<>();
+    	map.put("cid", emsAppId);
+    	map.put("clazzId", payRel.get("clazzId"));
+    	map.put("fee", payRel.get("fee"));
+    	map.put("incomeExpensesType", payRel.get("incomeExpensesType"));
+    	map.put("method", "addJournal");
+    	map.put("paymentId", payRel.get("paymentId"));
+    	map.put("schoolCode", payRel.get("schoolCode"));
+    	map.put("studentId", payRel.get("studentId"));
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        logger.info("支付同步ems参数：{}",map);
+        String result = HttpUtil.httpPost(payRelUrl, map);
+       
+        logger.info("支付同步ems返回报文：{},请求地址：{}", result,payRelUrl);
+        EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+
+        if (emsSubjectBody == null) {
+            throw new RuntimeException("向ems推送支付信息异常，流水号："+payRel.get("paymentId"));
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            throw new RuntimeException("向ems推送支付信息返回失败，异常信息："+emsSubjectBody.getErrorMessage());
+        }
+    }
+    public static void main(String[] args){
+
+
+    	/*Map<String, String> map = new TreeMap<>();
+    	map.put("brand", "黑马");
+    	map.put("classteacher", "");
+    	map.put("classTypeId", "android001");
+    	map.put("creatorName", "刁敏");
+    	map.put("enrolId","enrol_ems");
+    	map.put("graduationDate", "2018-10-11");
+    	map.put("id", "14910");
+    	map.put("isDelete", "false");
+    	map.put("jobNumber", "0");
+        map.put("lessonModel", "TRADITION");
+        map.put("name", "北京黑马Android基础1期(测试）（20180301面授）");
+        map.put("optType", "1");
+    	map.put("phase", "1期(测试）");
+    	//map.put("predictionGraduationDate", "");
+    	//map.put("schedule", "");
+    	map.put("schoolCode", "BEIJING");
+    	map.put("startDate", "2018-03-01");
+    	map.put("status", "1");
+    	map.put("subjectId", "android");
+        map.put("teachingModel", "FACETOFACE");
+        //map.put("sign", "b15d20fe8d6b04646a535ad11efce83e");
+        HttpHelper.handlerSigUrlByMd5(map, "c7cf4ba3ffd02c6dbae4ce36f20718f3");//0005c9b7e792e66cadf1053bc15adb44
+        System.out.println(map);
+        System.out.println(map.get("schedule"));
+        System.out.println(map.get("predictionGraduationDate"));
+        Map<String,String> m = new TreeMap<String,String>();
+        m.put("schedule", map.get("schedule"));
+        m.put("predictionGraduationDate",map.get("predictionGraduationDate"));
+        System.out.println(m.get("schedule"));
+        System.out.println(m.get("predictionGraduationDate"));
+       /* String result=null;
+		try {
+			result = HttpUtils.doPost("https://enrol.itcast.cn/enrol/emsapi/modifyClass", map);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        System.out.println(result);*/
+        
+    	/*Map<String, String> map = new LinkedHashMap<>();
+    	map.put("cid", "student_pay");
+    	map.put("clazzId", "14535");
+    	map.put("fee", "200.00");
+    	map.put("incomeExpensesType", "2");
+    	map.put("method", "addJournal");
+    	map.put("paymentId", "BXGPP20180206001077");
+    	map.put("schoolCode", "BEIJINGSHUNYI");
+    	map.put("studentId", "919965");
+        map.put("ts", "1517905468844");
+
+        HttpHelper.handlerSigUrlByMd5(map, "125bff78358342ab9d072f68c853cf26");
+        
+        String result = HttpUtil.httpPost("https://ems.itcast.cn/api/finance.do", map);
+        System.out.println(result);
+        EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+        
+        if (emsSubjectBody == null) {
+            throw new RuntimeException("向ems推送支付信息异常，流水号：");
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            throw new RuntimeException("向ems推送支付信息返回失败，异常信息："+emsSubjectBody.getErrorMessage());
+        }*/
+        
+    	/*Map<String, String> mapChecked = new LinkedHashMap<>();
+    	mapChecked.put("channelId", "1");
+    	mapChecked.put("channelName", "传智支付宝");
+    	mapChecked.put("cid", "student_pay");
+    	mapChecked.put("commission", "0.00");
+    	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	mapChecked.put("date", sdf.format(new Date()));
+    	mapChecked.put("incomeChannelName", "传智支付宝H5");
+    	mapChecked.put("method", "checked");
+    	mapChecked.put("paymentId", "BXGPP20180124000785");
+    	mapChecked.put("receipt", "abc123");
+        mapChecked.put("ts", String.valueOf(System.currentTimeMillis()));
+
+        HttpHelper.handlerSigUrlByMd5(mapChecked, "125bff78358342ab9d072f68c853cf26");
+        String resultC = HttpUtil.httpPost("https://ems.itcast.cn/api/finance.do", mapChecked);
+        System.out.println(resultC);
+        EmsSubjectBody emsSubjectBodyC = JsonUtil.jsonToObject(resultC, EmsSubjectBody.class);
+
+        if (emsSubjectBodyC == null) {
+            throw new RuntimeException("向ems推送支付信息异常，账单号：");
+        }
+        if (emsSubjectBodyC.getSuccess() == false) {
+            throw new RuntimeException("向ems推送支付信息返回失败，异常信息："+emsSubjectBodyC.getErrorMessage());
+        }*/
+        
+       /* Map<String, String> mapI = new LinkedHashMap<>();
+    	mapI.put("cid", "student_pay");
+    	mapI.put("invoice", "abc123");
+    	mapI.put("method", "updateReceiptno");
+    	mapI.put("paymentId", "BXGPP20180124000785");
+        mapI.put("ts", String.valueOf(System.currentTimeMillis()));
+        
+        HttpHelper.handlerSigUrlByMd5(mapI, "125bff78358342ab9d072f68c853cf26");
+        
+        String resultI = HttpUtil.httpPost("https://ems.itcast.cn/api/finance.do", mapI);
+        System.out.println(resultI);
+        EmsSubjectBody emsSubjectBodyI = JsonUtil.jsonToObject(resultI, EmsSubjectBody.class);
+
+        if (emsSubjectBodyI == null) {
+            throw new RuntimeException("向ems推送申请发票信息异常，流水号：");
+        }
+        if (emsSubjectBodyI.getSuccess() == false) {
+            throw new RuntimeException("向ems推送申请发票信息返回失败，异常信息："+emsSubjectBodyI.getErrorMessage());
+        }*/
+    	
+    }
+    
+    /**
+     * 向ems推送对账结果
+     */
+    public void pushBillToEms(List<Bill> billList) {
+
+        for(Bill bill:billList){
+        	boolean billStatus = bill.getCheckStatus();
+        	if(!billStatus){
+        		continue;
+        	}
+        	String subOrderNo = bill.getSubOrderNo();
+
+        	OrderSub subOrder = new OrderSub();
+        	subOrder.setOrderNo(subOrderNo);
+        	subOrder = orderSubService.selectOne(subOrder);
+        	
+        	BankAccount bankAccount = new BankAccount();
+        	bankAccount.setPayMethodCode(bill.getPayMethodNo());
+        	bankAccount = bankAccountService.selectOne(bankAccount);
+        	if(null==subOrder||null==bankAccount){
+        		continue;
+        	}
+        	
+        	Map<String, String> map = new LinkedHashMap<>();
+        	map.put("channelId", String.valueOf(bankAccount.getId()));
+        	map.put("channelName", bankAccount.getPayMethodName());
+        	map.put("cid", emsAppId);
+        	map.put("commission", String.valueOf(bill.getFee()));
+        	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        	map.put("date", sdf.format(new Date()));
+        	map.put("incomeChannelName", bankAccount.getPayMethodName());
+            map.put("method", "checked");
+
+            OrderFlow of = new OrderFlow();
+            of.setOrderNo(subOrderNo);
+            of=orderFlowService.selectOne(of);
+            map.put("paymentId", of.getFlowId());
+
+            map.put("posNo",bill.getPosNo());
+            map.put("posPayMethod",bill.getPosPayMethod());
+
+        	map.put("receipt", subOrder.getReceiptNo());
+            map.put("ts", String.valueOf(System.currentTimeMillis()));
+
+            HttpHelper.handlerSigUrlByMd5(map, emsKey);
+            
+            logger.info("对账同步ems参数：{}",map);
+            String result = HttpUtil.httpPost(billRelUrl, map);
+            logger.info("对账同步ems返回：{}，调用地址：{}",result,billRelUrl);
+            EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+
+            if (emsSubjectBody == null) {
+                throw new RuntimeException("向ems推送支付信息异常，账单号："+bill.getId());
+            }
+            if (emsSubjectBody.getSuccess() == false) {
+                throw new RuntimeException("向ems推送支付信息返回失败，异常信息："+emsSubjectBody.getErrorMessage());
+            }
+        }
+    }
+    
+    /**
+     * 申请发票同步到ems
+     */
+    public void pushInvoiceToEms(Map<String,String> invoiceMap){
+    	Map<String, String> map = new LinkedHashMap<>();
+    	map.put("cid", emsAppId);
+    	map.put("invoice", invoiceMap.get("invoiceNo"));
+    	map.put("method", "updateReceiptno");
+    	map.put("paymentId", invoiceMap.get("paymentId"));
+        map.put("ts", String.valueOf(System.currentTimeMillis()));
+        
+        HttpHelper.handlerSigUrlByMd5(map, emsKey);
+        logger.info("申请发票同步ems参数：{}",map);
+        String result = HttpUtil.httpPost(invoiceUrl, map);
+       
+        logger.info("申请发票同步ems返回报文：{},请求地址：{}", result,invoiceUrl);
+        EmsSubjectBody emsSubjectBody = JsonUtil.jsonToObject(result, EmsSubjectBody.class);
+
+        if (emsSubjectBody == null) {
+            throw new RuntimeException("向ems推送申请发票信息异常，流水号："+invoiceMap.get("paymentId"));
+        }
+        if (emsSubjectBody.getSuccess() == false) {
+            throw new RuntimeException("向ems推送申请发票信息返回失败，异常信息："+emsSubjectBody.getErrorMessage());
+        }
+    }
+   
+
+    private EmsClassBody requestClass(String pageNo, String startTime, String endTime) {
+        //组织参数
+        Map<String, String> param = new LinkedHashMap<>(6);
+        param.put("cid", emsAppId);
+        param.put("countPerPage", "100");
+        param.put("edate", endTime);
+        param.put("method", "search");
+        param.put("pageNo", pageNo);
+        param.put("sdate", startTime);
+        param.put("ts", String.valueOf(System.currentTimeMillis()));
+        //生成签名
+        HttpHelper.handlerSigUrlByMd5(param, emsKey);
+        //发送请求，得到结果
+        String result = HttpUtil.httpPost(classUrl, param);
+        EmsClassBody emsClassBody = JsonUtil.jsonToObject(result, EmsClassBody.class);
+        if (null == emsClassBody) {
+            BUS_LOG.error("同步班级信息异常", "");
+            return null;
+        }
+        if (emsClassBody.getSuccess() == false) {
+            BUS_LOG.error("同步班级信息异常:{}", emsClassBody.getErrorMessage());
+            return null;
+        }
+        return emsClassBody;
+    }
+
+
+    private Campus getCampusByCode(List<Campus> campuses, String code) {
+        if (CollectionUtils.isEmpty(campuses)) {
+
+            return new Campus();
+        }
+        for (Campus campus : campuses) {
+            if (campus.getSerialCode().equals(code)) {
+                return campus;
+            }
+        }
+        return new Campus();
+    }
+
+    private Subject getSubjectByCode(List<Subject> subjectList, String code) {
+        if (CollectionUtils.isEmpty(subjectList)) {
+            return new Subject();
+        }
+        for (Subject subject : subjectList) {
+            if (code.equals(subject.getCode())) {
+                return subject;
+            }
+        }
+        return new Subject();
+    }
+
+    private ClassType getClassTypeById(List<ClassType> classTypeList, String id) {
+        if (CollectionUtils.isEmpty(classTypeList)) {
+            return new ClassType();
+        }
+        for (ClassType classType : classTypeList) {
+            if (id.equals(classType.getId())) {
+                return classType;
+            }
+        }
+        return new ClassType();
+    }
+}

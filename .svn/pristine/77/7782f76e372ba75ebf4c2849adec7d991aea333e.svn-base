@@ -1,0 +1,318 @@
+package com.cz.enrol.entity;
+
+import javax.persistence.*;
+
+@Table(name = "enrol_class_student")
+public class ClassStudent {
+    /**
+     * 主键
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    /**
+     * 班级Id
+     */
+    @Column(name = "class_id")
+    private Long classId;
+
+    /**
+     * 学生Id
+     */
+    @Column(name = "student_id")
+    private Long studentId;
+
+    /**
+     * 排座时间
+     */
+    @Column(name = "seat_time")
+    private Long seatTime;
+    /**
+     * 合同的文档名
+     */
+    @Column(name = "contract_pdf_name")
+    private String contractPdfName;
+
+    /**
+     * 创建人
+     */
+    private String creator;
+
+    /**
+     * 创建时间
+     */
+    @Column(name = "create_time")
+    private Long createTime;
+
+    @Column(name = "status")
+    private Integer status;
+    
+    /**
+     * 合同状态，0、不允许签订，1、允许签订，2、已签订，3、合同废弃
+     */
+    @Column(name = "ontract_status")
+    private Integer contractStatus;
+    /**
+     * 合同存放url
+     */
+    @Column(name = "contract_url")
+    private String contractUrl;
+    
+    /**
+     * 合同签订个人ca证书id
+     */
+    @Column(name = "contract_sign_person_certid")
+    private String contractSignPersonCertid;
+    
+    /**
+     * 合同签订总公司ca证书id
+     */
+    @Column(name = "contract_sign_campus_certid1")
+    private String contractSignCampusCertid1;
+    
+    /**
+     * 合同签订分公司ca证书id
+     */
+    @Column(name = "contract_sign_campus_certid2")
+    private String contractSignCampusCertid2;
+    
+    /**
+     * 合同签订时间
+     */
+    @Column(name = "contract_sign_time")
+    private Long contractSignTime;
+    
+    /**
+     * 合同取消个人证书id
+     */
+    @Column(name = "contract_cancel_person_certid")
+    private String contractCancelPersonCertid;
+    
+    /**
+     * 合同取消总公司ca证书id
+     */
+    @Column(name = "contract_cancel_campus_certid1")
+    private String contractCancelCampusCertid1;
+    
+    /**
+     * 合同取消分公司ca证书id
+     */
+    @Column(name = "contract_cancel_campus_certid2")
+    private String contractCancelCampusCertid2;
+    
+    /**
+     * 合同取消时间
+     */
+    @Column(name = "contract_cancel_time")
+    private Long contractCancelTime;
+    
+    
+    
+
+    public Integer getContractStatus() {
+		return contractStatus;
+	}
+
+	public void setContractStatus(Integer contractStatus) {
+		this.contractStatus = contractStatus;
+	}
+
+	public String getContractUrl() {
+		return contractUrl;
+	}
+
+	public void setContractUrl(String contractUrl) {
+		this.contractUrl = contractUrl;
+	}
+
+	public String getContractSignPersonCertid() {
+		return contractSignPersonCertid;
+	}
+
+	public void setContractSignPersonCertid(String contractSignPersonCertid) {
+		this.contractSignPersonCertid = contractSignPersonCertid;
+	}
+
+	public String getContractSignCampusCertid1() {
+		return contractSignCampusCertid1;
+	}
+
+	public void setContractSignCampusCertid1(String contractSignCampusCertid1) {
+		this.contractSignCampusCertid1 = contractSignCampusCertid1;
+	}
+
+	public String getContractSignCampusCertid2() {
+		return contractSignCampusCertid2;
+	}
+
+	public void setContractSignCampusCertid2(String contractSignCampusCertid2) {
+		this.contractSignCampusCertid2 = contractSignCampusCertid2;
+	}
+
+	public Long getContractSignTime() {
+		return contractSignTime;
+	}
+
+	public void setContractSignTime(Long contractSignTime) {
+		this.contractSignTime = contractSignTime;
+	}
+
+	public String getContractCancelPersonCertid() {
+		return contractCancelPersonCertid;
+	}
+
+	public void setContractCancelPersonCertid(String contractCancelPersonCertid) {
+		this.contractCancelPersonCertid = contractCancelPersonCertid;
+	}
+
+	public String getContractCancelCampusCertid1() {
+		return contractCancelCampusCertid1;
+	}
+
+	public void setContractCancelCampusCertid1(String contractCancelCampusCertid1) {
+		this.contractCancelCampusCertid1 = contractCancelCampusCertid1;
+	}
+
+	public String getContractCancelCampusCertid2() {
+		return contractCancelCampusCertid2;
+	}
+
+	public void setContractCancelCampusCertid2(String contractCancelCampusCertid2) {
+		this.contractCancelCampusCertid2 = contractCancelCampusCertid2;
+	}
+
+	public Long getContractCancelTime() {
+		return contractCancelTime;
+	}
+
+	public void setContractCancelTime(Long contractCancelTime) {
+		this.contractCancelTime = contractCancelTime;
+	}
+
+	/**
+     * 获取主键
+     *
+     * @return id - 主键
+     */
+    public Long getId() {
+        return id;
+    }
+
+    /**
+     * 设置主键
+     *
+     * @param id 主键
+     */
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * 获取班级Id
+     *
+     * @return class_id - 班级Id
+     */
+    public Long getClassId() {
+        return classId;
+    }
+
+    /**
+     * 设置班级Id
+     *
+     * @param classId 班级Id
+     */
+    public void setClassId(Long classId) {
+        this.classId = classId;
+    }
+
+    /**
+     * 获取学生Id
+     *
+     * @return student_id - 学生Id
+     */
+    public Long getStudentId() {
+        return studentId;
+    }
+
+    /**
+     * 设置学生Id
+     *
+     * @param studentId 学生Id
+     */
+    public void setStudentId(Long studentId) {
+        this.studentId = studentId;
+    }
+
+    /**
+     * 获取排座时间
+     *
+     * @return seat_time - 排座时间
+     */
+    public Long getSeatTime() {
+        return seatTime;
+    }
+
+    /**
+     * 设置排座时间
+     *
+     * @param seatTime 排座时间
+     */
+    public void setSeatTime(Long seatTime) {
+        this.seatTime = seatTime;
+    }
+
+    
+    public String getContractPdfName() {
+		return contractPdfName;
+	}
+
+	public void setContractPdfName(String contractPdfName) {
+		this.contractPdfName = contractPdfName;
+	}
+
+	/**
+     * 获取创建人
+     *
+     * @return creator - 创建人
+     */
+    public String getCreator() {
+        return creator;
+    }
+
+    /**
+     * 设置创建人
+     *
+     * @param creator 创建人
+     */
+    public void setCreator(String creator) {
+        this.creator = creator;
+    }
+
+    /**
+     * 获取创建时间
+     *
+     * @return create_time - 创建时间
+     */
+    public Long getCreateTime() {
+        return createTime;
+    }
+
+    /**
+     * 设置创建时间
+     *
+     * @param createTime 创建时间
+     */
+    public void setCreateTime(Long createTime) {
+        this.createTime = createTime;
+    }
+
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+}

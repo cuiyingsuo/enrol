@@ -1,0 +1,241 @@
+package com.cz.enrol.utils;
+
+import okhttp3.*;
+
+import javax.net.ssl.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
+import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * @author liuzs
+ */
+public class HttpUtil {
+
+    private HttpUtil() {
+
+    }
+
+    private final static BusLogUtil LOGGER = new BusLogUtil(HttpUtil.class);
+ // 统一记录日志类
+  	private final static Logger logger = LoggerFactory.getLogger("enrol");
+
+    private static OkHttpClient okHttpClient;
+
+    static {
+
+        final int CONNECT_TIMEOUT = 30;
+        final int READ_TIMEOUT = 100;
+        final int WRITE_TIMEOUT = 60;
+
+        final TrustManager[] trustAllCerts = new TrustManager[]{
+                new X509TrustManager() {
+                    @Override
+                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                    }
+
+                    @Override
+                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                        return new java.security.cert.X509Certificate[]{};
+                    }
+                }
+        };
+        SSLContext sslContext;
+        SSLSocketFactory sslSocketFactory;
+        try {
+            sslContext = SSLContext.getInstance("SSL");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            sslSocketFactory = sslContext.getSocketFactory();
+            OkHttpClient.Builder builder = new OkHttpClient.Builder();
+            //设置各超时项
+            builder.connectTimeout(CONNECT_TIMEOUT, TimeUnit.SECONDS);
+            builder.readTimeout(READ_TIMEOUT, TimeUnit.SECONDS);
+            builder.writeTimeout(WRITE_TIMEOUT, TimeUnit.SECONDS);
+
+            builder.sslSocketFactory(sslSocketFactory);
+            builder.hostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+            HttpUtil.okHttpClient = builder.build();
+
+        } catch (NoSuchAlgorithmException e) {
+            LOGGER.error("初始化证书忽略ssl{}", e);
+        } catch (KeyManagementException e) {
+            LOGGER.error("初始化证书忽略ssl{}", e);
+        }
+
+    }
+
+    /**
+     * http get 有返回请求
+     *
+     * @param url
+     * @return
+     */
+    public static String httpGetownload(String url, String filePath, String fileName) {
+        Request request = new Request.Builder().url(url).build();
+        Call call = okHttpClient.newCall(request);
+        Response response = null;
+        try {
+            response = call.execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (200 != response.code()) {
+            throw new RuntimeException("okHttp调用远程服务异常，状态码：" + response.code());
+        }
+        File dir = new File(filePath);
+        if (!dir.exists() || !dir.isDirectory()) {
+            dir.mkdirs();
+        }
+        try (InputStream is = response.body().source().inputStream();
+             FileOutputStream fos = new FileOutputStream(new File(filePath + "/" + fileName))
+        ) {
+            //写入文件
+            int byteCount = 0;
+            byte[] bytes = new byte[1024];
+            while ((byteCount = is.read(bytes)) != -1) {
+                fos.write(bytes, 0, byteCount);
+            }
+        } catch (IOException e) {
+            LOGGER.error("okHttp 请求 异常:{}", e);
+        }
+        return filePath;
+    }
+
+
+    /**
+     * http get 有返回请求
+     *
+     * @param url
+     * @return
+     */
+    public static InputStream httpGet(String url) {
+        Request request = new Request.Builder().url(url).build();
+        Call call = okHttpClient.newCall(request);
+        return streamHandler(call);
+    }
+
+    /**
+     * post 处理一般格式的数据到目标服务器
+     *
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpPost(String url, Map<String, String> param) {
+
+        FormBody.Builder builder = new FormBody.Builder();
+        for (Map.Entry<String, String> entry : param.entrySet()) {
+            builder.add(entry.getKey(), entry.getValue());
+        }
+        RequestBody requestBodyPost = builder.build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBodyPost)
+                .build();
+        logger.info("request url:{}, param:{}", url, param);
+        Call call = okHttpClient.newCall(request);
+        String result = "";
+        return returnHandler(call, result);
+    }
+
+    /**
+     * post 处理一般格式的数据到目标服务器
+     *
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpPost(String url, Map<String, String> param, String encodeCharSet) {
+        FormBody.Builder builder = new FormBody.Builder();
+        for (Map.Entry<String, String> entry : param.entrySet()) {
+            try {
+                builder.add(entry.getKey(), URLEncoder.encode(entry.getValue(), encodeCharSet));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+        RequestBody requestBodyPost = builder.build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(requestBodyPost)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        String result = "";
+        return returnHandler(call, result);
+    }
+
+
+    /**
+     * post json格式的数据到目标服务器
+     *
+     * @param url
+     * @param param
+     * @return
+     */
+    public static String httpJsonPost(String url, Map<String, String> param) {
+
+        MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+        RequestBody body = RequestBody.create(JSON, JsonUtil.toJson(param));
+        Request request = new Request.Builder()
+                .url(url)
+                .post(body)
+                .build();
+        Call call = okHttpClient.newCall(request);
+        String result = "";
+        return returnHandler(call, result);
+    }
+
+
+    private static String returnHandler(Call call, String result) {
+        try {
+            Response response = call.execute();
+            if (200 != response.code()) {
+                throw new RuntimeException("okHttp调用远程服务异常，状态码：" + response.code());
+            }
+            result = response.body().string();
+            logger.info("请求返回：{}",result);
+        } catch (Exception e) {
+            logger.error("okHttp 请求 异常:{}", e);
+        } finally {
+            return result;
+        }
+    }
+
+    /**
+     * 返回字符流处理器
+     *
+     * @param call
+     * @return
+     */
+    private static InputStream streamHandler(Call call) {
+        InputStream result = null;
+        try {
+            Response response = call.execute();
+            if (200 != response.code()) {
+                throw new RuntimeException("okHttp调用远程服务异常，状态码：" + response.code());
+            }
+            result = response.body().source().inputStream();
+        } catch (IOException e) {
+            LOGGER.error("okHttp 请求 异常:{}", e);
+        } finally {
+            return result;
+        }
+    }
+
+}

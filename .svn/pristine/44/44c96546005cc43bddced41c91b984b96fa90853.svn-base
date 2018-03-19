@@ -1,0 +1,158 @@
+package com.cz.enrol.vo;
+
+import com.cz.enrol.entity.Goods;
+
+import java.util.Date;
+
+/**
+ * 商品扩展类
+ *
+ * @author liuzs
+ *         Created by liuzhongshuai on 2017/10/23.
+ */
+public class GoodsEx extends Goods {
+
+    /**
+     * 学科名称
+     */
+    private String subjectName;
+
+    /**
+     * 班级类型编码
+     */
+    private String calssTypeCode;
+
+    /**
+     * 班级类型名称
+     */
+    private String calssTypeName;
+
+    /**
+     * 授课模式编码
+     */
+    private String teachModeCode;
+
+    /**
+     * 授课模式名称
+     */
+    private String teachModeName;
+
+    /**
+     * 教授期数
+     */
+    private String periods;
+
+    /**
+     * 开班日期
+     */
+    private Date classStartDate;
+
+    /**
+     * 结束日期
+     */
+    private Date classEndDate;
+
+    /**
+     * 打折之后的价钱
+     */
+    private Long discountrice;
+
+    /**
+     * 计划招生数量
+     */
+    private int planStuNum;
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
+
+    public String getCalssTypeCode() {
+        return calssTypeCode;
+    }
+
+    public void setCalssTypeCode(String calssTypeCode) {
+        this.calssTypeCode = calssTypeCode;
+    }
+
+    public String getCalssTypeName() {
+        return calssTypeName;
+    }
+
+    public void setCalssTypeName(String calssTypeName) {
+        this.calssTypeName = calssTypeName;
+    }
+
+    public String getTeachModeCode() {
+        return teachModeCode;
+    }
+
+    public void setTeachModeCode(String teachModeCode) {
+        this.teachModeCode = teachModeCode;
+    }
+
+    public String getTeachModeName() {
+        return teachModeName;
+    }
+
+    public void setTeachModeName(String teachModeName) {
+        this.teachModeName = teachModeName;
+    }
+
+    public String getPeriods() {
+        return periods;
+    }
+
+    public void setPeriods(String periods) {
+        this.periods = periods;
+    }
+
+    public Date getClassStartDate() {
+        return classStartDate;
+    }
+
+    public void setClassStartDate(Date classStartDate) {
+        this.classStartDate = classStartDate;
+    }
+
+    public Date getClassEndDate() {
+        return classEndDate;
+    }
+
+    public void setClassEndDate(Date classEndDate) {
+        this.classEndDate = classEndDate;
+    }
+
+    public Long getDiscountrice() {
+        return discountrice;
+    }
+
+    public void setDiscountrice(Long discountrice) {
+        this.discountrice = discountrice;
+    }
+
+    public int getPlanStuNum() {
+        return planStuNum;
+    }
+
+    public void setPlanStuNum(int planStuNum) {
+        this.planStuNum = planStuNum;
+    }
+
+    public int getCurrentStuNum() {
+        return currentStuNum;
+    }
+
+    public void setCurrentStuNum(int currentStuNum) {
+        this.currentStuNum = currentStuNum;
+    }
+
+    /**
+     * 当前招生数量
+     */
+    private int currentStuNum;
+
+}

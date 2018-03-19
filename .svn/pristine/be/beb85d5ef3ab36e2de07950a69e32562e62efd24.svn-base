@@ -1,0 +1,43 @@
+package com.cz.enrol.dao.student;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.ClassStudent;
+import com.cz.enrol.entity.Student;
+import com.cz.enrol.vo.StuClassDetailVo;
+import com.cz.enrol.vo.StudentQueryEx;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * EnrolClassStudentMapper数据库操作接口类
+ **/
+public interface ClassStudentMapper extends BaseDao<ClassStudent> {
+
+
+    /**
+     * 待入学 学生查询
+     *
+     * @param studentQueryEx
+     * @return
+     */
+    List<Student> queryBeStartSchoolStus(StudentQueryEx studentQueryEx);
+
+    /**
+     * 查询待入学学生对应的班级信息
+     *
+     * @param studentId
+     * @return
+     */
+    List<Map> getBeSchoolForClass(Long studentId);
+
+    /**
+     * 查询学生班级详情
+     *
+     * @param map
+     * @return
+     */
+    List<StuClassDetailVo> stuClassDetail(Map<String, Long> map);
+
+
+}

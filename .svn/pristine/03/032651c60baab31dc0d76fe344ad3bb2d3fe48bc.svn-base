@@ -1,0 +1,8 @@
+package com.cz.enrol.dao.organize;
+
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.ClassType;
+
+public interface ClassTypeMapper extends BaseDao<ClassType> {
+}

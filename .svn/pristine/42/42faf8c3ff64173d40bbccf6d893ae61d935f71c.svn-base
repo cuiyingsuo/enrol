@@ -1,0 +1,24 @@
+package com.cz.enrol.dao.invoice;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolInvoice;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+
+
+/**
+ * EnrolInvoiceMapper数据库操作接口类
+ **/
+
+public interface EnrolInvoiceMapper extends BaseDao<EnrolInvoice> {
+
+
+ 
+
+    /**
+     * 根据订单号查询发票
+     */
+    List<EnrolInvoice> queryInvoiceByOrderNo(Long orderNo);
+
+}

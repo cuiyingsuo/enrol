@@ -1,0 +1,28 @@
+package com.cz.enrol.service;
+
+import org.mybatis.spring.SqlSessionTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.order.EnrolOrderFlowMapper;
+
+/**
+ * 
+ * 订单支付流水表/资金流水表 服务类
+ * 
+ **/
+@Service
+public class EnrolOrderFlowService {
+
+	// 统一记录日志类
+	private Logger Log = LoggerFactory.getLogger("enrol");
+	@Autowired
+	private SqlSessionTemplate session;
+
+	// 当前业务数据操作接口dao
+	@Autowired
+	private EnrolOrderFlowMapper orderFlowDao;
+
+}

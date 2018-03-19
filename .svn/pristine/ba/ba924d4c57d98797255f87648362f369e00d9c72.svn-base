@@ -1,0 +1,43 @@
+package com.cz.enrol.service;
+
+import java.util.List;
+
+import com.cz.enrol.common.BaseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cz.enrol.dao.invoice.InvoiceMapper;
+import com.cz.enrol.entity.Invoice;
+
+/**
+ * 发票表 服务类
+ **/
+@Service
+public class InvoiceService  extends BaseService<Invoice>{
+
+	@Autowired
+	private InvoiceMapper invoiceDao;
+
+	/**
+	 * 查询发票信息
+	 * 
+	 * @param id
+	 *            发票id
+	 * @return
+	 */
+	public Invoice selectByPrimaryKey(Long id) {
+		return invoiceDao.selectByPrimaryKey(id);
+	}
+
+	/**
+	 * 查询商品列表
+	 * 
+	 * @param orderNo
+	 *            订单id
+	 * @return
+	 */
+	public List<Invoice> queryInvoiceByOrderNo(Long orderNo) {
+		return invoiceDao.queryInvoiceByOrderNo(orderNo);
+	}
+
+}

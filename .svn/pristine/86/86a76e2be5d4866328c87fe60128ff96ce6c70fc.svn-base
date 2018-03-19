@@ -1,0 +1,127 @@
+package com.cz.enrol.service.plugIns;
+
+import com.timevale.esign.sdk.esignpro.bean.HttpConnectConfig;
+import com.timevale.esign.sdk.esignpro.bean.PositionBean;
+import com.timevale.esign.sdk.esignpro.bean.ProjectConfig;
+import com.timevale.esign.sdk.esignpro.bean.SignPDFFileBean;
+import com.timevale.esign.sdk.esignpro.bean.SignerAutoBean;
+import com.timevale.esign.sdk.esignpro.bean.result.AccountResult;
+import com.timevale.esign.sdk.esignpro.bean.result.CertResult;
+import com.timevale.esign.sdk.esignpro.bean.result.FileDigestSignResult;
+import com.timevale.esign.sdk.esignpro.bean.result.Result;
+import com.timevale.esign.sdk.esignpro.bean.result.SealResult;
+import com.timevale.esign.sdk.esignpro.constants.AccountType;
+import com.timevale.esign.sdk.esignpro.constants.HttpType;
+import com.timevale.esign.sdk.esignpro.constants.PosType;
+import com.timevale.esign.sdk.esignpro.constants.SealColorType;
+import com.timevale.esign.sdk.esignpro.constants.SealType;
+import com.timevale.esign.sdk.esignpro.outer.bean.PersonalOuterBean;
+import com.timevale.esign.sdk.esignpro.outer.bean.TemplateSealOuterBean;
+import com.timevale.esign.sdk.esignpro.outer.service.AccountService;
+import com.timevale.esign.sdk.esignpro.outer.service.BackSignService;
+import com.timevale.esign.sdk.esignpro.outer.service.CertService;
+import com.timevale.esign.sdk.esignpro.outer.service.SealService;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.AccountServiceFactory;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.BackSignServiceFactory;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.CertServiceFactory;
+import com.timevale.esign.sdk.esignpro.outer.service.factory.SealServiceFactory;
+import com.timevale.esign.sdk.esignpro.service.SDKService;
+import com.timevale.esign.sdk.esignpro.service.factory.SDKServiceFactory;
+
+/**
+ * Created by admin on 2017/9/18.
+ */
+public class ETest {
+	
+    public static void main(String[] args) {
+        //初始化项目
+        SDKService sdkService = SDKServiceFactory.instance();
+        ProjectConfig projectConfig = new ProjectConfig();
+        projectConfig.setProjectId("1000005");//项目projectid
+        projectConfig.setProjectSecret("86edd6e7a95b7d1035c2f02b39599e1d"); //项目projectsecret
+
+        HttpConnectConfig httpConnectConfig = new HttpConnectConfig();
+        httpConnectConfig.setServerIp("116.62.194.137");//天印签章服务IP地址
+        httpConnectConfig.setServerPort(8080);//天印签章服务端口
+        httpConnectConfig.setHttpType(HttpType.HTTP);
+        Result result = sdkService.init(projectConfig, httpConnectConfig);
+        System.out.println(result.getMsg());
+
+
+        //创建个人账户
+        AccountService accountService = AccountServiceFactory.instance();
+        PersonalOuterBean personalOuterBean = new PersonalOuterBean();
+        personalOuterBean.setName("杨辉");
+        personalOuterBean.setLicenseNumber("432423197307158479");
+//        personalOuterBean.setLicenseType(LicenseType.IDCard);
+        AccountResult accountResult = accountService.createAccount(personalOuterBean);//创建个人证书
+//        accountService.createAccount(organizeOuterBean)；//创建企业证书
+        String accountId = accountResult.getAccountId();
+        if(accountId == null) accountId = "83366d11-f8c7-4260-8668-67bdaf63944e";
+        
+
+        //创建证书并做关联
+        CertService certService = CertServiceFactory.instance();
+        CertResult certResult = certService.createCert(accountId, Boolean.TRUE);
+        String certId = certResult.getCertId();//证书id
+        if(certId == null) certId = "669145f3-ce75-4cf1-a8f4-a7b1bdbcaeab";
+        
+        //创建印章
+        SealService sealService = SealServiceFactory.instance();
+        TemplateSealOuterBean templateSealOuterBean = new TemplateSealOuterBean();
+        templateSealOuterBean.setSealName("杨辉");
+        templateSealOuterBean.setType(SealType.SEAL_PERSON);
+//        templateSealOuterBean.setTemplateType(TemplateType.SQUARE);
+//        templateSealOuterBean.setCentral(TemplateCentralType.STAR);
+//        templateSealOuterBean.setTemplateOfficialType(TemplateOfficialType.TEMPLATE_ROUND);
+//        templateSealOuterBean.gethText();
+//        templateSealOuterBean.setqText();
+        templateSealOuterBean.setColor(SealColorType.RED);
+        templateSealOuterBean.setType(SealType.SEAL_PERSON);
+        SealResult sealResult = sealService.createSeal(accountId,templateSealOuterBean, Boolean.TRUE);
+
+        //盖章操作
+        BackSignService backSignService = BackSignServiceFactory.instance();
+        SignerAutoBean signerAutoBean = new SignerAutoBean();
+        signerAutoBean.setAccountId(accountId);
+        signerAutoBean.setAccountType(AccountType.Person);
+        signerAutoBean.setCertId("0");
+        signerAutoBean.setSealId("0");
+        SignPDFFileBean signPDFFileBean = new SignPDFFileBean();
+        signPDFFileBean.setSrcPdfFile("D:\\tmp\\Document.pdf");
+        signPDFFileBean.setDstPdfFile("D:\\tmp\\test-my.pdf");
+        PositionBean positionBean = new PositionBean();
+        positionBean.setPosType(PosType.Multi);
+        positionBean.setPosPage("1");
+        positionBean.setPosX(200);
+        positionBean.setPosY(200);
+//        positionBean.setKey("");
+        FileDigestSignResult fileDigestSignResult = backSignService.pdfSign(signerAutoBean, signPDFFileBean, positionBean);
+        System.out.printf(fileDigestSignResult.getSignServiceId());
+
+        //企业内部盖章流程
+//        BackSignService backSignService = BackSignServiceFactory.instance();
+//        SignerAutoBean signerAutoBean = new SignerAutoBean();
+//        signerAutoBean.setAccountId("1340aa8c-ad5d-45c5-9fa1-d14e1aa3d468");
+//        signerAutoBean.setAccountType(AccountType.Department);
+////        signerAutoBean.
+//        SignPDFFileBean signPDFFileBean = new SignPDFFileBean();
+//        signPDFFileBean.setSrcPdfFile("D:\\test.pdf");
+//        signPDFFileBean.setDstPdfFile("D:\\test-my.pdf");
+//        PositionBean positionBean = new PositionBean();
+//        positionBean.setPosType(PosType.Single);
+//        positionBean.setPosPage("1");
+//        positionBean.setPosX(200);
+//        positionBean.setPosY(200);
+//        backSignService.pdfSign(signerAutoBean,signPDFFileBean,positionBean);
+    }
+}
+
+/*
+String accountId = accountResult.getAccountId();
+83366d11-f8c7-4260-8668-67bdaf63944e
+
+String accountId = accountResult.getAccountId();
+669145f3-ce75-4cf1-a8f4-a7b1bdbcaeab
+*/
+

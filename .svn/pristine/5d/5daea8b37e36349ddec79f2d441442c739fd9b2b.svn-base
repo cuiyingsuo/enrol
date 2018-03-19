@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.goods.GoodsMapper">
+
+	<!--实体映射 -->
+	<resultMap id="EnrolGoodsResultMapResultMap" type="com.cz.enrol.entity.Goods">
+		<!--主键 -->
+		<id property="id" column="主键" />
+		<!--商品编号 -->
+		<result property="goodsNo" column="goods_no" />
+		<!-- 商品名称 -->
+		<result property="name" column="name" />
+		<!--学科Id -->
+		<result property="subjectId" column="subject_id" />
+		<!--价格 -->
+		<result property="price" column="price" />
+		<!--状态（0：下架，1：上架） -->
+		<result property="status" column="status" />
+		<!--封面图片base64 -->
+<!-- 		<result property="coverImg" column="cover_img" /> -->
+		<!--简介 -->
+		<result property="synopsis" column="synopsis" />
+		<!--详情图片base64格式 -->
+<!-- 		<result property="detailImg" column="detail_img" /> -->
+		<!--商品详情 -->
+		<result property="detail" column="detail" />
+		<!--创建者 -->
+		<result property="creator" column="creator" />
+		<!--创建时间 -->
+		<result property="createTime" column="create_time" />
+		<!--编辑者 -->
+		<result property="editor" column="editor" />
+		<!--编辑时间 -->
+		<result property="editTime" column="edit_time" />
+		<!--是否支持全款支付，0否，1是；默认为1； -->
+		<result property="isFull" column="is_full" />
+		<!--是否支持分批付款，0否，1是；默认为1； -->
+		<result property="isBatch" column="is_batch" />
+		<!--最大分配付款批次数，默认为3次； -->
+		<result property="batchMax" column="batch_max" />
+		<!--是否支持贷款，0否，1是；默认位1； -->
+		<result property="isLoan" column="is_loan" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, goods_no,name, subject_id, price, status,
+		cover_img_url,
+		synopsis, detail_img_url, detail, creator, create_time, editor,
+		edit_time,
+		is_full, is_batch, batch_max, is_loan
+	</sql>
+
+	<!-- 根据商品（课程）id查询商品规格 -->
+	<select id="selectGoodsSpec" parameterType="java.lang.Long"
+		resultType="java.util.Map">
+		SELECT cla.teach_mode_code AS teachModeCode,
+		cla.teach_mode_name AS teachModeName,
+		cla.id AS classId,
+		cla.`name` AS
+		className,
+		cla.start_date AS classStartDate,
+		cla.class_time AS
+		classTime,
+		cla.campus_id AS campusId,
+		cam.`name` AS campusName,
+		cam.address AS campusAddress
+		FROM enrol_class cla LEFT JOIN
+		enrol_campus cam ON
+		cla.campus_id=cam.id
+		WHERE cla.`status`=1 AND
+		cam.`status`=1 AND cla.id
+		in (
+		SELECT class_id FROM enrol_goods_class
+		WHERE goods_id =#{goodsId}
+		);
+	</select>
+
+	<!-- 根据学科查询商品列表 -->
+	<select id="selectGoodsListBySubjectId" parameterType="java.lang.Long"
+		resultType="java.util.Map">
+		SELECT
+		goods.id,
+		goods.goods_no AS goodsNo,
+		goods.name,
+		goods.subject_id AS subjectId,
+		goods.price,
+		goods.status,
+		goods.synopsis,
+		goods.is_full AS isFull,
+		goods.is_batch AS isBatch,
+		goods.batch_max AS batchMax,
+		goods.is_loan AS isLoan,
+		goods.cover_img_url AS
+		coverImg,
+		goods.detail_img_url AS detailImg,
+		goods.detail,
+		SUM(cla.current)
+		AS currentNum,
+		goods.is_free AS isFree,
+		goods.is_other_expense AS isOtherExpense,
+		goods.other_expense AS otherExpense,
+		goods.other_expense_remark AS otherExpenseRemark
+
+		FROM enrol_goods goods,enrol_class cla,enrol_goods_class
+		gc
+
+		WHERE goods.subject_id=#{subjectId} AND gc.goods_id=goods.id AND
+		gc.class_id=cla.id AND goods.status=1
+		GROUP BY goods.id
+	</select>
+	
+	<!-- 根据商品id查询商品信息 -->
+	<select id="selectGoodsInfo" parameterType="java.lang.Long"
+		resultType="java.util.Map">
+		SELECT
+		goods.id,
+		goods.goods_no AS goodsNo,
+		goods.name,
+		goods.subject_id AS subjectId,
+		goods.price,
+		goods.status,
+		goods.synopsis,
+		goods.is_full AS isFull,
+		goods.is_batch AS isBatch,
+		goods.batch_max AS batchMax,
+		goods.is_loan AS isLoan,
+		goods.cover_img_url AS coverImg,
+		goods.detail_img_url AS detailImg,
+		goods.detail,
+		SUM(cla.current) AS currentNum
+
+		FROM enrol_goods goods,enrol_class cla,enrol_goods_class gc
+
+		WHERE goods.id=#{goodsId} AND gc.goods_id=goods.id AND gc.class_id=cla.id
+	</select>
+</mapper>

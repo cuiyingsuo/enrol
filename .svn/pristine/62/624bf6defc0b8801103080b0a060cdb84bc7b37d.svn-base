@@ -1,0 +1,23 @@
+package com.cz.enrol.dao.dict;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.EnrolDict;
+
+/**
+ * EnrolDictMapper数据库操作接口类
+ **/
+
+public interface EnrolDictMapper extends BaseDao<EnrolDict>{
+
+    /**
+     * 根据类型查询字典集合
+     *
+     * @param type
+     * @return
+     */
+    List<Map<String, String>> selectInfoByType(String type);
+
+}

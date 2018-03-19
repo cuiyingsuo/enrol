@@ -1,0 +1,29 @@
+package com.cz.enrol.dao.permission;
+
+import com.cz.enrol.common.BaseDao;
+import com.cz.enrol.entity.RolePermission;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 
+ * EnrolRolePermissionMapper数据库操作接口类
+ * 
+ **/
+
+public interface RolePermissionMapper extends BaseDao<RolePermission>{
+
+
+    /**
+     * 通过角色查询权限
+     * @param roleIds
+     * @return
+     */
+    List<Map<String,String>> queryPermissionByRole(@Param(value="roleIds") String roleIds);
+
+
+	
+
+}

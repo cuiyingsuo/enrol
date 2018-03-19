@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cz.enrol.dao.organize.EnrolCampusMapper">
+
+	<!--实体映射-->
+	<resultMap id="EnrolCampusResultMapResultMap" type="com.apicloud.server.entity.enrol.EnrolCampus">
+		<!--主键-->
+		<id property="id" column="主键" />
+		<!--校区名称-->
+		<result property="name" column="name" />
+		<!--校区地址-->
+		<result property="address" column="address" />
+		<!--校长名-->
+		<result property="owner" column="owner" />
+		<!--联系电话-->
+		<result property="telphone" column="telphone" />
+		<!--创建者-->
+		<result property="creator" column="creator" />
+		<!--创建时间-->
+		<result property="createTime" column="create_time" />
+		<!--编辑者-->
+		<result property="editor" column="editor" />
+		<!--编辑时间-->
+		<result property="editTime" column="edit_time" />
+		<!--校区介绍；-->
+		<result property="introduce" column="introduce" />
+		<!--校区邮箱；-->
+		<result property="email" column="email" />
+		<!--校区联系人；-->
+		<result property="contacts" column="contacts" />
+		<!--校区管理员，对应enrol_user表关键字Id；-->
+		<result property="managerId" column="manager_id" />
+		<!--备注；-->
+		<result property="memo" column="memo" />
+		<!--状态(0:停用,1:启用)-->
+		<result property="status" column="status" />
+	</resultMap>
+
+
+	<!-- 通用查询结果列-->
+	<sql id="Base_Column_List">
+		 id,	name,	address,	owner,	telphone,	creator,	create_time,	editor,	edit_time,	introduce,	email,	contacts,	manager_id,	memo,	status
+	</sql>
+
+	<!-- 查询（根据主键ID查询） -->
+	<select id="selectByPrimaryKey" resultType="com.apicloud.server.entity.enrol.EnrolCampus" parameterType="java.lang.Long">
+		 SELECT
+		 <include refid="Base_Column_List" />
+		 FROM enrol_campus
+		 WHERE id = #{id}
+	</select>
+
+	<!--删除：根据主键ID删除-->
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+		 DELETE FROM enrol_campus
+		 WHERE id = #{id}
+	</delete>
+
+	<!-- 添加 -->
+	<insert id="insert" parameterType="com.apicloud.server.entity.enrol.EnrolCampus">
+		 INSERT INTO enrol_campus
+ 		(id,name,address,owner,telphone,creator,create_time,editor,edit_time,introduce,email,contacts,manager_id,memo,status) 
+		 VALUES 
+ 		(#{id},#{name},#{address},#{owner},#{telphone},#{creator},#{createTime},#{editor},#{editTime},#{introduce},#{email},#{contacts},#{managerId},#{memo},#{status}) 
+	</insert>
+
+	<!-- 添加 （匹配有值的字段）-->
+	<insert id="insertSelective" parameterType="com.apicloud.server.entity.enrol.EnrolCampus">
+		 INSERT INTO enrol_campus
+		 <trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null">
+				 id,
+			</if>
+			<if test="name != null">
+				 name,
+			</if>
+			<if test="address != null">
+				 address,
+			</if>
+			<if test="owner != null">
+				 owner,
+			</if>
+			<if test="telphone != null">
+				 telphone,
+			</if>
+			<if test="creator != null">
+				 creator,
+			</if>
+			<if test="createTime != null">
+				 create_time,
+			</if>
+			<if test="editor != null">
+				 editor,
+			</if>
+			<if test="editTime != null">
+				 edit_time,
+			</if>
+			<if test="introduce != null">
+				 introduce,
+			</if>
+			<if test="email != null">
+				 email,
+			</if>
+			<if test="contacts != null">
+				 contacts,
+			</if>
+			<if test="managerId != null">
+				 manager_id,
+			</if>
+			<if test="memo != null">
+				 memo,
+			</if>
+			<if test="status != null">
+				 status,
+			</if>
+
+		 </trim>
+		 <trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id!=null">
+				 #{id},
+			</if>
+			<if test="name!=null">
+				 #{name},
+			</if>
+			<if test="address!=null">
+				 #{address},
+			</if>
+			<if test="owner!=null">
+				 #{owner},
+			</if>
+			<if test="telphone!=null">
+				 #{telphone},
+			</if>
+			<if test="creator!=null">
+				 #{creator},
+			</if>
+			<if test="createTime!=null">
+				 #{createTime},
+			</if>
+			<if test="editor!=null">
+				 #{editor},
+			</if>
+			<if test="editTime!=null">
+				 #{editTime},
+			</if>
+			<if test="introduce!=null">
+				 #{introduce},
+			</if>
+			<if test="email!=null">
+				 #{email},
+			</if>
+			<if test="contacts!=null">
+				 #{contacts},
+			</if>
+			<if test="managerId!=null">
+				 #{managerId},
+			</if>
+			<if test="memo!=null">
+				 #{memo},
+			</if>
+			<if test="status!=null">
+				 #{status},
+			</if>
+		 </trim>
+	</insert>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKeySelective" parameterType="com.apicloud.server.entity.enrol.EnrolCampus">
+		 UPDATE enrol_campus
+ 		 <set> 
+			<if test="name != null">
+				 name = #{name},
+			</if>
+			<if test="address != null">
+				 address = #{address},
+			</if>
+			<if test="owner != null">
+				 owner = #{owner},
+			</if>
+			<if test="telphone != null">
+				 telphone = #{telphone},
+			</if>
+			<if test="creator != null">
+				 creator = #{creator},
+			</if>
+			<if test="createTime != null">
+				 create_time = #{createTime},
+			</if>
+			<if test="editor != null">
+				 editor = #{editor},
+			</if>
+			<if test="editTime != null">
+				 edit_time = #{editTime},
+			</if>
+			<if test="introduce != null">
+				 introduce = #{introduce},
+			</if>
+			<if test="email != null">
+				 email = #{email},
+			</if>
+			<if test="contacts != null">
+				 contacts = #{contacts},
+			</if>
+			<if test="managerId != null">
+				 manager_id = #{managerId},
+			</if>
+			<if test="memo != null">
+				 memo = #{memo},
+			</if>
+			<if test="status != null">
+				 status = #{status},
+			</if>
+
+ 		 </set>
+		 WHERE id = #{id}
+	</update>
+
+	<!-- 修 改-->
+	<update id="updateByPrimaryKey" parameterType="com.apicloud.server.entity.enrol.EnrolCampus">
+		 UPDATE enrol_campus
+		 SET 
+			 name = #{name},
+			 address = #{address},
+			 owner = #{owner},
+			 telphone = #{telphone},
+			 creator = #{creator},
+			 create_time = #{createTime},
+			 editor = #{editor},
+			 edit_time = #{editTime},
+			 introduce = #{introduce},
+			 email = #{email},
+			 contacts = #{contacts},
+			 manager_id = #{managerId},
+			 memo = #{memo},
+			 status = #{status}
+		 WHERE id = #{id}
+	</update>
+
+</mapper>
